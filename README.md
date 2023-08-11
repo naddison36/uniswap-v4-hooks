@@ -15,20 +15,30 @@ cd uniswap-v4-hooks
 forge install
 ```
 
-## Testing
+## Unit Testing
 
 ```
 forge test
 ```
 
-### Local Development (Anvil)
+## Local Deployment
 
-Because v4 exceeds the bytecode limit of Ethereum and it's _business licensed_, we can only deploy & test hooks on a local node like [anvil](https://book.getfoundry.sh/anvil/).
+Because v4 exceeds the bytecode limit of Ethereum and it's _business licensed_, we can only deploy & test hooks on a local node like [Anvil](https://book.getfoundry.sh/anvil/).
+
+The following runs the Foundry script [script/Counter.s.sol](./script/Counter.s.sol) against the local Anvil node that:
+
+- deploys the Uniswap v4 PoolManager
+- deploys [Counter](./src/Counter.sol) hook.
+- adds the Counter hook to the PoolManager
+- add liquidity to the pool
+- does a swap
 
 ```bash
 # start anvil, with a larger code limit
 anvil --code-size-limit 30000
+```
 
+```bash
 # in a new terminal
 forge script script/Counter.s.sol \
     --rpc-url http://localhost:8545 \
@@ -51,6 +61,7 @@ forge script script/Counter.s.sol \
 ## Contracts Diagrams
 
 Contract dependencies
+
 ![Uniswap v4 Contract dependencies](./docs/uniswapContractsV4.png)
 
 ## Contribution
