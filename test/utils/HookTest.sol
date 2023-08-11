@@ -8,6 +8,7 @@ import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.s
 import {PoolModifyPositionTest} from "@uniswap/v4-core/contracts/test/PoolModifyPositionTest.sol";
 import {PoolSwapTest} from "@uniswap/v4-core/contracts/test/PoolSwapTest.sol";
 import {PoolDonateTest} from "@uniswap/v4-core/contracts/test/PoolDonateTest.sol";
+import {PoolKey} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 
 import {TestERC20} from "@uniswap/v4-core/contracts/test/TestERC20.sol";
 import {TickMath} from "@uniswap/v4-core/contracts/libraries/TickMath.sol";
@@ -67,7 +68,7 @@ contract HookTest is Test {
         }
     }
 
-    function swap(IPoolManager.PoolKey memory key, int256 amountSpecified, bool zeroForOne) internal {
+    function swap(PoolKey memory key, int256 amountSpecified, bool zeroForOne) internal {
         IPoolManager.SwapParams memory params = IPoolManager.SwapParams({
             zeroForOne: zeroForOne,
             amountSpecified: amountSpecified,

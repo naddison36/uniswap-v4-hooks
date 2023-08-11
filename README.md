@@ -1,10 +1,19 @@
-# v4-template
-### **A template for writing Uniswap v4 Hooks 🦄**
+# A Playground for Uniswap v4 Hooks
 
-[`Use this Template`](https://github.com/saucepoint/v4-template/generate)
+## Examples
 
 1. The example hook [Counter.sol](src/Counter.sol) demonstrates the `beforeSwap()` and `afterSwap()` hooks
 2. The test template [Counter.t.sol](test/Counter.t.sol) preconfigures the v4 pool manager, test tokens, and test liquidity.
+
+## Install
+
+*requires [foundry](https://book.getfoundry.sh)*
+
+```
+git clone git@github.com:naddison36/uniswap-v4-hooks.git
+cd uniswap-v4-hooks
+forge install
+```
 
 ---
 
@@ -13,11 +22,11 @@
 *requires [foundry](https://book.getfoundry.sh)*
 
 ```
-forge install
+forge build
 forge test
 ```
 
-Because v4 exceeds the bytecode limit of Ethereum and it's *business licensed*, we can only deploy & test hooks on [anvil](https://book.getfoundry.sh/anvil/).
+Because v4 exceeds the bytecode limit of Ethereum and it's *business licensed*, we can only deploy & test hooks on a local node like [anvil](https://book.getfoundry.sh/anvil/).
 
 ```bash
 # start anvil, with a larger code limit
