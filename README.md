@@ -7,7 +7,7 @@
 
 ## Install
 
-*requires [foundry](https://book.getfoundry.sh)*
+This project uses [Foundry](https://book.getfoundry.sh) to manage dependencies, compile contracts, test contracts and run a local node. See Foundry [installation](https://book.getfoundry.sh/getting-started/installation) for instructions on how to install Foundry which includes `forge` and `anvil`.
 
 ```
 git clone git@github.com:naddison36/uniswap-v4-hooks.git
@@ -15,18 +15,15 @@ cd uniswap-v4-hooks
 forge install
 ```
 
----
-
-### Local Development (Anvil)
-
-*requires [foundry](https://book.getfoundry.sh)*
+## Testing
 
 ```
-forge build
 forge test
 ```
 
-Because v4 exceeds the bytecode limit of Ethereum and it's *business licensed*, we can only deploy & test hooks on a local node like [anvil](https://book.getfoundry.sh/anvil/).
+### Local Development (Anvil)
+
+Because v4 exceeds the bytecode limit of Ethereum and it's _business licensed_, we can only deploy & test hooks on a local node like [anvil](https://book.getfoundry.sh/anvil/).
 
 ```bash
 # start anvil, with a larger code limit
@@ -40,11 +37,29 @@ forge script script/Counter.s.sol \
     --broadcast
 ```
 
----
+## Uniswap v4 Feature Summary
 
-Additional resources:
+- Lifecycle Hooks: initialize, position, swap and donate
+- Hook managed fees
+  - swap and/or withdraw
+  - static or dynamic
+- Swap and withdraw protocol fees
+- ERC-1155 accounting of multiple tokens
+- Native ETH pools like V1
+- Donate liquidity to pools
 
-[v4-periphery](https://github.com/uniswap/v4-periphery) contains advanced hook implementations that serve as a great reference
+## Contracts Diagrams
 
-[v4-core](https://github.com/uniswap/v4-core)
+Contract dependencies
+![Uniswap v4 Contract dependencies](./docs/uniswapContractsV4.png)
 
+## Contribution
+
+This repository was created from this GitHub project template https://github.com/saucepoint/v4-template
+
+## Additional resources:
+
+- [Uniswap v4 Core](https://github.com/Uniswap/v4-core/blob/main/whitepaper-v4-draft.pdf) whitepaper
+- Uniswap [v4-core](https://github.com/uniswap/v4-core) repository
+- Uniswap [v4-periphery](https://github.com/uniswap/v4-periphery) repository contains advanced hook implementations that serve as a great reference.
+- A curated list of [Uniswap v4 hooks](https://github.com/fewwwww/awesome-uniswap-hooks#awesome-uniswap-v4-hooks)
