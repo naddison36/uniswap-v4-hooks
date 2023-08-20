@@ -1,9 +1,10 @@
 # A Playground for Uniswap v4 Hooks
 
-## Examples
+## Counter Example
 
-1. The example hook [Counter.sol](src/Counter.sol) demonstrates the `beforeSwap()` and `afterSwap()` hooks
-2. The test template [Counter.t.sol](test/Counter.t.sol) preconfigures the v4 pool manager, test tokens, and test liquidity.
+1. The [CounterHook](src/CounterHook.sol) demonstrates the `beforeSwap` and `afterSwap` hooks.
+2. The [Counter.t](test/Counter.t.sol) test deploys the v4 pool manager, test tokens, counter hook and test routers. It then sets up a pool and performs a swap.
+3. The [Counter.s](script/Counter.s.sol) script deploys to a local Anvil node and does a swap.
 
 ## Install
 
@@ -49,11 +50,9 @@ forge script script/Counter.s.sol \
 
 WARNING The above private key for account 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 is only used for Foundry testing. Do not use this known account on mainnet.
 
-```
-export FACTORY=0x610178da211fef7d417bc0e6fed39f05609ad788
-cast call $FACTORY "TargetPrefix()(address)" --rpc-url http://localhost:8545
-
-export COUNTER=0x0c5495e7b5B50732B9CbEFDf09Fa70C64183EC2a
+```bash
+# Get the counter values from the CounterHook
+export COUNTER=0x0c2a3e14b14e9D70FBdc7C9185F4cAC3BbF0e1c1
 cast call $COUNTER "beforeSwapCounter()(uint256)" --rpc-url http://localhost:8545
 cast call $COUNTER "afterSwapCounter()(uint256)" --rpc-url http://localhost:8545
 ```
