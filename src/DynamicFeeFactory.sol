@@ -5,11 +5,9 @@ import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.s
 import {Hooks} from "@uniswap/v4-core/contracts/libraries/Hooks.sol";
 
 import {BaseFactory} from "./BaseFactory.sol";
-import {MyHook} from "./MyHook.sol";
+import {DynamicFeeHook} from "./DynamicFeeHook.sol";
 
-// import {console} from "forge-std/console.sol";
-
-contract MyHookFactory is BaseFactory {
+contract DynamicFeeFactory is BaseFactory {
     constructor()
         BaseFactory(
             address(
@@ -22,6 +20,6 @@ contract MyHookFactory is BaseFactory {
     {}
 
     function _hashBytecode(IPoolManager poolManager) internal pure override returns (bytes32 bytecodeHash) {
-        bytecodeHash = keccak256(abi.encodePacked(type(MyHook).creationCode, abi.encode(poolManager)));
+        bytecodeHash = keccak256(abi.encodePacked(type(DynamicFeeHook).creationCode, abi.encode(poolManager)));
     }
 }

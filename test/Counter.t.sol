@@ -28,7 +28,7 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
         // Deploy the CounterHook factory
         CounterFactory counterFactory = new CounterFactory();
         // Use the factory to create a new CounterHook contract
-        counterHook = counterFactory.mineDeploy(manager);
+        counterHook = CounterHook(counterFactory.mineDeploy(manager));
 
         // Create the pool
         poolKey = PoolKey(Currency.wrap(address(token0)), Currency.wrap(address(token1)), 3000, 60, IHooks(counterHook));

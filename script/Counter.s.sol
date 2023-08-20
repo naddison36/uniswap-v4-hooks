@@ -19,7 +19,6 @@ import {CounterHook, CounterFactory} from "../src/CounterFactory.sol";
 
 /// @notice Forge script for deploying v4 & hooks to **anvil**
 /// @dev This script only works on an anvil RPC because v4 exceeds bytecode limits
-/// @dev and we also need vm.etch() to deploy the hook to the proper address
 contract CounterScript is Script {
     using PoolIdLibrary for PoolKey;
     using CurrencyLibrary for Currency;
@@ -59,7 +58,7 @@ contract CounterScript is Script {
         // the PoolManager address will be 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
         // The first salt from 0 to get the required address perfix is 436
         // so starting from that to not burn up too much gas
-        IHooks hook = counterFactory.mineDeploy(poolManager, 436);
+        IHooks hook = IHooks(counterFactory.mineDeploy(poolManager, 436));
         console.log("counter hook %s", address(hook));
 
         // Derive the key and id for the new pool
