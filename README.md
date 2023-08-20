@@ -41,6 +41,8 @@ forge test
 2. The [Counter.t](test/Counter.t.sol) test deploys the v4 pool manager, test tokens, counter hook and test routers. It then sets up a pool and performs a swap.
 3. The [Counter.s](script/Counter.s.sol) script deploys to a local Anvil node and does a swap.
 
+![CounterHook Contract](./docs/CounterHook.svg)
+
 ### Local Testing
 
 Because v4 exceeds the bytecode limit of Ethereum and it's _business licensed_, we can only deploy & test hooks on a local node like [Anvil](https://book.getfoundry.sh/anvil/).
