@@ -19,9 +19,7 @@ abstract contract BaseFactory {
         TargetPrefix = _targetPrefix;
     }
 
-    function deploy(IPoolManager poolManager, bytes32 salt) public returns (address) {
-        return address(new CounterHook{salt: salt}(poolManager));
-    }
+    function deploy(IPoolManager poolManager, bytes32 salt) public virtual returns (address);
 
     function mineDeploy(IPoolManager poolManager, uint256 startSalt) public returns (address) {
         uint256 endSalt = uint256(startSalt) + 1000;

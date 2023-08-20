@@ -19,6 +19,10 @@ contract CounterFactory is BaseFactory {
         )
     {}
 
+    function deploy(IPoolManager poolManager, bytes32 salt) public override returns (address) {
+        return address(new CounterHook{salt: salt}(poolManager));
+    }
+
     function _hashBytecode(IPoolManager poolManager) internal pure override returns (bytes32 bytecodeHash) {
         bytecodeHash = keccak256(abi.encodePacked(type(CounterHook).creationCode, abi.encode(poolManager)));
     }

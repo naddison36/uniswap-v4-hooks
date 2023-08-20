@@ -19,6 +19,10 @@ contract DynamicFeeFactory is BaseFactory {
         )
     {}
 
+    function deploy(IPoolManager poolManager, bytes32 salt) public override returns (address) {
+        return address(new DynamicFeeHook{salt: salt}(poolManager));
+    }
+
     function _hashBytecode(IPoolManager poolManager) internal pure override returns (bytes32 bytecodeHash) {
         bytecodeHash = keccak256(abi.encodePacked(type(DynamicFeeHook).creationCode, abi.encode(poolManager)));
     }
