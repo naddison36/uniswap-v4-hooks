@@ -11,17 +11,13 @@ import {PoolKey, PoolId, PoolIdLibrary} from "@uniswap/v4-core/contracts/types/P
 import {Deployers} from "@uniswap/v4-core/test/foundry-tests/utils/Deployers.sol";
 import {CurrencyLibrary, Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
 import {HookTest} from "./utils/HookTest.sol";
-import {Counter} from "../src/Counter.sol";
-import {CounterImplementation} from "./implementation/CounterImplementation.sol";
+import {CounterHook, CounterFactory} from "../src/CounterFactory.sol";
 
 contract CounterTest is HookTest, Deployers, GasSnapshot {
     using PoolIdLibrary for PoolKey;
     using CurrencyLibrary for Currency;
 
-    Counter counter =
-        Counter(
-            address(uint160(Hooks.BEFORE_SWAP_FLAG | Hooks.AFTER_SWAP_FLAG))
-        );
+    CounterHook counterHook;
     PoolKey poolKey;
     PoolId poolId;
 
@@ -29,47 +25,27 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
         // creates the pool manager, test tokens, and other utility routers
         HookTest.initHookTestEnv();
 
-        // testing environment requires our contract to override `validateHookAddress`
-        // well do that via the Implementation contract to avoid deploying the override with the production contract
-        CounterImplementation impl = new CounterImplementation(
-            manager,
-            counter
-        );
-        etchHook(address(impl), address(counter));
+        // Deploy the CounterHook factory
+        CounterFactory counterFactory = new CounterFactory();
+        // Use the factory to create a new CounterHook contract
+        counterHook = counterFactory.deploy(manager);
 
         // Create the pool
-        poolKey = PoolKey(
-            Currency.wrap(address(token0)),
-            Currency.wrap(address(token1)),
-            3000,
-            60,
-            IHooks(counter)
-        );
+        poolKey = PoolKey(Currency.wrap(address(token0)), Currency.wrap(address(token1)), 3000, 60, IHooks(counterHook));
         poolId = poolKey.toId();
         manager.initialize(poolKey, SQRT_RATIO_1_1);
 
         // Provide liquidity to the pool
+        modifyPositionRouter.modifyPosition(poolKey, IPoolManager.ModifyPositionParams(-60, 60, 10 ether));
+        modifyPositionRouter.modifyPosition(poolKey, IPoolManager.ModifyPositionParams(-120, 120, 10 ether));
         modifyPositionRouter.modifyPosition(
-            poolKey,
-            IPoolManager.ModifyPositionParams(-60, 60, 10 ether)
-        );
-        modifyPositionRouter.modifyPosition(
-            poolKey,
-            IPoolManager.ModifyPositionParams(-120, 120, 10 ether)
-        );
-        modifyPositionRouter.modifyPosition(
-            poolKey,
-            IPoolManager.ModifyPositionParams(
-                TickMath.minUsableTick(60),
-                TickMath.maxUsableTick(60),
-                10 ether
-            )
+            poolKey, IPoolManager.ModifyPositionParams(TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 10 ether)
         );
     }
 
     function testCounterHooks() public {
-        assertEq(counter.beforeSwapCount(), 0);
-        assertEq(counter.afterSwapCount(), 0);
+        assertEq(counterHook.beforeSwapCount(), 0);
+        assertEq(counterHook.afterSwapCount(), 0);
 
         // Perform a test swap //
         int256 amount = 100;
@@ -77,7 +53,7 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
         swap(poolKey, amount, zeroForOne);
         // ------------------- //
 
-        assertEq(counter.beforeSwapCount(), 1);
-        assertEq(counter.afterSwapCount(), 1);
+        assertEq(counterHook.beforeSwapCount(), 1);
+        assertEq(counterHook.afterSwapCount(), 1);
     }
 }

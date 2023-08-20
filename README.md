@@ -47,6 +47,12 @@ forge script script/Counter.s.sol \
     --broadcast
 ```
 
+```
+export COUNTER=0xe7f1725e7734ce288f8367e1bb143e90bb3f0512
+cast call $COUNTER "beforeSwapCount()(uint256)" --rpc-url http://localhost:8545
+cast call $COUNTER "afterSwapCount()(uint256)" --rpc-url http://localhost:8545
+```
+
 ## Uniswap v4 Feature Summary
 
 - Lifecycle Hooks: initialize, position, swap and donate
@@ -66,7 +72,7 @@ Contract dependencies
 
 ## Contribution
 
-This repository was created from this GitHub project template https://github.com/saucepoint/v4-template
+This repository was created from this GitHub project template https://github.com/saucepoint/v4-template. Thanks [@saucepoint](https://twitter.com/saucepoint) for an excellent starting point.
 
 ## Additional resources:
 
@@ -74,3 +80,6 @@ This repository was created from this GitHub project template https://github.com
 - Uniswap [v4-core](https://github.com/uniswap/v4-core) repository
 - Uniswap [v4-periphery](https://github.com/uniswap/v4-periphery) repository contains advanced hook implementations that serve as a great reference.
 - A curated list of [Uniswap v4 hooks](https://github.com/fewwwww/awesome-uniswap-hooks#awesome-uniswap-v4-hooks)
+- [Uniswap v4 Hooks: Create a fully on-chain "take-profit" orders hook on Uniswap v4](https://learnweb3.io/lessons/uniswap-v4-hooks-create-a-fully-on-chain-take-profit-orders-hook-on-uniswap-v4/)
+- [SharkTeam's Best Security Practices for UniswapV4 Hooks](https://twitter.com/sharkteamorg/status/1686673161650417664)
+- [Research - What bad hooks look like](https://uniswap.notion.site/Research-What-bad-hooks-look-like-b10256c445904111914eb3b01fb4ec53)

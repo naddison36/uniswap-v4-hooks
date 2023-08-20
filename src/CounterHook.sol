@@ -8,7 +8,7 @@ import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.s
 import {PoolKey, PoolId, PoolIdLibrary} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 import {BalanceDelta} from "@uniswap/v4-core/contracts/types/BalanceDelta.sol";
 
-contract Counter is BaseHook {
+contract CounterHook is BaseHook {
     using PoolIdLibrary for PoolKey;
 
     uint256 public beforeSwapCount;
