@@ -85,6 +85,8 @@ Summary of the modify position calls
 Summary of the swap calls
 ![Counter Swap Summary](./docs/counterSwapSummary.svg)
 
+See [here](./docs/README.md#counter-hook) for more detailed transaction traces with call parameters and events.
+
 ## Contribution
 
 This repository was created from this GitHub project template https://github.com/saucepoint/v4-template. Thanks [@saucepoint](https://twitter.com/saucepoint) for an excellent starting point. This repo has significantly evolved from the starting template.
