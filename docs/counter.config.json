@@ -160,7 +160,7 @@
       }
     ]
   },
-  "0x0c2a3e14b14e9D70FBdc7C9185F4cAC3BbF0e1c1": {
+  "0x3CD91b522f2a6CB67F378d7fBee767602d5140bB": {
     "contractName": "CounterHook",
     "abi": [
       {
@@ -220,7 +220,33 @@
             "type": "uint256"
           }
         ],
+        "name": "AfterModify",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "counter",
+            "type": "uint256"
+          }
+        ],
         "name": "AfterSwap",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "counter",
+            "type": "uint256"
+          }
+        ],
+        "name": "BeforeModify",
         "type": "event"
       },
       {
@@ -356,6 +382,19 @@
           }
         ],
         "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "afterModifyCounter",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
         "type": "function"
       },
       {
@@ -642,6 +681,19 @@
           }
         ],
         "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "beforeModifyCounter",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
         "type": "function"
       },
       {

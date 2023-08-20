@@ -57,9 +57,9 @@ contract CounterScript is Script {
         // Deploy has to mine a salt to match the Uniswap hook flags so can use a lot of gas
         // If Counter.s.sol script is executed against a new Anvil node,
         // the PoolManager address will be 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
-        // The first salt from 0 to get the before and after swap flags is 745
+        // The first salt from 0 to get the require address perfix is 436
         // so starting from that to not burn up too much gas
-        IHooks hook = counterFactory.mineDeploy(poolManager, 745);
+        IHooks hook = counterFactory.mineDeploy(poolManager, 436);
         console.log("counter hook %s", address(hook));
 
         // Derive the key and id for the new pool

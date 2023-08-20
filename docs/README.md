@@ -18,18 +18,18 @@ sol2uml class ../src,../lib -b CounterHook
 tx2uml --nodeType anvil --configFile counter.config.json -t -l -g -v 0x9cf249890694687e28f66952c3a0469e9150dc788c2a4983ba7e373433270c44,0xc1756dfb5669fe320edb26f99150f836448b07aed75b453604fe3af20ba97e72,0x02ff4b04a82193eba7247358a09a1d0630159a0e54d946d1d45a10dff6ce3388 -o counterSetup
 ``` -->
 
-### Add Liquidity
+### Modify Liquidity
 
-![Counter Add Summary](./counterAddSummary.svg)
-
-```
-tx2uml --nodeType anvil --configFile counter.config.json -p -l -g -t -v 0x801443fb37b2b6a6acb7a3c1a7d0d0744c237f2bb69defe06319d1ac286d6fe2 -o counterAddSummary
-```
-
-![Counter Add Detailed](./counterAddDetailed.svg)
+![Counter Modify Summary](./counterModifySummary.svg)
 
 ```
-tx2uml --nodeType anvil --configFile counter.config.json -g -t -v 0x801443fb37b2b6a6acb7a3c1a7d0d0744c237f2bb69defe06319d1ac286d6fe2 -o counterAddDetailed
+tx2uml --nodeType anvil --configFile counter.config.json -p -l -g -t -v 0x9b115c369b25d6ec3a0496ac1b851de7446d08d69e47361cf096912328a85730 -o counterModifySummary
+```
+
+![Counter Modify Detailed](./counterModifyDetailed.svg)
+
+```
+tx2uml --nodeType anvil --configFile counter.config.json -g -t -v 0x9b115c369b25d6ec3a0496ac1b851de7446d08d69e47361cf096912328a85730 -o counterModifyDetailed
 ```
 
 ### Swap
@@ -37,11 +37,11 @@ tx2uml --nodeType anvil --configFile counter.config.json -g -t -v 0x801443fb37b2
 ![Counter Swap Summary](./counterSwapSummary.svg)
 
 ```
-tx2uml --nodeType anvil --configFile counter.config.json -p -l -g -t -v 0xdf85e1e3bc524858d3fdf7288efc8d5f5cdb68ea442d5e3c5a3c562c04a20a57 -o counterSwapSummary
+tx2uml --nodeType anvil --configFile counter.config.json -p -l -g -t -v 0x3b1c9480838e66bb5b49ee814ef6bed474244ad69b452a03d04452f803cd560c -o counterSwapSummary
 ```
 
 ![Counter Swap Detailed](./counterSwapDetailed.svg)
 
 ```
-tx2uml --nodeType anvil --configFile counter.config.json -g -t -v 0xdf85e1e3bc524858d3fdf7288efc8d5f5cdb68ea442d5e3c5a3c562c04a20a57 -o counterSwapDetailed
+tx2uml --nodeType anvil --configFile counter.config.json -g -t -v 0x3b1c9480838e66bb5b49ee814ef6bed474244ad69b452a03d04452f803cd560c -o counterSwapDetailed
 ```

@@ -29,16 +29,16 @@ forge install
 
 ## Unit Testing
 
-The following will run the unit tests in [test/Counter.t](./test/Counter.t.sol).
+The following will run the unit tests in [test/Counter.t](./test/Counter.t.sol)
 
 ```
 forge test
 ```
 
-## Counter Example
+## Counter Hook Example
 
-1. The [CounterHook](src/CounterHook.sol) demonstrates the `beforeSwap` and `afterSwap` hooks.
-2. The [Counter.t](test/Counter.t.sol) test deploys the v4 pool manager, test tokens, counter hook and test routers. It then sets up a pool and performs a swap.
+1. The [CounterHook](src/CounterHook.sol) demonstrates the `beforeModifyPosition`, `afterModifyPosition`, `beforeSwap` and `afterSwap` hooks.
+2. The [Counter.t](test/Counter.t.sol) test deploys the v4 pool manager, test tokens, counter hook and test routers. It then sets up a pool, adds token liquidity and performs a swap.
 3. The [Counter.s](script/Counter.s.sol) script deploys to a local Anvil node and does a swap.
 
 ![CounterHook Contract](./docs/CounterHook.svg)
@@ -74,10 +74,13 @@ WARNING The above private key for account 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb9
 
 ```bash
 # Get the counter values from the CounterHook
-export COUNTER=0x0c2a3e14b14e9D70FBdc7C9185F4cAC3BbF0e1c1
+export COUNTER=0x3CD91b522f2a6CB67F378d7fBee767602d5140bB
 cast call $COUNTER "beforeSwapCounter()(uint256)" --rpc-url http://localhost:8545
 cast call $COUNTER "afterSwapCounter()(uint256)" --rpc-url http://localhost:8545
 ```
+
+Summary of the modify position calls
+![Counter Modify Summary](./docs/counterModifySummary.svg)
 
 Summary of the swap calls
 ![Counter Swap Summary](./docs/counterSwapSummary.svg)
