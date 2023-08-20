@@ -87,6 +87,25 @@ Summary of the swap calls
 
 See [here](./docs/README.md#counter-hook) for more detailed transaction traces with call parameters and events.
 
+## My Hook
+
+1. The [MyHook](src/MyHook.sol) contract has empty `beforeModifyPosition`, `afterModifyPosition`, `beforeSwap` and `afterSwap` hooks that can be implemented.
+2. The [MyHook.s](script/MyHook.s.sol) script deploys to a local Anvil node and does a swap.
+
+```bash
+# start anvil with a larger code limit
+anvil --code-size-limit 30000
+```
+
+```bash
+# in a new terminal, run the Forge script
+forge script script/MyHook.s.sol \
+    --rpc-url http://localhost:8545 \
+    --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
+    --code-size-limit 30000 \
+    --broadcast
+```
+
 ## Contribution
 
 This repository was created from this GitHub project template https://github.com/saucepoint/v4-template. Thanks [@saucepoint](https://twitter.com/saucepoint) for an excellent starting point. This repo has significantly evolved from the starting template.

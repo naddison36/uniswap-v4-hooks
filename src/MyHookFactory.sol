@@ -4,11 +4,11 @@ pragma solidity ^0.8.15;
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
 import {Hooks} from "@uniswap/v4-core/contracts/libraries/Hooks.sol";
 
-import {CounterHook} from "./CounterHook.sol";
+import {MyHook} from "./MyHook.sol";
 
 // import {console} from "forge-std/console.sol";
 
-contract CounterFactory {
+contract MyHookFactory {
     uint160 public constant UNISWAP_FLAG_MASK = 0xff << 152;
 
     // Uniswap hook contracts must have specific flags encoded in the first byte of their address
@@ -19,11 +19,11 @@ contract CounterFactory {
         )
     );
 
-    function deploy(IPoolManager poolManager, bytes32 salt) public returns (CounterHook) {
-        return new CounterHook{salt: salt}(poolManager);
+    function deploy(IPoolManager poolManager, bytes32 salt) public returns (MyHook) {
+        return new MyHook{salt: salt}(poolManager);
     }
 
-    function mineDeploy(IPoolManager poolManager, uint256 startSalt) public returns (CounterHook) {
+    function mineDeploy(IPoolManager poolManager, uint256 startSalt) public returns (MyHook) {
         uint256 endSalt = uint256(startSalt) + 1000;
         for (uint256 i = startSalt; i < endSalt; ++i) {
             bytes32 salt = bytes32(i);
@@ -37,12 +37,12 @@ contract CounterFactory {
         }
     }
 
-    function mineDeploy(IPoolManager poolManager) external returns (CounterHook) {
+    function mineDeploy(IPoolManager poolManager) external returns (MyHook) {
         return mineDeploy(poolManager, 0);
     }
 
     function computeHookAddress(IPoolManager poolManager, bytes32 salt) public view returns (address) {
-        bytes32 bytecodeHash = keccak256(abi.encodePacked(type(CounterHook).creationCode, abi.encode(poolManager)));
+        bytes32 bytecodeHash = keccak256(abi.encodePacked(type(MyHook).creationCode, abi.encode(poolManager)));
         bytes32 hash = keccak256(abi.encodePacked(bytes1(0xff), address(this), salt, bytecodeHash));
         return address(uint160(uint256(hash)));
     }

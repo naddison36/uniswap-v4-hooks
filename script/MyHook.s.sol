@@ -15,12 +15,12 @@ import {PoolSwapTest} from "@uniswap/v4-core/contracts/test/PoolSwapTest.sol";
 import {PoolDonateTest} from "@uniswap/v4-core/contracts/test/PoolDonateTest.sol";
 import {TestERC20} from "@uniswap/v4-core/contracts/test/TestERC20.sol";
 
-import {CounterHook, CounterFactory} from "../src/CounterFactory.sol";
+import {MyHook, MyHookFactory} from "../src/MyHookFactory.sol";
 
 /// @notice Forge script for deploying v4 & hooks to **anvil**
 /// @dev This script only works on an anvil RPC because v4 exceeds bytecode limits
 /// @dev and we also need vm.etch() to deploy the hook to the proper address
-contract CounterScript is Script {
+contract MyHookScript is Script {
     using PoolIdLibrary for PoolKey;
     using CurrencyLibrary for Currency;
 
@@ -52,14 +52,12 @@ contract CounterScript is Script {
         deployTestHelpers(approvalAmount);
 
         // Deploy the hook
-        CounterFactory counterFactory = new CounterFactory();
+        MyHookFactory factory = new MyHookFactory();
 
-        // Deploy has to mine a salt to match the Uniswap hook flags so can use a lot of gas
-        // If Counter.s.sol script is executed against a new Anvil node,
-        // the PoolManager address will be 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
-        // The first salt from 0 to get the required address perfix is 436
+        // If the PoolManager address is 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+        // The first salt from 0 to get the required address perfix is 45
         // so starting from that to not burn up too much gas
-        IHooks hook = counterFactory.mineDeploy(poolManager, 436);
+        IHooks hook = factory.mineDeploy(poolManager, 45);
         console.log("counter hook %s", address(hook));
 
         // Derive the key and id for the new pool
