@@ -1,18 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
-import {BaseHook} from "v4-periphery/BaseHook.sol";
-
 import {Hooks} from "@uniswap/v4-core/contracts/libraries/Hooks.sol";
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
 import {PoolKey, PoolId, PoolIdLibrary} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 import {BalanceDelta} from "@uniswap/v4-core/contracts/types/BalanceDelta.sol";
+import {BaseHook} from "v4-periphery/BaseHook.sol";
 
 contract CounterHook is BaseHook {
     using PoolIdLibrary for PoolKey;
 
-    uint256 public beforeSwapCount;
-    uint256 public afterSwapCount;
+    uint256 public beforeSwapCounter;
+    uint256 public afterSwapCounter;
+
+    event BeforeSwap(uint256 counter);
+    event AfterSwap(uint256 counter);
 
     constructor(IPoolManager _poolManager) BaseHook(_poolManager) {}
 
@@ -34,7 +36,9 @@ contract CounterHook is BaseHook {
         override
         returns (bytes4)
     {
-        beforeSwapCount++;
+        beforeSwapCounter++;
+        emit BeforeSwap(beforeSwapCounter);
+
         return BaseHook.beforeSwap.selector;
     }
 
@@ -43,7 +47,9 @@ contract CounterHook is BaseHook {
         override
         returns (bytes4)
     {
-        afterSwapCount++;
+        afterSwapCounter++;
+        emit AfterSwap(afterSwapCounter);
+
         return BaseHook.afterSwap.selector;
     }
 }

@@ -47,10 +47,15 @@ forge script script/Counter.s.sol \
     --broadcast
 ```
 
+WARNING The above private key for account 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 is only used for Foundry testing. Do not use this known account on mainnet.
+
 ```
-export COUNTER=0xe7f1725e7734ce288f8367e1bb143e90bb3f0512
-cast call $COUNTER "beforeSwapCount()(uint256)" --rpc-url http://localhost:8545
-cast call $COUNTER "afterSwapCount()(uint256)" --rpc-url http://localhost:8545
+export FACTORY=0x610178da211fef7d417bc0e6fed39f05609ad788
+cast call $FACTORY "TargetPrefix()(address)" --rpc-url http://localhost:8545
+
+export COUNTER=0x0c5495e7b5B50732B9CbEFDf09Fa70C64183EC2a
+cast call $COUNTER "beforeSwapCounter()(uint256)" --rpc-url http://localhost:8545
+cast call $COUNTER "afterSwapCounter()(uint256)" --rpc-url http://localhost:8545
 ```
 
 ## Uniswap v4 Feature Summary
@@ -72,7 +77,7 @@ Contract dependencies
 
 ## Contribution
 
-This repository was created from this GitHub project template https://github.com/saucepoint/v4-template. Thanks [@saucepoint](https://twitter.com/saucepoint) for an excellent starting point.
+This repository was created from this GitHub project template https://github.com/saucepoint/v4-template. Thanks [@saucepoint](https://twitter.com/saucepoint) for an excellent starting point. This repo has significantly evolved from the starting template.
 
 ## Additional resources:
 

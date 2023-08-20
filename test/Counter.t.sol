@@ -28,7 +28,7 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
         // Deploy the CounterHook factory
         CounterFactory counterFactory = new CounterFactory();
         // Use the factory to create a new CounterHook contract
-        counterHook = counterFactory.deploy(manager);
+        counterHook = counterFactory.mineDeploy(manager);
 
         // Create the pool
         poolKey = PoolKey(Currency.wrap(address(token0)), Currency.wrap(address(token1)), 3000, 60, IHooks(counterHook));
@@ -44,8 +44,8 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
     }
 
     function testCounterHooks() public {
-        assertEq(counterHook.beforeSwapCount(), 0);
-        assertEq(counterHook.afterSwapCount(), 0);
+        assertEq(counterHook.beforeSwapCounter(), 0);
+        assertEq(counterHook.afterSwapCounter(), 0);
 
         // Perform a test swap //
         int256 amount = 100;
@@ -53,7 +53,7 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
         swap(poolKey, amount, zeroForOne);
         // ------------------- //
 
-        assertEq(counterHook.beforeSwapCount(), 1);
-        assertEq(counterHook.afterSwapCount(), 1);
+        assertEq(counterHook.beforeSwapCounter(), 1);
+        assertEq(counterHook.afterSwapCounter(), 1);
     }
 }
