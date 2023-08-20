@@ -12,8 +12,14 @@ tx2uml --nodeType anvil --configFile counter.config.json -t -l -g -v 0x9cf249890
 
 ### Swap
 
-[Counter Swap](./counterSwap.svg)
+![Counter Swap Summary](./counterSwapSummary.svg)
 
 ```
-tx2uml --nodeType anvil --configFile counter.config.json -g -t -v 0xdf85e1e3bc524858d3fdf7288efc8d5f5cdb68ea442d5e3c5a3c562c04a20a57 -o counterSwap
+tx2uml --nodeType anvil --configFile counter.config.json -p -l -g -t -v 0xdf85e1e3bc524858d3fdf7288efc8d5f5cdb68ea442d5e3c5a3c562c04a20a57 -o counterSwapSummary
+```
+
+![Counter Swap Detailed](./counterSwapDetailed.svg)
+
+```
+tx2uml --nodeType anvil --configFile counter.config.json -g -t -v 0xdf85e1e3bc524858d3fdf7288efc8d5f5cdb68ea442d5e3c5a3c562c04a20a57 -o counterSwapDetailed
 ```
