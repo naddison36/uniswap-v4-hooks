@@ -80,9 +80,11 @@ cast call $COUNTER "afterSwapCounter()(uint256)" --rpc-url http://localhost:8545
 ```
 
 Summary of the modify position calls
+
 ![Counter Modify Summary](./docs/counterModifySummary.svg)
 
 Summary of the swap calls
+
 ![Counter Swap Summary](./docs/counterSwapSummary.svg)
 
 See [here](./docs/README.md#counter-hook) for more detailed transaction traces with call parameters and events.
@@ -121,7 +123,10 @@ poolKey = PoolKey(
 poolManager.initialize(poolKey, SQRT_RATIO_1_1);
 ```
 
+![DynamicFeeHook Contract](./docs/dynamicFeeHook.svg)
+
 Summary of the swap calls
+
 ![Dynamic Fee Swap Summary](./docs/dynamicFeeSwapSummary.svg)
 
 ### Local Testing
