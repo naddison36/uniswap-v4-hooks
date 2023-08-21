@@ -123,7 +123,7 @@ poolKey = PoolKey(
 poolManager.initialize(poolKey, SQRT_RATIO_1_1);
 ```
 
-![DynamicFeeHook Contract](./docs/dynamicFeeHook.svg)
+![DynamicFeeHook Contract](./docs/DynamicFeeHook.svg)
 
 Summary of the swap calls
 
