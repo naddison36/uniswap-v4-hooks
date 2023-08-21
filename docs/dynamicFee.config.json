@@ -1,7 +1,12 @@
 {
-  "0x610178da211fef7d417bc0e6fed39f05609ad788": {
-    "contractName": "CounterFactory",
+  "0x610178dA211FEF7D417bC0e6FeD39F05609AD788": {
+    "contractName": "DynamicFeeFactory",
     "abi": [
+      {
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
       {
         "inputs": [],
         "name": "TargetPrefix",
@@ -44,74 +49,12 @@
         "name": "deploy",
         "outputs": [
           {
-            "internalType": "contract CounterHook",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "contract IPoolManager",
-            "name": "poolManager",
-            "type": "address"
-          }
-        ],
-        "name": "deploy",
-        "outputs": [
-          {
-            "internalType": "contract CounterHook",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "contract IPoolManager",
-            "name": "poolManager",
-            "type": "address"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "salt",
-            "type": "bytes32"
-          }
-        ],
-        "name": "getPrecomputedHookAddress",
-        "outputs": [
-          {
             "internalType": "address",
             "name": "",
             "type": "address"
           }
         ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "_address",
-            "type": "address"
-          }
-        ],
-        "name": "isPrefix",
-        "outputs": [
-          {
-            "internalType": "bool",
-            "name": "",
-            "type": "bool"
-          }
-        ],
-        "stateMutability": "pure",
+        "stateMutability": "nonpayable",
         "type": "function"
       },
       {
@@ -130,7 +73,7 @@
         "name": "mineDeploy",
         "outputs": [
           {
-            "internalType": "contract CounterHook",
+            "internalType": "address",
             "name": "",
             "type": "address"
           }
@@ -149,7 +92,7 @@
         "name": "mineDeploy",
         "outputs": [
           {
-            "internalType": "contract CounterHook",
+            "internalType": "address",
             "name": "",
             "type": "address"
           }
@@ -159,8 +102,8 @@
       }
     ]
   },
-  "0x3Cb60b16BEd0e100F4ab2EC78566E5d96D48eab3": {
-    "contractName": "CounterHook",
+  "0x3CFeFf84Bec4242ee52149676c0c94DE888C9feE": {
+    "contractName": "DynamicFeeHook",
     "abi": [
       {
         "inputs": [
@@ -208,58 +151,6 @@
         "inputs": [],
         "name": "NotSelf",
         "type": "error"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": false,
-            "internalType": "uint256",
-            "name": "counter",
-            "type": "uint256"
-          }
-        ],
-        "name": "AfterModify",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": false,
-            "internalType": "uint256",
-            "name": "counter",
-            "type": "uint256"
-          }
-        ],
-        "name": "AfterSwap",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": false,
-            "internalType": "uint256",
-            "name": "counter",
-            "type": "uint256"
-          }
-        ],
-        "name": "BeforeModify",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": false,
-            "internalType": "uint256",
-            "name": "counter",
-            "type": "uint256"
-          }
-        ],
-        "name": "BeforeSwap",
-        "type": "event"
       },
       {
         "inputs": [
@@ -381,19 +272,6 @@
           }
         ],
         "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "afterModifyCounter",
-        "outputs": [
-          {
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "stateMutability": "view",
         "type": "function"
       },
       {
@@ -553,19 +431,6 @@
         "type": "function"
       },
       {
-        "inputs": [],
-        "name": "afterSwapCounter",
-        "outputs": [
-          {
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
         "inputs": [
           {
             "internalType": "address",
@@ -680,19 +545,6 @@
           }
         ],
         "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "beforeModifyCounter",
-        "outputs": [
-          {
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "stateMutability": "view",
         "type": "function"
       },
       {
@@ -842,16 +694,49 @@
         "type": "function"
       },
       {
-        "inputs": [],
-        "name": "beforeSwapCounter",
-        "outputs": [
+        "inputs": [
           {
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
+            "components": [
+              {
+                "internalType": "Currency",
+                "name": "currency0",
+                "type": "address"
+              },
+              {
+                "internalType": "Currency",
+                "name": "currency1",
+                "type": "address"
+              },
+              {
+                "internalType": "uint24",
+                "name": "fee",
+                "type": "uint24"
+              },
+              {
+                "internalType": "int24",
+                "name": "tickSpacing",
+                "type": "int24"
+              },
+              {
+                "internalType": "contract IHooks",
+                "name": "hooks",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct PoolKey",
+            "name": "key",
+            "type": "tuple"
           }
         ],
-        "stateMutability": "view",
+        "name": "getFee",
+        "outputs": [
+          {
+            "internalType": "uint24",
+            "name": "fee",
+            "type": "uint24"
+          }
+        ],
+        "stateMutability": "nonpayable",
         "type": "function"
       },
       {

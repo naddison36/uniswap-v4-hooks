@@ -23,13 +23,13 @@ tx2uml --nodeType anvil --configFile counter.config.json -t -l -g -v 0x9cf249890
 ![Counter Modify Summary](./counterModifySummary.svg)
 
 ```
-tx2uml --nodeType anvil --configFile counter.config.json -p -l -g -t -v 0x9b115c369b25d6ec3a0496ac1b851de7446d08d69e47361cf096912328a85730 -o counterModifySummary
+tx2uml --nodeType anvil --configFile counter.config.json -pv -l -g -t -v 0xedad69b97461dc5bb65e6ec01cc35b47cc5e1c410d87a1c96c648fad8b81b1e8 -o counterModifySummary
 ```
 
 ![Counter Modify Detailed](./counterModifyDetailed.svg)
 
 ```
-tx2uml --nodeType anvil --configFile counter.config.json -g -t -v 0x9b115c369b25d6ec3a0496ac1b851de7446d08d69e47361cf096912328a85730 -o counterModifyDetailed
+tx2uml --nodeType anvil --configFile counter.config.json -g -t -v 0xedad69b97461dc5bb65e6ec01cc35b47cc5e1c410d87a1c96c648fad8b81b1e8 -o counterModifyDetailed
 ```
 
 ### Swap
@@ -37,11 +37,34 @@ tx2uml --nodeType anvil --configFile counter.config.json -g -t -v 0x9b115c369b25
 ![Counter Swap Summary](./counterSwapSummary.svg)
 
 ```
-tx2uml --nodeType anvil --configFile counter.config.json -p -l -g -t -v 0x3b1c9480838e66bb5b49ee814ef6bed474244ad69b452a03d04452f803cd560c -o counterSwapSummary
+tx2uml --nodeType anvil --configFile counter.config.json -pv -l -g -t -v 0x8bf2dcb4a75e71fdda9139fe0539ba22bcfe0dcb31e41559897b7e20d440beb1 -o counterSwapSummary
 ```
 
 ![Counter Swap Detailed](./counterSwapDetailed.svg)
 
 ```
-tx2uml --nodeType anvil --configFile counter.config.json -g -t -v 0x3b1c9480838e66bb5b49ee814ef6bed474244ad69b452a03d04452f803cd560c -o counterSwapDetailed
+tx2uml --nodeType anvil --configFile counter.config.json -g -t -v 0x8bf2dcb4a75e71fdda9139fe0539ba22bcfe0dcb31e41559897b7e20d440beb1 -o counterSwapDetailed
+```
+
+
+### DynamicFeeHook Contract
+
+![DynamicFeeHook Contract](./DynamicFeeHook.svg)
+
+```
+sol2uml class ../src,../lib -b DynamicFeeHook
+```
+
+### Swap
+
+![Dynamic Fee Swap Summary](./dynamicFeeSwapSummary.svg)
+
+```
+tx2uml --nodeType anvil --configFile dynamicFee.config.json -pv -l -g -t -v 0x3308a33a04fd35a176026c3a68f264baca83a0e2f151838b7f1291170463a049 -o dynamicFeeSwapSummary
+```
+
+![Dynamic Fee Swap Detailed](./dynamicFeeSwapDetailed.svg)
+
+```
+tx2uml --nodeType anvil --configFile dynamicFee.config.json -g -t -v 0x3308a33a04fd35a176026c3a68f264baca83a0e2f151838b7f1291170463a049 -o dynamicFeeSwapDetailed
 ```

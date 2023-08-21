@@ -31,7 +31,6 @@ contract CounterScript is Script {
     TestERC20 token1;
 
     PoolKey poolKey;
-    PoolId poolId;
 
     uint160 public constant SQRT_RATIO_1_1 = 79228162514264337593543950336;
     uint160 public constant MIN_PRICE_LIMIT = TickMath.MIN_SQRT_RATIO + 1;
@@ -55,15 +54,14 @@ contract CounterScript is Script {
 
         // Deploy has to mine a salt to match the Uniswap hook flags so can use a lot of gas
         // If Counter.s.sol script is executed against a new Anvil node,
-        // the PoolManager address will be 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
-        // The first salt from 0 to get the required address perfix is 436
-        // so starting from that to not burn up too much gas
-        IHooks hook = IHooks(counterFactory.mineDeploy(poolManager, 436));
-        console.log("counter hook %s", address(hook));
+        // the PoolManager address will be 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0.
+        // The first salt from 0 to get the required address perfix is 385
+        // so starting from that to not burn up too much gas.
+        IHooks hook = IHooks(counterFactory.mineDeploy(poolManager, 385));
+        console.log("Deployed hook to address %s", address(hook));
 
-        // Derive the key and id for the new pool
+        // Derive the key for the new pool
         poolKey = PoolKey(Currency.wrap(address(token0)), Currency.wrap(address(token1)), 3000, 60, hook);
-        poolId = poolKey.toId();
         // Create the pool in the Uniswap Pool Manager
         poolManager.initialize(poolKey, SQRT_RATIO_1_1);
 

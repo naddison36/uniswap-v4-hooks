@@ -7,6 +7,7 @@ import {IHooks} from "@uniswap/v4-core/contracts/interfaces/IHooks.sol";
 import {PoolManager} from "@uniswap/v4-core/contracts/PoolManager.sol";
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
 import {TickMath} from "@uniswap/v4-core/contracts/libraries/TickMath.sol";
+import {FeeLibrary} from "@uniswap/v4-core/contracts/libraries/FeeLibrary.sol";
 import {CurrencyLibrary, Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
 import {PoolKey} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 
@@ -15,11 +16,11 @@ import {PoolSwapTest} from "@uniswap/v4-core/contracts/test/PoolSwapTest.sol";
 import {PoolDonateTest} from "@uniswap/v4-core/contracts/test/PoolDonateTest.sol";
 import {TestERC20} from "@uniswap/v4-core/contracts/test/TestERC20.sol";
 
-import {MyHook, MyHookFactory} from "../src/MyHookFactory.sol";
+import {DynamicFeeHook, DynamicFeeFactory} from "../src/DynamicFeeFactory.sol";
 
 /// @notice Forge script for deploying v4 & hooks to **anvil**
 /// @dev This script only works on an anvil RPC because v4 exceeds bytecode limits
-contract MyHookScript is Script {
+contract DynamicFeeScript is Script {
     using CurrencyLibrary for Currency;
 
     PoolManager poolManager;
@@ -49,17 +50,18 @@ contract MyHookScript is Script {
         deployTestHelpers(approvalAmount);
 
         // Deploy the hook
-        MyHookFactory factory = new MyHookFactory();
+        DynamicFeeFactory factory = new DynamicFeeFactory();
 
         // If the PoolManager address is 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0,
-        // the first salt from 0 to get the required address perfix is 138.
+        // the first salt from 0 to get the required address perfix is 640.
         // Any changes to the DynamicFee contract will mean a different salt will be needed
-        // so just starting from 0 in this script
-        IHooks hook = IHooks(factory.mineDeploy(poolManager, 0));
+        IHooks hook = IHooks(factory.mineDeploy(poolManager, 640));
         console.log("Deployed hook to address %s", address(hook));
 
         // Derive the key for the new pool
-        poolKey = PoolKey(Currency.wrap(address(token0)), Currency.wrap(address(token1)), 3000, 60, hook);
+        poolKey = PoolKey(
+            Currency.wrap(address(token0)), Currency.wrap(address(token1)), FeeLibrary.DYNAMIC_FEE_FLAG, 60, hook
+        );
         // Create the pool in the Uniswap Pool Manager
         poolManager.initialize(poolKey, SQRT_RATIO_1_1);
 

@@ -106,6 +106,42 @@ forge script script/MyHook.s.sol \
     --broadcast
 ```
 
+## Dynamic Fee Hook
+
+1. The [DynamicFeeHook](src/DynamicFeeHook.sol) contract has an empty `getFee` function that is used to set the fee for dynamic fee pools.
+   It also has empty `beforeModifyPosition`, `afterModifyPosition`, `beforeSwap` and `afterSwap` hooks but they are not required for a dynamic fee hook. They can be removed if not needed.
+2. The [DynamicFeeHook.s](script/DynamicFeeHook.s.sol) script deploys to a local Anvil node and does a swap. Note the fee in the PoolKey is set with the `DYNAMIC_FEE_FLAG`.
+
+```Solidity
+// Derive the key for the new pool
+poolKey = PoolKey(
+    Currency.wrap(address(token0)), Currency.wrap(address(token1)), FeeLibrary.DYNAMIC_FEE_FLAG, 60, hook
+);
+// Create the pool in the Uniswap Pool Manager
+poolManager.initialize(poolKey, SQRT_RATIO_1_1);
+```
+
+Summary of the swap calls
+![Dynamic Fee Swap Summary](./docs/dynamicFeeSwapSummary.svg)
+
+### Local Testing
+
+```bash
+# start anvil with a larger code limit
+anvil --code-size-limit 30000
+```
+
+The following runs the [DynamicFeeHook.s](script/DynamicFeeHook.s.sol) Forge script against a local Anvil node
+
+```bash
+# in a new terminal, run the Forge script
+forge script script/DynamicFeeHook.s.sol \
+    --rpc-url http://localhost:8545 \
+    --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
+    --code-size-limit 30000 \
+    --broadcast
+```
+
 ## Contribution
 
 This repository was created from this GitHub project template https://github.com/saucepoint/v4-template. Thanks [@saucepoint](https://twitter.com/saucepoint) for an excellent starting point. This repo has significantly evolved from the starting template.

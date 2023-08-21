@@ -21,32 +21,41 @@ abstract contract BaseFactory {
 
     function deploy(IPoolManager poolManager, bytes32 salt) public virtual returns (address);
 
-    function mineDeploy(IPoolManager poolManager, uint256 startSalt) public returns (address) {
-        uint256 endSalt = uint256(startSalt) + 1000;
-        unchecked {
-            for (uint256 i = startSalt; i < endSalt; ++i) {
-                bytes32 salt = bytes32(i);
-                address hookAddress = _computeHookAddress(poolManager, salt);
-                // console.log("Testing address in loop %s %s", i, hookAddress);
-
-                if (_isPrefix(hookAddress)) {
-                    // console.log("Found address in loop %s %s", i, hookAddress);
-                    return deploy(poolManager, salt);
-                }
-            }
-        }
-    }
-
     function mineDeploy(IPoolManager poolManager) external returns (address) {
         return mineDeploy(poolManager, 0);
     }
 
-    function _hashBytecode(IPoolManager poolManager) internal pure virtual returns (bytes32 bytecodeHash);
+    function mineDeploy(IPoolManager poolManager, uint256 startSalt) public returns (address) {
+        bytes32 salt = mineSalt(poolManager, startSalt);
+        return deploy(poolManager, salt);
+    }
+
+    function mineSalt(IPoolManager poolManager, uint256 startSalt) public returns (bytes32 salt) {
+        uint256 endSalt = uint256(startSalt) + 1000;
+        unchecked {
+            for (uint256 i = startSalt; i < endSalt; ++i) {
+                salt = bytes32(i);
+                address hookAddress = _computeHookAddress(poolManager, salt);
+                // console.log("Testing salt %s for address %s", i, hookAddress);
+
+                if (_isPrefix(hookAddress)) {
+                    // console.log("Found salt %s for address %s", i, hookAddress);
+                    return salt;
+                }
+            }
+            revert("Failed to find a salt");
+        }
+    }
 
     function _computeHookAddress(IPoolManager poolManager, bytes32 salt) internal view returns (address) {
         bytes32 hash = keccak256(abi.encodePacked(bytes1(0xff), address(this), salt, _hashBytecode(poolManager)));
         return address(uint160(uint256(hash)));
     }
+
+    /// @dev The implementing contract must override this function to return the bytecode hash of its contract
+    /// For example, the CounterHook contract would return:
+    /// bytecodeHash = keccak256(abi.encodePacked(type(CounterHook).creationCode, abi.encode(poolManager)));
+    function _hashBytecode(IPoolManager poolManager) internal pure virtual returns (bytes32 bytecodeHash);
 
     function _isPrefix(address _address) internal view returns (bool) {
         // zero out all but the first byte of the address

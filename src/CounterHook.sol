@@ -35,47 +35,49 @@ contract CounterHook is BaseHook {
         });
     }
 
-    function beforeModifyPosition(address, PoolKey calldata, IPoolManager.ModifyPositionParams calldata)
-        external
-        override
-        returns (bytes4)
-    {
+    function beforeModifyPosition(
+        address sender,
+        PoolKey calldata key,
+        IPoolManager.ModifyPositionParams calldata params
+    ) external override returns (bytes4 selector) {
         beforeModifyCounter++;
         emit BeforeModify(beforeModifyCounter);
 
-        return BaseHook.beforeModifyPosition.selector;
+        selector = BaseHook.beforeModifyPosition.selector;
     }
 
-    function afterModifyPosition(address, PoolKey calldata, IPoolManager.ModifyPositionParams calldata, BalanceDelta)
-        external
-        override
-        returns (bytes4)
-    {
+    function afterModifyPosition(
+        address sender,
+        PoolKey calldata key,
+        IPoolManager.ModifyPositionParams calldata params,
+        BalanceDelta delta
+    ) external override returns (bytes4 selector) {
         afterModifyCounter++;
         emit AfterModify(afterModifyCounter);
 
-        return BaseHook.afterModifyPosition.selector;
+        selector = BaseHook.afterModifyPosition.selector;
     }
 
-    function beforeSwap(address, PoolKey calldata, IPoolManager.SwapParams calldata)
+    function beforeSwap(address sender, PoolKey calldata key, IPoolManager.SwapParams calldata params)
         external
         override
-        returns (bytes4)
+        returns (bytes4 selector)
     {
         beforeSwapCounter++;
         emit BeforeSwap(beforeSwapCounter);
 
-        return BaseHook.beforeSwap.selector;
+        selector = BaseHook.beforeSwap.selector;
     }
 
-    function afterSwap(address, PoolKey calldata, IPoolManager.SwapParams calldata, BalanceDelta)
-        external
-        override
-        returns (bytes4)
-    {
+    function afterSwap(
+        address sender,
+        PoolKey calldata key,
+        IPoolManager.SwapParams calldata params,
+        BalanceDelta delta
+    ) external override returns (bytes4 selector) {
         afterSwapCounter++;
         emit AfterSwap(afterSwapCounter);
 
-        return BaseHook.afterSwap.selector;
+        selector = BaseHook.afterSwap.selector;
     }
 }
