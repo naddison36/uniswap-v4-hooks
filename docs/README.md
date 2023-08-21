@@ -10,13 +10,15 @@
 sol2uml class ../src,../lib -b CounterHook
 ```
 
-<!-- ### Pool Setup
+### Pool Setup
 
-[Counter Swap](./counterSwap.svg)
+Deploy a `CounterHook` contract via the `CounterFactory` and initialize a new Uniswap v4 pool using the hook.
+
+![Counter Swap](./counterSetup.svg)
 
 ```
-tx2uml --nodeType anvil --configFile counter.config.json -t -l -g -v 0x9cf249890694687e28f66952c3a0469e9150dc788c2a4983ba7e373433270c44,0xc1756dfb5669fe320edb26f99150f836448b07aed75b453604fe3af20ba97e72,0x02ff4b04a82193eba7247358a09a1d0630159a0e54d946d1d45a10dff6ce3388 -o counterSetup
-``` -->
+tx2uml --nodeType anvil --configFile counter.config.json -t -l -g -v 0xaf292eedd8b6188bd7fa91efccfe337b820d2526f34966853baf03dc58e97fbd,0x48c4082ffe451e41c9cbaeb0ff77867e498af1a94175e1fcf5115538783535ca -o counterSetup
+```
 
 ### Modify Liquidity
 
@@ -45,7 +47,6 @@ tx2uml --nodeType anvil --configFile counter.config.json -pv -l -g -t -v 0x8bf2d
 ```
 tx2uml --nodeType anvil --configFile counter.config.json -g -t -v 0x8bf2dcb4a75e71fdda9139fe0539ba22bcfe0dcb31e41559897b7e20d440beb1 -o counterSwapDetailed
 ```
-
 
 ### DynamicFeeHook Contract
 

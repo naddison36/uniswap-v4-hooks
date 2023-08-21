@@ -4,6 +4,11 @@
     "abi": [
       {
         "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
+        "inputs": [],
         "name": "TargetPrefix",
         "outputs": [
           {
@@ -44,74 +49,12 @@
         "name": "deploy",
         "outputs": [
           {
-            "internalType": "contract CounterHook",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "contract IPoolManager",
-            "name": "poolManager",
-            "type": "address"
-          }
-        ],
-        "name": "deploy",
-        "outputs": [
-          {
-            "internalType": "contract CounterHook",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "contract IPoolManager",
-            "name": "poolManager",
-            "type": "address"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "salt",
-            "type": "bytes32"
-          }
-        ],
-        "name": "getPrecomputedHookAddress",
-        "outputs": [
-          {
             "internalType": "address",
             "name": "",
             "type": "address"
           }
         ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "_address",
-            "type": "address"
-          }
-        ],
-        "name": "isPrefix",
-        "outputs": [
-          {
-            "internalType": "bool",
-            "name": "",
-            "type": "bool"
-          }
-        ],
-        "stateMutability": "pure",
+        "stateMutability": "nonpayable",
         "type": "function"
       },
       {
@@ -130,7 +73,7 @@
         "name": "mineDeploy",
         "outputs": [
           {
-            "internalType": "contract CounterHook",
+            "internalType": "address",
             "name": "",
             "type": "address"
           }
@@ -149,9 +92,33 @@
         "name": "mineDeploy",
         "outputs": [
           {
-            "internalType": "contract CounterHook",
+            "internalType": "address",
             "name": "",
             "type": "address"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "contract IPoolManager",
+            "name": "poolManager",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startSalt",
+            "type": "uint256"
+          }
+        ],
+        "name": "mineSalt",
+        "outputs": [
+          {
+            "internalType": "bytes32",
+            "name": "salt",
+            "type": "bytes32"
           }
         ],
         "stateMutability": "nonpayable",
