@@ -14,15 +14,35 @@ contract MyHook is BaseHook {
 
     function getHooksCalls() public pure override returns (Hooks.Calls memory) {
         return Hooks.Calls({
-            beforeInitialize: false,
-            afterInitialize: false,
+            beforeInitialize: true,
+            afterInitialize: true,
             beforeModifyPosition: true,
             afterModifyPosition: true,
             beforeSwap: true,
             afterSwap: true,
-            beforeDonate: false,
-            afterDonate: false
+            beforeDonate: true,
+            afterDonate: true
         });
+    }
+
+    function beforeInitialize(address sender, PoolKey calldata key, uint160 sqrtPriceX96)
+        external
+        override
+        returns (bytes4 selector)
+    {
+        // insert hook logic here
+
+        selector = BaseHook.beforeInitialize.selector;
+    }
+
+    function afterInitialize(address sender, PoolKey calldata key, uint160 sqrtPriceX96, int24 tick)
+        external
+        override
+        returns (bytes4 selector)
+    {
+        // insert hook logic here
+
+        selector = BaseHook.afterInitialize.selector;
     }
 
     function beforeModifyPosition(
@@ -65,5 +85,25 @@ contract MyHook is BaseHook {
         // insert hook logic here
 
         selector = BaseHook.afterSwap.selector;
+    }
+
+    function beforeDonate(address sender, PoolKey calldata key, uint256 amount0, uint256 amount1)
+        external
+        override
+        returns (bytes4 selector)
+    {
+        // insert hook logic here
+
+        selector = BaseHook.beforeDonate.selector;
+    }
+
+    function afterDonate(address sender, PoolKey calldata key, uint256 amount0, uint256 amount1)
+        external
+        override
+        returns (bytes4 selector)
+    {
+        // insert hook logic here
+
+        selector = BaseHook.afterDonate.selector;
     }
 }

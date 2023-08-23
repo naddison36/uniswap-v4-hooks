@@ -91,7 +91,7 @@ See [here](./docs/README.md#counter-hook) for more detailed transaction traces w
 
 ## My Hook
 
-1. The [MyHook](src/MyHook.sol) contract has empty `beforeModifyPosition`, `afterModifyPosition`, `beforeSwap` and `afterSwap` hooks that can be implemented.
+1. The [MyHook](src/MyHook.sol) contract has empty `beforeInitialize`, `afterInitialize`, `beforeModifyPosition`, `afterModifyPosition`, `beforeSwap`, `afterSwap`, `beforeDonate` and `afterDonate` hooks that can be implemented.
 2. The [MyHook.s](script/MyHook.s.sol) script deploys to a local Anvil node and does a swap.
 
 ```bash
