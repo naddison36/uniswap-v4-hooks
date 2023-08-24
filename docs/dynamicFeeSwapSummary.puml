@@ -1,0 +1,75 @@
+@startuml
+title 0x3308a33a04fd35a176026c3a68f264baca83a0e2f151838b7f1291170463a049
+
+caption mainnet, block 4, Thu, 24 Aug 2023 09:35:49 GMT
+actor "0xf39f..2266" as f39f2266 
+participant "0xdc64..f6c9" as dc64f6c9 <<PoolSwapTest>>
+participant "0x9fe4..a6e0" as 9fe4a6e0 <<PoolManager>>
+participant "0x3cfe..9fee" as 3cfe9fee <<DynamicFeeHook>>
+participant "0x5fbd..0aa3" as 5fbd0aa3 <<TestERC20>>
+participant "0xe7f1..0512" as e7f10512 <<TestERC20>>
+
+f39f2266 -> dc64f6c9: swap(\n  key,\n  params,\n  testSettings)
+activate dc64f6c9
+dc64f6c9 -> 9fe4a6e0: lock(\n  data)
+activate 9fe4a6e0
+9fe4a6e0 -> dc64f6c9: lockAcquired(\n  rawData)
+activate dc64f6c9
+dc64f6c9 -> 9fe4a6e0: swap(\n  key,\n  params)
+activate 9fe4a6e0
+9fe4a6e0 -> 3cfe9fee: beforeSwap(\n  sender,\n  key,\n  params)
+activate 3cfe9fee
+return\n  selector
+9fe4a6e0 -> 3cfe9fee: getFee(\n  key)
+activate 3cfe9fee
+return\n  fee
+9fe4a6e0 -> 3cfe9fee: afterSwap(\n  sender,\n  key,\n  params,\n  delta)
+activate 3cfe9fee
+return\n  selector
+return\n  delta
+dc64f6c9 -> 5fbd0aa3: transferFrom(\n  sender,\n  recipient,\n  amount)
+activate 5fbd0aa3
+return\n?
+dc64f6c9 -> 9fe4a6e0: settle(\n  currency)
+activate 9fe4a6e0
+9fe4a6e0 -> 5fbd0aa3: balanceOf(\n?)
+activate 5fbd0aa3
+return\n?
+return\n  paid
+dc64f6c9 -> 9fe4a6e0: take(\n  currency,\n  to,\n  amount)
+activate 9fe4a6e0
+9fe4a6e0 -> e7f10512: transfer(\n  recipient,\n  amount)
+activate e7f10512
+return\n?
+return
+return\n?
+return\n  result
+return\n  delta
+
+note over 9fe4a6e0 #aqua
+Swap:
+    id,
+    sender,
+    amount0,
+    amount1,
+    sqrtPriceX96,
+    liquidity,
+    tick,
+    fee
+end note
+
+/ note over 5fbd0aa3 #aqua
+Transfer:
+    from,
+    to,
+    value
+end note
+
+/ note over e7f10512 #aqua
+Transfer:
+    from,
+    to,
+    value
+end note
+
+@endumls

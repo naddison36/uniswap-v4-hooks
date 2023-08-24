@@ -75,11 +75,25 @@ tx2uml --nodeType anvil --configFile dynamicFee.config.json -g -t -v 0x3308a33a0
 ![Dynamic Fee Deposit Summary](./dynamicFeeDepositSummary.svg)
 
 ```
-tx2uml --nodeType anvil --configFile dynamicFee.config.json -pv -g -t -v 0xe61f9f1b5f5c9da8ee54f66e431b2abb6429eb2e63ec3e39cd3529f6f53eb882 -o dynamicFeeDepositSummary
+tx2uml --nodeType anvil --configFile dynamicFee.config.json -pv -g -t -v 0xb89adc24b12077a794a25c1012a0e993950551521b253f2087847d9e0b291e7a -o dynamicFeeDepositSummary
 ```
 
 ![Dynamic Fee Deposit Detailed](./dynamicFeeDepositDetailed.svg)
 
 ```
-tx2uml --nodeType anvil --configFile dynamicFee.config.json -g -t -v 0xe61f9f1b5f5c9da8ee54f66e431b2abb6429eb2e63ec3e39cd3529f6f53eb882 -o dynamicFeeDepositDetailed
+tx2uml --nodeType anvil --configFile dynamicFee.config.json -g -t -v 0xb89adc24b12077a794a25c1012a0e993950551521b253f2087847d9e0b291e7a -o dynamicFeeDepositDetailed
+```
+
+## Withdraw
+
+![Dynamic Fee Withdraw Summary](./dynamicFeeWithdrawSummary.svg)
+
+```
+tx2uml --nodeType anvil --configFile dynamicFee.config.json -pv -g -t -v 0xfa251126a2003db9eedaf37f0c295dd502cdb650afb6bfe055b9c9cdcd724130 -o dynamicFeeWithdrawSummary
+```
+
+![Dynamic Fee Withdraw Detailed](./dynamicFeeWithdrawDetailed.svg)
+
+```
+tx2uml --nodeType anvil --configFile dynamicFee.config.json -g -t -v 0xfa251126a2003db9eedaf37f0c295dd502cdb650afb6bfe055b9c9cdcd724130 -o dynamicFeeWithdrawDetailed
 ```

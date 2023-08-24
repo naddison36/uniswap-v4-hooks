@@ -83,6 +83,9 @@ contract DynamicFeeScript is Script {
         bool zeroForOne = true;
         swap(poolKey, amount, zeroForOne);
 
+        // Remove tokens from the pool manager
+        modifyPositionRouter.modifyPosition(poolKey, IPoolManager.ModifyPositionParams(-60, 60, -10 ether));
+
         vm.stopBroadcast();
     }
 
