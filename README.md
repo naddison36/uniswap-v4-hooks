@@ -153,6 +153,7 @@ This repository was created from this GitHub project template https://github.com
 
 ## Additional resources:
 
+- [Uniswap V3 Development Book](https://uniswapv3book.com/)
 - [Uniswap v4 Core](https://github.com/Uniswap/v4-core/blob/main/whitepaper-v4-draft.pdf) whitepaper
 - Uniswap [v4-core](https://github.com/uniswap/v4-core) repository
 - Uniswap [v4-periphery](https://github.com/uniswap/v4-periphery) repository contains advanced hook implementations that serve as a great reference.
