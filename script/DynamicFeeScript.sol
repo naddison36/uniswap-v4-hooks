@@ -17,6 +17,7 @@ import {PoolDonateTest} from "@uniswap/v4-core/contracts/test/PoolDonateTest.sol
 import {TestERC20} from "@uniswap/v4-core/contracts/test/TestERC20.sol";
 
 import {DynamicFeeHook, DynamicFeeFactory} from "../src/DynamicFeeFactory.sol";
+import {Call, CallType, GenericRouter} from "../src/GenericRouter.sol";
 
 /// @notice Forge script for deploying v4 & hooks to **anvil**
 /// @dev This script only works on an anvil RPC because v4 exceeds bytecode limits
@@ -29,6 +30,7 @@ contract DynamicFeeScript is Script {
     PoolDonateTest donateRouter;
     TestERC20 token0;
     TestERC20 token1;
+    GenericRouter router;
 
     PoolKey poolKey;
 
@@ -46,16 +48,26 @@ contract DynamicFeeScript is Script {
         // Deploy a new Uniswap Pool Manager
         poolManager = new PoolManager(500000);
 
+        // Helpers for interacting with the pool
+        modifyPositionRouter = new PoolModifyPositionTest(IPoolManager(address(poolManager)));
+        token0.approve(address(modifyPositionRouter), approvalAmount);
+        token1.approve(address(modifyPositionRouter), approvalAmount);
+
         // Deploy the test routers
-        deployTestHelpers(approvalAmount);
+        router = new GenericRouter(poolManager);
+
+        // Approve the router to transfer test tokens
+        token0.approve(address(router), approvalAmount);
+        token1.approve(address(router), approvalAmount);
+        console.log("token0 allowance to router %s", token0.allowance(address(this), address(router)));
 
         // Deploy the hook
         DynamicFeeFactory factory = new DynamicFeeFactory();
 
         // If the PoolManager address is 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0,
-        // the first salt from 0 to get the required address perfix is 640.
+        // the first salt from 0 to get the required address perfix is 65.
         // Any changes to the DynamicFee contract will mean a different salt will be needed
-        IHooks hook = IHooks(factory.mineDeploy(poolManager, 640));
+        IHooks hook = IHooks(factory.mineDeploy(poolManager, 65));
         console.log("Deployed hook to address %s", address(hook));
 
         // Derive the key for the new pool
@@ -78,28 +90,39 @@ contract DynamicFeeScript is Script {
     function run() public {
         vm.startBroadcast();
 
-        // Perform a test swap
-        int256 amount = 100;
-        bool zeroForOne = true;
-        swap(poolKey, amount, zeroForOne);
+        token0.approve(address(router), 2 ** 128);
+        token1.approve(address(router), 2 ** 128);
 
-        // Remove tokens from the pool manager
-        modifyPositionRouter.modifyPosition(poolKey, IPoolManager.ModifyPositionParams(-60, 60, -10 ether));
+        Call[] memory calls = new Call[](4);
+
+        // Swap 100 0 tokens for 1 tokens
+        IPoolManager.SwapParams memory params =
+            IPoolManager.SwapParams({zeroForOne: true, amountSpecified: 100, sqrtPriceLimitX96: MIN_PRICE_LIMIT});
+        calls[0] = Call(
+            address(poolManager), CallType.Call, 0, abi.encodeWithSelector(poolManager.swap.selector, poolKey, params)
+        );
+        // Transfer token0 from test contract to Pool Manager
+        calls[1] = Call({
+            target: address(token0),
+            callType: CallType.Call,
+            value: 0,
+            data: abi.encodeWithSelector(token0.transferFrom.selector, address(this), address(poolManager), 100)
+        });
+        calls[2] = Call({
+            target: address(poolManager),
+            callType: CallType.Call,
+            value: 0,
+            data: abi.encodeWithSelector(poolManager.settle.selector, poolKey.currency0)
+        });
+        calls[3] = Call({
+            target: address(poolManager),
+            callType: CallType.Call,
+            value: 0,
+            data: abi.encodeWithSelector(poolManager.take.selector, poolKey.currency1, address(this), 98)
+        });
+        bytes[] memory results = router.process(calls);
 
         vm.stopBroadcast();
-    }
-
-    function swap(PoolKey memory key, int256 amountSpecified, bool zeroForOne) internal {
-        IPoolManager.SwapParams memory params = IPoolManager.SwapParams({
-            zeroForOne: zeroForOne,
-            amountSpecified: amountSpecified,
-            sqrtPriceLimitX96: zeroForOne ? MIN_PRICE_LIMIT : MAX_PRICE_LIMIT // unlimited impact
-        });
-
-        PoolSwapTest.TestSettings memory testSettings =
-            PoolSwapTest.TestSettings({withdrawTokens: true, settleUsingTransfer: true});
-
-        swapRouter.swap(key, params, testSettings);
     }
 
     function deployTestTokens(uint256 amount) public {
@@ -115,20 +138,5 @@ contract DynamicFeeScript is Script {
             token0 = _tokenB;
             token1 = _tokenA;
         }
-    }
-
-    function deployTestHelpers(uint256 amount) public {
-        // Helpers for interacting with the pool
-        modifyPositionRouter = new PoolModifyPositionTest(IPoolManager(address(poolManager)));
-        swapRouter = new PoolSwapTest(IPoolManager(address(poolManager)));
-        donateRouter = new PoolDonateTest(IPoolManager(address(poolManager)));
-
-        // Approve for liquidity provision
-        token0.approve(address(modifyPositionRouter), amount);
-        token1.approve(address(modifyPositionRouter), amount);
-
-        // Approve for swapping
-        token0.approve(address(swapRouter), amount);
-        token1.approve(address(swapRouter), amount);
     }
 }

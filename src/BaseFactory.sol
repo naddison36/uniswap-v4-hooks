@@ -6,7 +6,7 @@ import {Hooks} from "@uniswap/v4-core/contracts/libraries/Hooks.sol";
 
 import {CounterHook} from "./CounterHook.sol";
 
-// import {console} from "forge-std/console.sol";
+import {console} from "forge-std/console.sol";
 
 abstract contract BaseFactory {
     /// @notice zero out all but the first byte of the address which is all 1's
@@ -39,7 +39,7 @@ abstract contract BaseFactory {
                 // console.log("Testing salt %s for address %s", i, hookAddress);
 
                 if (_isPrefix(hookAddress)) {
-                    // console.log("Found salt %s for address %s", i, hookAddress);
+                    console.log("Found salt %s for address %s", i, hookAddress);
                     return salt;
                 }
             }

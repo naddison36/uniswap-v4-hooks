@@ -29,17 +29,17 @@ forge install
 
 ## Unit Testing
 
-The following will run the unit tests in [test/Counter.t](./test/Counter.t.sol)
+The following will run the unit tests in [test/CounterScript](./test/CounterScript.sol)
 
 ```
-forge test
+forge test -vvv
 ```
 
 ## Counter Hook Example
 
 1. The [CounterHook](src/CounterHook.sol) demonstrates the `beforeModifyPosition`, `afterModifyPosition`, `beforeSwap` and `afterSwap` hooks.
-2. The [Counter.t](test/Counter.t.sol) test deploys the v4 pool manager, test tokens, counter hook and test routers. It then sets up a pool, adds token liquidity and performs a swap.
-3. The [Counter.s](script/Counter.s.sol) script deploys to a local Anvil node and does a swap.
+2. The [CounterScript](test/CounterScript.sol) deploys the v4 pool manager, test tokens, counter hook and test routers. It then sets up a pool, adds token liquidity and performs a swap.
+3. The [CounterScript](script/CounterScript.sol) script deploys to a local Anvil node and does a swap.
 
 ![CounterHook Contract](./docs/CounterHook.svg)
 
@@ -47,7 +47,7 @@ forge test
 
 Because v4 exceeds the bytecode limit of Ethereum and it's _business licensed_, we can only deploy & test hooks on a local node like [Anvil](https://book.getfoundry.sh/anvil/).
 
-The following runs the [script/Counter.s](./script/Counter.s.sol) Forge script against a local Anvil node that:
+The following runs the [script/CounterScript](./script/CounterScript.sol) Forge script against a local Anvil node that:
 
 - Deploys the Uniswap v4 PoolManager
 - Deploys the [CounterFactory](./src/CounterFactory.sol) contract.
@@ -63,7 +63,7 @@ anvil --code-size-limit 30000
 
 ```bash
 # in a new terminal, run the Forge script
-forge script script/Counter.s.sol \
+forge script script/CounterScript.sol \
     --rpc-url http://localhost:8545 \
     --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
     --code-size-limit 30000 \
@@ -92,7 +92,7 @@ See [here](./docs/README.md#counter-hook) for more detailed transaction traces w
 ## My Hook
 
 1. The [MyHook](src/MyHook.sol) contract has empty `beforeInitialize`, `afterInitialize`, `beforeModifyPosition`, `afterModifyPosition`, `beforeSwap`, `afterSwap`, `beforeDonate` and `afterDonate` hooks that can be implemented.
-2. The [MyHook.s](script/MyHook.s.sol) script deploys to a local Anvil node and does a swap.
+2. The [MyHookScript](script/MyHookScript.sol) script deploys to a local Anvil node and does a swap.
 
 ```bash
 # start anvil with a larger code limit
@@ -101,7 +101,7 @@ anvil --code-size-limit 30000
 
 ```bash
 # in a new terminal, run the Forge script
-forge script script/MyHook.s.sol \
+forge script script/MyHookScript.sol \
     --rpc-url http://localhost:8545 \
     --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
     --code-size-limit 30000 \
@@ -112,7 +112,7 @@ forge script script/MyHook.s.sol \
 
 1. The [DynamicFeeHook](src/DynamicFeeHook.sol) contract has an empty `getFee` function that is used to set the fee for dynamic fee pools.
    It also has empty `beforeModifyPosition`, `afterModifyPosition`, `beforeSwap` and `afterSwap` hooks but they are not required for a dynamic fee hook. They can be removed if not needed.
-2. The [DynamicFeeHook.s](script/DynamicFeeHook.s.sol) script deploys to a local Anvil node and does a swap. Note the fee in the PoolKey is set with the `DYNAMIC_FEE_FLAG`.
+2. The [DynamicFeeScript](script/DynamicFeeScript.sol) script deploys to a local Anvil node and does a swap. Note the fee in the PoolKey is set with the `DYNAMIC_FEE_FLAG`.
 
 ```Solidity
 // Derive the key for the new pool
@@ -136,11 +136,11 @@ Summary of the swap calls
 anvil --code-size-limit 30000
 ```
 
-The following runs the [DynamicFeeHook.s](script/DynamicFeeHook.s.sol) Forge script against a local Anvil node
+The following runs the [DynamicFeeScript](script/DynamicFeeScript.sol) against a local Anvil node
 
 ```bash
 # in a new terminal, run the Forge script
-forge script script/DynamicFeeHook.s.sol \
+forge script script/DynamicFeeScript.sol \
     --rpc-url http://localhost:8545 \
     --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
     --code-size-limit 30000 \
