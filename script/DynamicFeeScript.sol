@@ -33,13 +33,17 @@ contract DynamicFeeScript is Script {
     GenericRouter router;
 
     PoolKey poolKey;
+    uint256 privateKey;
+    address signerAddr;
 
     uint160 public constant SQRT_RATIO_1_1 = 79228162514264337593543950336;
     uint160 public constant MIN_PRICE_LIMIT = TickMath.MIN_SQRT_RATIO + 1;
     uint160 public constant MAX_PRICE_LIMIT = TickMath.MAX_SQRT_RATIO - 1;
 
     function setUp() public {
-        vm.startBroadcast();
+        privateKey = vm.envUint("PRIVATE_KEY");
+        signerAddr = vm.addr(privateKey);
+        vm.startBroadcast(privateKey);
 
         uint256 approvalAmount = 2 ** 128;
         // Deploy test tokens
@@ -59,7 +63,6 @@ contract DynamicFeeScript is Script {
         // Approve the router to transfer test tokens
         token0.approve(address(router), approvalAmount);
         token1.approve(address(router), approvalAmount);
-        console.log("token0 allowance to router %s", token0.allowance(address(this), address(router)));
 
         // Deploy the hook
         DynamicFeeFactory factory = new DynamicFeeFactory();
@@ -88,10 +91,7 @@ contract DynamicFeeScript is Script {
     }
 
     function run() public {
-        vm.startBroadcast();
-
-        token0.approve(address(router), 2 ** 128);
-        token1.approve(address(router), 2 ** 128);
+        vm.startBroadcast(privateKey);
 
         Call[] memory calls = new Call[](4);
 
@@ -106,7 +106,7 @@ contract DynamicFeeScript is Script {
             target: address(token0),
             callType: CallType.Call,
             value: 0,
-            data: abi.encodeWithSelector(token0.transferFrom.selector, address(this), address(poolManager), 100)
+            data: abi.encodeWithSelector(token0.transferFrom.selector, signerAddr, address(poolManager), 100)
         });
         calls[2] = Call({
             target: address(poolManager),

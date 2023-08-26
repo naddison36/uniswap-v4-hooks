@@ -30,13 +30,17 @@ contract MyHookScript is Script {
     TestERC20 token1;
 
     PoolKey poolKey;
+    uint256 privateKey;
+    address signerAddr;
 
     uint160 public constant SQRT_RATIO_1_1 = 79228162514264337593543950336;
     uint160 public constant MIN_PRICE_LIMIT = TickMath.MIN_SQRT_RATIO + 1;
     uint160 public constant MAX_PRICE_LIMIT = TickMath.MAX_SQRT_RATIO - 1;
 
     function setUp() public {
-        vm.startBroadcast();
+        privateKey = vm.envUint("PRIVATE_KEY");
+        signerAddr = vm.addr(privateKey);
+        vm.startBroadcast(privateKey);
 
         uint256 approvalAmount = 2 ** 128;
         // Deploy test tokens
@@ -74,7 +78,7 @@ contract MyHookScript is Script {
     }
 
     function run() public {
-        vm.startBroadcast();
+        vm.startBroadcast(privateKey);
 
         // Perform a test swap
         int256 amount = 100;

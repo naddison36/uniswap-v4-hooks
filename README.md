@@ -63,9 +63,9 @@ anvil --code-size-limit 30000
 
 ```bash
 # in a new terminal, run the Forge script
+export PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 forge script script/CounterScript.sol \
     --rpc-url http://localhost:8545 \
-    --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
     --code-size-limit 30000 \
     --broadcast
 ```
@@ -101,9 +101,9 @@ anvil --code-size-limit 30000
 
 ```bash
 # in a new terminal, run the Forge script
+export PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 forge script script/MyHookScript.sol \
     --rpc-url http://localhost:8545 \
-    --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
     --code-size-limit 30000 \
     --broadcast
 ```
@@ -140,9 +140,9 @@ The following runs the [DynamicFeeScript](script/DynamicFeeScript.sol) against a
 
 ```bash
 # in a new terminal, run the Forge script
+export PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 forge script script/DynamicFeeScript.sol \
     --rpc-url http://localhost:8545 \
-    --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
     --code-size-limit 30000 \
     --broadcast
 ```
