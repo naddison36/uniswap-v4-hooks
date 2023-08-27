@@ -111,22 +111,22 @@ contract HookTest is Test {
         });
 
         // Take toToken using a delegated call back to swapTake on this contract
-        bytes memory paramData = abi.encode(manager, toCurrency, address(this));
-        bytes memory swapTakeData = abi.encodeWithSelector(this.swapTake.selector, paramData, hex"");
+        bytes memory callData = abi.encode(manager, toCurrency, address(this), zeroForOne);
+        bytes memory swapTakeData = abi.encodeWithSelector(this.swapTake.selector, callData, hex"");
         calls[3] =
             Call({target: address(this), callType: CallType.Delegate, results: true, value: 0, data: swapTakeData});
 
         results = router.process(calls);
     }
 
-    function swapTake(bytes memory paramData, bytes memory resultData) external {
-        (PoolManager poolManager, Currency currency, address receipient) =
-            abi.decode(paramData, (PoolManager, Currency, address));
+    function swapTake(bytes memory callData, bytes memory resultData) external {
+        (PoolManager poolManager, Currency currency, address receipient, bool zeroForOne) =
+            abi.decode(callData, (PoolManager, Currency, address, bool));
 
         bytes[] memory results = abi.decode(resultData, (bytes[]));
         BalanceDelta delta = abi.decode(results[0], (BalanceDelta));
 
-        uint128 takeAmount = uint128(-1 * delta.amount1());
+        uint128 takeAmount = zeroForOne ? uint128(-1 * delta.amount1()) : uint128(-1 * delta.amount0());
 
         poolManager.take(currency, receipient, takeAmount);
     }

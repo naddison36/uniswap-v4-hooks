@@ -70,8 +70,8 @@ contract DynamicFeeTest is HookTest, Deployers, GasSnapshot {
         assertEq(manager.hookFeesAccrued(address(hook), poolKey.currency1), 0);
     }
 
-    function testSwapSettleTake() public {
-        // Perform a test swap
+    function testSwap0_1() public {
+        // Swap token0 for token1
         bytes[] memory results = swap(poolKey, token0, 100);
 
         // Check settle result
@@ -81,5 +81,15 @@ contract DynamicFeeTest is HookTest, Deployers, GasSnapshot {
 
         // assertGt(manager.hookFeesAccrued(address(hook), poolKey.currency0), 0);
         // assertEq(manager.hookFeesAccrued(address(hook), poolKey.currency1), 0);
+    }
+
+    function testSwap1_0() public {
+        // Swap token1 for token0
+        bytes[] memory results = swap(poolKey, token1, 100);
+
+        // Check settle result
+        BalanceDelta delta = abi.decode(results[0], (BalanceDelta));
+        assertEq(delta.amount0(), -98);
+        assertEq(delta.amount1(), 100);
     }
 }
