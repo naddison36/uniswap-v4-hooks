@@ -26,23 +26,21 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
         HookTest.initHookTestEnv();
 
         // Deploy the CounterHook factory
-        CounterFactory counterFactory = new CounterFactory();
+        CounterFactory factory = new CounterFactory();
         // Use the factory to create a new CounterHook contract
-        hook = CounterHook(counterFactory.mineDeploy(manager));
+        hook = CounterHook(factory.mineDeploy(manager));
 
         // Create the pool
-        poolKey = PoolKey(Currency.wrap(address(token0)), Currency.wrap(address(token1)), 3000, 60, IHooks(hook));
+        poolKey = PoolKey(currency0, currency1, 3000, 60, IHooks(hook));
         manager.initialize(poolKey, SQRT_RATIO_1_1);
 
-        // Provide liquidity to the pool
-        modifyPositionRouter.modifyPosition(poolKey, IPoolManager.ModifyPositionParams(-60, 60, 10 ether));
-        modifyPositionRouter.modifyPosition(poolKey, IPoolManager.ModifyPositionParams(-120, 120, 10 ether));
-        modifyPositionRouter.modifyPosition(
-            poolKey, IPoolManager.ModifyPositionParams(TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 10 ether)
-        );
+        // Provide liquidity over different ranges to the pool
+        addLiquidity(poolKey, -60, 60, 10 ether);
+        addLiquidity(poolKey, -120, 120, 10 ether);
+        addLiquidity(poolKey, TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 10 ether);
     }
 
-    function testHookFee() public {
+    function testCounterHookFee() public {
         // Check the hook fee
         (Pool.Slot0 memory slot0,,,) = manager.pools(poolKey.toId());
         // assertEq(slot0.hookSwapFee, 3000);

@@ -4,10 +4,8 @@ pragma solidity ^0.8.15;
 import "forge-std/Test.sol";
 
 import {PoolManager} from "@uniswap/v4-core/contracts/PoolManager.sol";
+import {IERC20Minimal} from "@uniswap/v4-core/contracts/interfaces/external/IERC20Minimal.sol";
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
-import {PoolModifyPositionTest} from "@uniswap/v4-core/contracts/test/PoolModifyPositionTest.sol";
-import {PoolSwapTest} from "@uniswap/v4-core/contracts/test/PoolSwapTest.sol";
-import {PoolDonateTest} from "@uniswap/v4-core/contracts/test/PoolDonateTest.sol";
 import {BalanceDelta} from "@uniswap/v4-core/contracts/types/BalanceDelta.sol";
 import {PoolKey} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 
@@ -21,15 +19,15 @@ import {Call, CallType, GenericRouter} from "../../src/GenericRouter.sol";
 /// @dev Minimal initialization. Inheriting contract should set up pools and provision liquidity
 contract HookTest is Test {
     PoolManager manager;
-    PoolModifyPositionTest modifyPositionRouter;
-    PoolSwapTest swapRouter;
-    PoolDonateTest donateRouter;
     TestERC20 token0;
     TestERC20 token1;
+    Currency currency0;
+    Currency currency1;
     GenericRouter router;
 
     uint160 public constant MIN_PRICE_LIMIT = TickMath.MIN_SQRT_RATIO + 1;
     uint160 public constant MAX_PRICE_LIMIT = TickMath.MAX_SQRT_RATIO - 1;
+    bytes constant EmptyResults = hex"";
 
     function initHookTestEnv() public {
         uint256 amount = 2 ** 128;
@@ -45,6 +43,8 @@ contract HookTest is Test {
             token0 = _tokenB;
             token1 = _tokenA;
         }
+        currency0 = Currency.wrap(address(token0));
+        currency1 = Currency.wrap(address(token1));
 
         manager = new PoolManager(500000);
 
@@ -53,19 +53,76 @@ contract HookTest is Test {
 
         token0.approve(address(router), 2 ** 128);
         token1.approve(address(router), 2 ** 128);
+    }
 
-        // Helpers for interacting with the pool
-        modifyPositionRouter = new PoolModifyPositionTest(IPoolManager(address(manager)));
-        swapRouter = new PoolSwapTest(IPoolManager(address(manager)));
-        donateRouter = new PoolDonateTest(IPoolManager(address(manager)));
+    function addLiquidity(PoolKey memory poolKey, int24 tickLower, int24 tickUpper, int256 liquidityAmount)
+        internal
+        returns (bytes[] memory results)
+    {
+        Call[] memory calls = new Call[](5);
 
-        // Approve for liquidity provision
-        token0.approve(address(modifyPositionRouter), amount);
-        token1.approve(address(modifyPositionRouter), amount);
+        // Add liquidity to the pool
+        IPoolManager.ModifyPositionParams memory modifyPositionParams =
+            IPoolManager.ModifyPositionParams(tickLower, tickUpper, liquidityAmount);
+        calls[0] = Call({
+            target: address(manager),
+            callType: CallType.Call,
+            results: false,
+            value: 0,
+            data: abi.encodeWithSelector(manager.modifyPosition.selector, poolKey, modifyPositionParams)
+        });
 
-        // Approve for swapping
-        token0.approve(address(swapRouter), amount);
-        token1.approve(address(swapRouter), amount);
+        // Transfer token0 to Pool Manager
+        bytes memory paramData = abi.encode(token0, address(this), address(manager), true);
+        calls[1] = Call({
+            target: address(this),
+            callType: CallType.Delegate,
+            results: true,
+            value: 0,
+            data: abi.encodeWithSelector(this.transferToPool.selector, paramData, EmptyResults)
+        });
+
+        // Settle token0
+        calls[2] = Call({
+            target: address(manager),
+            callType: CallType.Call,
+            results: false,
+            value: 0,
+            data: abi.encodeWithSelector(manager.settle.selector, currency0)
+        });
+
+        // Transfer token1 to Pool Manager
+        paramData = abi.encode(token1, address(this), address(manager), false);
+        calls[3] = Call({
+            target: address(this),
+            callType: CallType.Delegate,
+            results: true,
+            value: 0,
+            data: abi.encodeWithSelector(this.transferToPool.selector, paramData, EmptyResults)
+        });
+
+        // Settle token1
+        calls[4] = Call({
+            target: address(manager),
+            callType: CallType.Call,
+            results: false,
+            value: 0,
+            data: abi.encodeWithSelector(manager.settle.selector, currency1)
+        });
+
+        results = router.process(calls);
+    }
+
+    function transferToPool(bytes memory callData, bytes memory resultData) external {
+        (IERC20Minimal token, address sender, address receipient, bool zeroToken) =
+            abi.decode(callData, (IERC20Minimal, address, address, bool));
+
+        bytes[] memory results = abi.decode(resultData, (bytes[]));
+        BalanceDelta delta = abi.decode(results[0], (BalanceDelta));
+
+        uint128 amount = zeroToken ? uint128(delta.amount0()) : uint128(delta.amount1());
+
+        token.transferFrom(sender, receipient, amount);
     }
 
     function swap(PoolKey memory poolKey, TestERC20 fromToken, int256 swapAmount)
@@ -98,7 +155,7 @@ contract HookTest is Test {
             callType: CallType.Call,
             results: false,
             value: 0,
-            data: abi.encodeWithSelector(token0.transferFrom.selector, address(this), address(manager), swapAmount)
+            data: abi.encodeWithSelector(fromToken.transferFrom.selector, address(this), address(manager), swapAmount)
         });
 
         // Settle fromToken
@@ -112,7 +169,7 @@ contract HookTest is Test {
 
         // Take toToken using a delegated call back to swapTake on this contract
         bytes memory callData = abi.encode(manager, toCurrency, address(this), zeroForOne);
-        bytes memory swapTakeData = abi.encodeWithSelector(this.swapTake.selector, callData, hex"");
+        bytes memory swapTakeData = abi.encodeWithSelector(this.swapTake.selector, callData, EmptyResults);
         calls[3] =
             Call({target: address(this), callType: CallType.Delegate, results: true, value: 0, data: swapTakeData});
 

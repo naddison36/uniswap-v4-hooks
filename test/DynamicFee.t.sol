@@ -24,7 +24,6 @@ contract DynamicFeeTest is HookTest, Deployers, GasSnapshot {
 
     DynamicFeeHook hook;
     PoolKey poolKey;
-    PoolId poolId;
 
     function setUp() public {
         // creates the pool manager, test tokens, and other utility routers
@@ -36,22 +35,13 @@ contract DynamicFeeTest is HookTest, Deployers, GasSnapshot {
         hook = DynamicFeeHook(factory.mineDeploy(manager));
 
         // Create the pool
-        poolKey = PoolKey(
-            Currency.wrap(address(token0)),
-            Currency.wrap(address(token1)),
-            FeeLibrary.DYNAMIC_FEE_FLAG,
-            60,
-            IHooks(hook)
-        );
-        poolId = poolKey.toId();
+        poolKey = PoolKey(currency0, currency1, FeeLibrary.DYNAMIC_FEE_FLAG, 60, IHooks(hook));
         manager.initialize(poolKey, SQRT_RATIO_1_1);
 
-        // Provide liquidity to the pool
-        modifyPositionRouter.modifyPosition(poolKey, IPoolManager.ModifyPositionParams(-60, 60, 10 ether));
-        modifyPositionRouter.modifyPosition(poolKey, IPoolManager.ModifyPositionParams(-120, 120, 10 ether));
-        modifyPositionRouter.modifyPosition(
-            poolKey, IPoolManager.ModifyPositionParams(TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 10 ether)
-        );
+        // Provide liquidity over different ranges to the pool
+        addLiquidity(poolKey, -60, 60, 10 ether);
+        addLiquidity(poolKey, -120, 120, 10 ether);
+        addLiquidity(poolKey, TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 10 ether);
     }
 
     function testMintPoolManager() public {
