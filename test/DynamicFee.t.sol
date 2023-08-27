@@ -24,17 +24,10 @@ contract DynamicFeeTest is HookTest, Deployers, GasSnapshot {
     DynamicFeeHook hook;
     PoolKey poolKey;
     PoolId poolId;
-    GenericRouter router;
 
     function setUp() public {
         // creates the pool manager, test tokens, and other utility routers
         HookTest.initHookTestEnv();
-
-        router = new GenericRouter(manager);
-
-        token0.approve(address(router), 2 ** 128);
-        token1.approve(address(router), 2 ** 128);
-        console.log("token0 allowance to router %s", token0.allowance(address(this), address(router)));
 
         // Deploy the factory contract
         DynamicFeeFactory factory = new DynamicFeeFactory();
@@ -60,6 +53,12 @@ contract DynamicFeeTest is HookTest, Deployers, GasSnapshot {
         );
     }
 
+    function testMintPoolManager() public {
+        uint256 mintAmount = 100;
+
+        mint(poolKey, poolKey.currency1, mintAmount);
+    }
+
     function testHookFee() public {
         // Check the hook fee
         (Pool.Slot0 memory slot0,,,) = manager.pools(poolKey.toId());
@@ -71,25 +70,8 @@ contract DynamicFeeTest is HookTest, Deployers, GasSnapshot {
     }
 
     function testSwapSettleTake() public {
-        Call[] memory calls = new Call[](4);
-
-        // Swap 100 0 tokens for 1 tokens
-        IPoolManager.SwapParams memory params =
-            IPoolManager.SwapParams({zeroForOne: true, amountSpecified: 100, sqrtPriceLimitX96: MIN_PRICE_LIMIT});
-        bytes memory swapCallData = abi.encodeWithSelector(manager.swap.selector, poolKey, params);
-        calls[0] = Call(address(manager), CallType.Call, 0, swapCallData);
-
-        bytes memory transferCallData =
-            abi.encodeWithSelector(token0.transferFrom.selector, address(this), address(manager), 100);
-        calls[1] = Call(address(token0), CallType.Call, 0, transferCallData);
-
-        bytes memory settleCallData = abi.encodeWithSelector(manager.settle.selector, poolKey.currency0);
-        calls[2] = Call(address(manager), CallType.Call, 0, settleCallData);
-
-        bytes memory takeCallData = abi.encodeWithSelector(manager.take.selector, poolKey.currency1, address(this), 98);
-        calls[3] = Call(address(manager), CallType.Call, 0, takeCallData);
-
-        bytes[] memory results = router.process(calls);
+        // Perform a test swap
+        bytes[] memory results = swap(poolKey, token0, 100);
 
         // Check settle result
         assertEq(abi.decode(results[2], (uint256)), 100);

@@ -56,11 +56,8 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
         assertEq(hook.beforeSwapCounter(), 100);
         assertEq(hook.afterSwapCounter(), 200);
 
-        // Perform a test swap //
-        int256 amount = 100;
-        bool zeroForOne = true;
-        swap(poolKey, amount, zeroForOne);
-        // ------------------- //
+        // Perform a test swap
+        swap(poolKey, token0, 100);
 
         assertEq(hook.beforeSwapCounter(), 101);
         assertEq(hook.afterSwapCounter(), 201);
