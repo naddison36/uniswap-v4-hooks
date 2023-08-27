@@ -11,12 +11,15 @@ import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.s
 import {PoolKey, PoolId, PoolIdLibrary} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 import {Deployers} from "@uniswap/v4-core/test/foundry-tests/utils/Deployers.sol";
 import {CurrencyLibrary, Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
+
 import {HookTest} from "./utils/HookTest.sol";
 import {CounterHook, CounterFactory} from "../src/CounterFactory.sol";
+import {GenericRouter, GenericRouterLibrary} from "../src/router/GenericRouterLibrary.sol";
 
 contract CounterTest is Test, HookTest, Deployers, GasSnapshot {
     using PoolIdLibrary for PoolKey;
     using CurrencyLibrary for Currency;
+    using GenericRouterLibrary for GenericRouter;
 
     CounterHook hook;
     PoolKey poolKey;
@@ -31,13 +34,13 @@ contract CounterTest is Test, HookTest, Deployers, GasSnapshot {
         hook = CounterHook(factory.mineDeploy(manager));
 
         // Create the pool
-        poolKey = PoolKey(currency0, currency1, 3000, 60, IHooks(hook));
+        poolKey = PoolKey(Currency.wrap(address(token0)), Currency.wrap(address(token1)), 3000, 60, IHooks(hook));
         manager.initialize(poolKey, SQRT_RATIO_1_1);
 
         // Provide liquidity over different ranges to the pool
-        addLiquidity(poolKey, -60, 60, 10 ether);
-        addLiquidity(poolKey, -120, 120, 10 ether);
-        addLiquidity(poolKey, TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 10 ether);
+        router.addLiquidity(manager, poolKey, -60, 60, 10 ether);
+        router.addLiquidity(manager, poolKey, -120, 120, 10 ether);
+        router.addLiquidity(manager, poolKey, TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 10 ether);
     }
 
     function testCounterHookFee() public {
@@ -55,7 +58,7 @@ contract CounterTest is Test, HookTest, Deployers, GasSnapshot {
         assertEq(hook.afterSwapCounter(), 200);
 
         // Perform a test swap
-        swap(poolKey, token0, 100);
+        router.swap(manager, poolKey, poolKey.currency0, 100);
 
         assertEq(hook.beforeSwapCounter(), 101);
         assertEq(hook.afterSwapCounter(), 201);

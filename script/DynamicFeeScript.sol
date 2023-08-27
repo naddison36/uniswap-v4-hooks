@@ -15,7 +15,7 @@ import {PoolModifyPositionTest} from "@uniswap/v4-core/contracts/test/PoolModify
 import {TestERC20} from "@uniswap/v4-core/contracts/test/TestERC20.sol";
 
 import {DynamicFeeHook, DynamicFeeFactory} from "../src/DynamicFeeFactory.sol";
-import {Call, CallType, GenericRouter} from "../src/GenericRouter.sol";
+import {Call, CallType, GenericRouter} from "../src/router/GenericRouter.sol";
 
 /// @notice Forge script for deploying v4 & hooks to **anvil**
 /// @dev This script only works on an anvil RPC because v4 exceeds bytecode limits

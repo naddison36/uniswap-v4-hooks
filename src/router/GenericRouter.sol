@@ -38,7 +38,6 @@ contract GenericRouter is ILockCallback {
         bytes[] memory results = new bytes[](calls.length);
 
         bool success;
-        bytes memory result;
         for (uint256 i = 0; i < calls.length; ++i) {
             Call memory call = calls[i];
 

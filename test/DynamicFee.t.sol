@@ -16,11 +16,12 @@ import {Pool} from "@uniswap/v4-core/contracts/libraries/Pool.sol";
 
 import {HookTest} from "./utils/HookTest.sol";
 import {DynamicFeeHook, DynamicFeeFactory} from "../src/DynamicFeeFactory.sol";
-import {Call, CallType, GenericRouter} from "../src/GenericRouter.sol";
+import {GenericRouter, GenericRouterLibrary} from "../src/router/GenericRouterLibrary.sol";
 
 contract DynamicFeeTest is Test, HookTest, Deployers, GasSnapshot {
     using PoolIdLibrary for PoolKey;
     using CurrencyLibrary for Currency;
+    using GenericRouterLibrary for GenericRouter;
 
     DynamicFeeHook hook;
     PoolKey poolKey;
@@ -35,19 +36,25 @@ contract DynamicFeeTest is Test, HookTest, Deployers, GasSnapshot {
         hook = DynamicFeeHook(factory.mineDeploy(manager));
 
         // Create the pool
-        poolKey = PoolKey(currency0, currency1, FeeLibrary.DYNAMIC_FEE_FLAG, 60, IHooks(hook));
+        poolKey = PoolKey(
+            Currency.wrap(address(token0)),
+            Currency.wrap(address(token1)),
+            FeeLibrary.DYNAMIC_FEE_FLAG,
+            60,
+            IHooks(hook)
+        );
         manager.initialize(poolKey, SQRT_RATIO_1_1);
 
         // Provide liquidity over different ranges to the pool
-        addLiquidity(poolKey, -60, 60, 10 ether);
-        addLiquidity(poolKey, -120, 120, 10 ether);
-        addLiquidity(poolKey, TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 10 ether);
+        router.addLiquidity(manager, poolKey, -60, 60, 10 ether);
+        router.addLiquidity(manager, poolKey, -120, 120, 10 ether);
+        router.addLiquidity(manager, poolKey, TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 10 ether);
     }
 
     function testMintPoolManager() public {
         uint256 mintAmount = 100;
 
-        mint(poolKey, poolKey.currency1, mintAmount);
+        router.mint(manager, poolKey.currency1, mintAmount);
     }
 
     function testHookFee() public {
@@ -62,7 +69,7 @@ contract DynamicFeeTest is Test, HookTest, Deployers, GasSnapshot {
 
     function testSwap0_1() public {
         // Swap token0 for token1
-        bytes[] memory results = swap(poolKey, token0, 100);
+        bytes[] memory results = router.swap(manager, poolKey, poolKey.currency0, 100);
 
         // Check settle result
         BalanceDelta delta = abi.decode(results[0], (BalanceDelta));
@@ -75,11 +82,29 @@ contract DynamicFeeTest is Test, HookTest, Deployers, GasSnapshot {
 
     function testSwap1_0() public {
         // Swap token1 for token0
-        bytes[] memory results = swap(poolKey, token1, 100);
+        bytes[] memory results = router.swap(manager, poolKey, poolKey.currency1, 100);
 
         // Check settle result
         BalanceDelta delta = abi.decode(results[0], (BalanceDelta));
         assertEq(delta.amount0(), -98);
         assertEq(delta.amount1(), 100);
+    }
+
+    function testImbalancedAdd() public {
+        router.addLiquidity(manager, poolKey, -60, 0, 10 ether);
+        router.addLiquidity(manager, poolKey, 0, 120, 10 ether);
+        router.addLiquidity(manager, poolKey, 60, 180, 10 ether);
+    }
+
+    function testSwap1_0_tilt0() public {
+        router.addLiquidity(manager, poolKey, 0, 60, 10 ether);
+
+        // Swap token1 for token0
+        bytes[] memory results = router.swap(manager, poolKey, poolKey.currency1, 100);
+
+        // Check settle result
+        BalanceDelta delta = abi.decode(results[0], (BalanceDelta));
+        // assertEq(delta.amount0(), -98);
+        // assertEq(delta.amount1(), 100);
     }
 }
