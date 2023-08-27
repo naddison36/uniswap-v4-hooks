@@ -87,6 +87,7 @@ contract HookTest is Test {
         calls[0] = Call({
             target: address(manager),
             callType: CallType.Call,
+            results: false,
             value: 0,
             data: abi.encodeWithSelector(manager.swap.selector, poolKey, params)
         });
@@ -95,6 +96,7 @@ contract HookTest is Test {
         calls[1] = Call({
             target: address(fromToken),
             callType: CallType.Call,
+            results: false,
             value: 0,
             data: abi.encodeWithSelector(token0.transferFrom.selector, address(this), address(manager), swapAmount)
         });
@@ -103,6 +105,7 @@ contract HookTest is Test {
         calls[2] = Call({
             target: address(manager),
             callType: CallType.Call,
+            results: false,
             value: 0,
             data: abi.encodeWithSelector(manager.settle.selector, fromCurrency)
         });
@@ -110,14 +113,8 @@ contract HookTest is Test {
         // Take toToken using a delegated call back to swapTake on this contract
         bytes memory paramData = abi.encode(manager, toCurrency, address(this));
         bytes memory swapTakeData = abi.encodeWithSelector(this.swapTake.selector, paramData, hex"");
-        calls[3] = Call({target: address(this), callType: CallType.Delegate, value: 0, data: swapTakeData});
-
-        // calls[3] = Call({
-        //     target: address(manager),
-        //     callType: CallType.Call,
-        //     value: 0,
-        //     data: abi.encodeWithSelector(manager.take.selector, toCurrency, address(this), 98)
-        // });
+        calls[3] =
+            Call({target: address(this), callType: CallType.Delegate, results: true, value: 0, data: swapTakeData});
 
         results = router.process(calls);
     }
@@ -141,23 +138,31 @@ contract HookTest is Test {
         Call[] memory calls = new Call[](3);
 
         // Router transfers token1 from this test contract to Pool Manager
-        calls[0] = Call(
-            address(token1),
-            CallType.Call,
-            0,
-            abi.encodeWithSelector(token1.transferFrom.selector, address(this), address(manager), mintAmount)
-        );
+        calls[0] = Call({
+            target: address(token1),
+            callType: CallType.Call,
+            results: false,
+            value: 0,
+            data: abi.encodeWithSelector(token1.transferFrom.selector, address(this), address(manager), mintAmount)
+        });
 
         // Mint token1 to the router
-        calls[1] = Call(
-            address(manager),
-            CallType.Call,
-            0,
-            abi.encodeWithSelector(manager.mint.selector, currency, address(this), mintAmount)
-        );
+        calls[1] = Call({
+            target: address(manager),
+            callType: CallType.Call,
+            results: false,
+            value: 0,
+            data: abi.encodeWithSelector(manager.mint.selector, currency, address(this), mintAmount)
+        });
 
         // Settle token1 in the Pool Manager
-        calls[2] = Call(address(manager), CallType.Call, 0, abi.encodeWithSelector(manager.settle.selector, currency));
+        calls[2] = Call({
+            target: address(manager),
+            callType: CallType.Call,
+            results: false,
+            value: 0,
+            data: abi.encodeWithSelector(manager.settle.selector, currency)
+        });
 
         results = router.process(calls);
     }

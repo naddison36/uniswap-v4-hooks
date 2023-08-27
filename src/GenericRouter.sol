@@ -14,6 +14,7 @@ enum CallType {
 struct Call {
     address target; // contract to be called, or account if no data
     CallType callType;
+    bool results; // include the the latest call results
     uint256 value; // Ether value
     bytes data; // call data
 }
@@ -41,21 +42,28 @@ contract GenericRouter is ILockCallback {
         for (uint256 i = 0; i < calls.length; ++i) {
             Call memory call = calls[i];
 
-            if (call.callType == CallType.Delegate) {
+            bytes memory callData;
+            if (call.results) {
+                // decode the selector so we can re-encode the call with results data
                 bytes4 selector = bytes4(call.data);
+                // remove the selector from the in memory call data
                 bytes memory dataNoSelector = removeSelector(call.data);
+                // decode the param and ignore the result
                 (bytes memory decodedCallData,) = abi.decode(dataNoSelector, (bytes, bytes));
-
+                // encode the current results data into bytes
                 bytes memory resultsData = abi.encode(results);
-
-                bytes memory dataWithResults = abi.encodeWithSelector(selector, decodedCallData, resultsData);
-
-                (success, results[i]) = call.target.delegatecall(dataWithResults);
+                // re-encode the call data with the latest results data
+                callData = abi.encodeWithSelector(selector, decodedCallData, resultsData);
             } else {
-                (success, results[i]) = call.target.call{value: call.value}(call.data);
-                console.log("results from call %s", i);
-                console.logBytes(results[i]);
+                callData = call.data;
             }
+
+            if (call.callType == CallType.Delegate) {
+                (success, results[i]) = call.target.delegatecall(callData);
+            } else {
+                (success, results[i]) = call.target.call{value: call.value}(callData);
+            }
+
             if (success == false) {
                 console.log("call failed");
                 assembly {
@@ -71,10 +79,9 @@ contract GenericRouter is ILockCallback {
     }
 
     function removeSelector(bytes memory data) public pure returns (bytes memory remainingData) {
-        require(data.length >= 4, "no selecor");
+        require(data.length >= 4, "no selector");
 
         remainingData = new bytes(data.length - 4);
-
         for (uint256 i = 0; i < remainingData.length; ++i) {
             remainingData[i] = data[i + 4];
         }

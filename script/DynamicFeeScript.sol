@@ -98,25 +98,32 @@ contract DynamicFeeScript is Script {
         // Swap 100 0 tokens for 1 tokens
         IPoolManager.SwapParams memory params =
             IPoolManager.SwapParams({zeroForOne: true, amountSpecified: 100, sqrtPriceLimitX96: MIN_PRICE_LIMIT});
-        calls[0] = Call(
-            address(poolManager), CallType.Call, 0, abi.encodeWithSelector(poolManager.swap.selector, poolKey, params)
-        );
+        calls[0] = Call({
+            target: address(poolManager),
+            callType: CallType.Call,
+            results: false,
+            value: 0,
+            data: abi.encodeWithSelector(poolManager.swap.selector, poolKey, params)
+        });
         // Transfer token0 from test contract to Pool Manager
         calls[1] = Call({
             target: address(token0),
             callType: CallType.Call,
+            results: false,
             value: 0,
             data: abi.encodeWithSelector(token0.transferFrom.selector, signerAddr, address(poolManager), 100)
         });
         calls[2] = Call({
             target: address(poolManager),
             callType: CallType.Call,
+            results: false,
             value: 0,
             data: abi.encodeWithSelector(poolManager.settle.selector, poolKey.currency0)
         });
         calls[3] = Call({
             target: address(poolManager),
             callType: CallType.Call,
+            results: false,
             value: 0,
             data: abi.encodeWithSelector(poolManager.take.selector, poolKey.currency1, address(this), 98)
         });
