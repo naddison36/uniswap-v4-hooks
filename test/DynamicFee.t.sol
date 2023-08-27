@@ -14,11 +14,11 @@ import {Deployers} from "@uniswap/v4-core/test/foundry-tests/utils/Deployers.sol
 import {CurrencyLibrary, Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
 import {Pool} from "@uniswap/v4-core/contracts/libraries/Pool.sol";
 
-import {HookTest} from "./utils/HookTest.sol";
+import {TestPoolManager} from "./utils/TestPoolManager.sol";
 import {DynamicFeeHook, DynamicFeeFactory} from "../src/DynamicFeeFactory.sol";
 import {GenericRouter, GenericRouterLibrary} from "../src/router/GenericRouterLibrary.sol";
 
-contract DynamicFeeTest is Test, HookTest, Deployers, GasSnapshot {
+contract DynamicFeeTest is Test, TestPoolManager, Deployers, GasSnapshot {
     using PoolIdLibrary for PoolKey;
     using CurrencyLibrary for Currency;
     using GenericRouterLibrary for GenericRouter;
@@ -27,8 +27,8 @@ contract DynamicFeeTest is Test, HookTest, Deployers, GasSnapshot {
     PoolKey poolKey;
 
     function setUp() public {
-        // creates the pool manager, test tokens, and other utility routers
-        HookTest.initHookTestEnv();
+        // creates the pool manager, test tokens and generic routers
+        TestPoolManager.initialize();
 
         // Deploy the factory contract
         DynamicFeeFactory factory = new DynamicFeeFactory();

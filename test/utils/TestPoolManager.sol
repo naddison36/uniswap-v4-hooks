@@ -2,20 +2,14 @@
 pragma solidity ^0.8.15;
 
 import {PoolManager} from "@uniswap/v4-core/contracts/PoolManager.sol";
-import {IERC20Minimal} from "@uniswap/v4-core/contracts/interfaces/external/IERC20Minimal.sol";
-import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
-import {BalanceDelta} from "@uniswap/v4-core/contracts/types/BalanceDelta.sol";
-import {PoolKey} from "@uniswap/v4-core/contracts/types/PoolId.sol";
-
-import {Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
 import {TestERC20} from "@uniswap/v4-core/contracts/test/TestERC20.sol";
 import {TickMath} from "@uniswap/v4-core/contracts/libraries/TickMath.sol";
 
-import {GenericRouter} from "../../src/router/GenericRouter.sol";
+import {GenericRouter, GenericRouterLibrary} from "../../src/router/GenericRouterLibrary.sol";
 
-/// @notice Contract to initialize some test helpers
+/// @notice Deploys a pool manager, test tokens and a generic router.
 /// @dev Minimal initialization. Inheriting contract should set up pools and provision liquidity
-contract HookTest {
+contract TestPoolManager {
     PoolManager manager;
     TestERC20 token0;
     TestERC20 token1;
@@ -25,7 +19,7 @@ contract HookTest {
     uint160 public constant MAX_PRICE_LIMIT = TickMath.MAX_SQRT_RATIO - 1;
     bytes constant EmptyResults = hex"";
 
-    function initHookTestEnv() public {
+    function initialize() public {
         uint256 amount = 2 ** 128;
         TestERC20 _tokenA = new TestERC20(amount);
         TestERC20 _tokenB = new TestERC20(amount);
@@ -49,28 +43,14 @@ contract HookTest {
         token1.approve(address(router), 2 ** 128);
     }
 
+    // Needed by the GenericRouter to delegate call to when using the GenericRouterLibrary functions
     function transferToPool(bytes memory callData, bytes memory resultData) external {
-        (IERC20Minimal token, address sender, address receipient, bool zeroToken) =
-            abi.decode(callData, (IERC20Minimal, address, address, bool));
-
-        bytes[] memory results = abi.decode(resultData, (bytes[]));
-        BalanceDelta delta = abi.decode(results[0], (BalanceDelta));
-
-        uint128 amount = zeroToken ? uint128(delta.amount0()) : uint128(delta.amount1());
-
-        token.transferFrom(sender, receipient, amount);
+        GenericRouterLibrary.transferToPool(callData, resultData);
     }
 
+    // Needed by the GenericRouter to delegate call to when using the GenericRouterLibrary functions
     function swapTake(bytes memory callData, bytes memory resultData) external {
-        (PoolManager poolManager, Currency currency, address receipient, bool zeroForOne) =
-            abi.decode(callData, (PoolManager, Currency, address, bool));
-
-        bytes[] memory results = abi.decode(resultData, (bytes[]));
-        BalanceDelta delta = abi.decode(results[0], (BalanceDelta));
-
-        uint128 takeAmount = zeroForOne ? uint128(-1 * delta.amount1()) : uint128(-1 * delta.amount0());
-
-        poolManager.take(currency, receipient, takeAmount);
+        GenericRouterLibrary.swapTake(callData, resultData);
     }
 
     function onERC1155Received(address, address, uint256, uint256, bytes memory) public virtual returns (bytes4) {

@@ -12,11 +12,11 @@ import {PoolKey, PoolId, PoolIdLibrary} from "@uniswap/v4-core/contracts/types/P
 import {Deployers} from "@uniswap/v4-core/test/foundry-tests/utils/Deployers.sol";
 import {CurrencyLibrary, Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
 
-import {HookTest} from "./utils/HookTest.sol";
+import {TestPoolManager} from "./utils/TestPoolManager.sol";
 import {CounterHook, CounterFactory} from "../src/CounterFactory.sol";
 import {GenericRouter, GenericRouterLibrary} from "../src/router/GenericRouterLibrary.sol";
 
-contract CounterTest is Test, HookTest, Deployers, GasSnapshot {
+contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
     using PoolIdLibrary for PoolKey;
     using CurrencyLibrary for Currency;
     using GenericRouterLibrary for GenericRouter;
@@ -25,8 +25,8 @@ contract CounterTest is Test, HookTest, Deployers, GasSnapshot {
     PoolKey poolKey;
 
     function setUp() public {
-        // creates the pool manager, test tokens, and other utility routers
-        HookTest.initHookTestEnv();
+        // creates the pool manager, test tokens and generic routers
+        TestPoolManager.initialize();
 
         // Deploy the CounterHook factory
         CounterFactory factory = new CounterFactory();
