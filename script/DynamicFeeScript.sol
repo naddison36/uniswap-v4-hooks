@@ -8,12 +8,10 @@ import {PoolManager} from "@uniswap/v4-core/contracts/PoolManager.sol";
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
 import {TickMath} from "@uniswap/v4-core/contracts/libraries/TickMath.sol";
 import {FeeLibrary} from "@uniswap/v4-core/contracts/libraries/FeeLibrary.sol";
-import {CurrencyLibrary, Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
+import {Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
 import {PoolKey} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 
 import {PoolModifyPositionTest} from "@uniswap/v4-core/contracts/test/PoolModifyPositionTest.sol";
-import {PoolSwapTest} from "@uniswap/v4-core/contracts/test/PoolSwapTest.sol";
-import {PoolDonateTest} from "@uniswap/v4-core/contracts/test/PoolDonateTest.sol";
 import {TestERC20} from "@uniswap/v4-core/contracts/test/TestERC20.sol";
 
 import {DynamicFeeHook, DynamicFeeFactory} from "../src/DynamicFeeFactory.sol";
@@ -22,12 +20,8 @@ import {Call, CallType, GenericRouter} from "../src/GenericRouter.sol";
 /// @notice Forge script for deploying v4 & hooks to **anvil**
 /// @dev This script only works on an anvil RPC because v4 exceeds bytecode limits
 contract DynamicFeeScript is Script {
-    using CurrencyLibrary for Currency;
-
     PoolManager poolManager;
     PoolModifyPositionTest modifyPositionRouter;
-    PoolSwapTest swapRouter;
-    PoolDonateTest donateRouter;
     TestERC20 token0;
     TestERC20 token1;
     GenericRouter router;

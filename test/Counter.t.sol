@@ -14,7 +14,7 @@ import {CurrencyLibrary, Currency} from "@uniswap/v4-core/contracts/types/Curren
 import {HookTest} from "./utils/HookTest.sol";
 import {CounterHook, CounterFactory} from "../src/CounterFactory.sol";
 
-contract CounterTest is HookTest, Deployers, GasSnapshot {
+contract CounterTest is Test, HookTest, Deployers, GasSnapshot {
     using PoolIdLibrary for PoolKey;
     using CurrencyLibrary for Currency;
 

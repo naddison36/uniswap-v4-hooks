@@ -18,7 +18,7 @@ import {HookTest} from "./utils/HookTest.sol";
 import {DynamicFeeHook, DynamicFeeFactory} from "../src/DynamicFeeFactory.sol";
 import {Call, CallType, GenericRouter} from "../src/GenericRouter.sol";
 
-contract DynamicFeeTest is HookTest, Deployers, GasSnapshot {
+contract DynamicFeeTest is Test, HookTest, Deployers, GasSnapshot {
     using PoolIdLibrary for PoolKey;
     using CurrencyLibrary for Currency;
 

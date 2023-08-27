@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
-import "forge-std/Test.sol";
-
 import {PoolManager} from "@uniswap/v4-core/contracts/PoolManager.sol";
 import {IERC20Minimal} from "@uniswap/v4-core/contracts/interfaces/external/IERC20Minimal.sol";
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
@@ -17,7 +15,7 @@ import {Call, CallType, GenericRouter} from "../../src/GenericRouter.sol";
 
 /// @notice Contract to initialize some test helpers
 /// @dev Minimal initialization. Inheriting contract should set up pools and provision liquidity
-contract HookTest is Test {
+contract HookTest {
     PoolManager manager;
     TestERC20 token0;
     TestERC20 token1;
