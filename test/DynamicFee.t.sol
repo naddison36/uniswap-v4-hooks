@@ -4,18 +4,20 @@ pragma solidity ^0.8.15;
 import "forge-std/Test.sol";
 import {GasSnapshot} from "forge-gas-snapshot/GasSnapshot.sol";
 import {IHooks} from "@uniswap/v4-core/contracts/interfaces/IHooks.sol";
+import {FeeLibrary} from "@uniswap/v4-core/contracts/libraries/FeeLibrary.sol";
 import {Hooks} from "@uniswap/v4-core/contracts/libraries/Hooks.sol";
 import {TickMath} from "@uniswap/v4-core/contracts/libraries/TickMath.sol";
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
 import {PoolKey, PoolId, PoolIdLibrary} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 import {Deployers} from "@uniswap/v4-core/test/foundry-tests/utils/Deployers.sol";
 import {CurrencyLibrary, Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
+import {Pool} from "@uniswap/v4-core/contracts/libraries/Pool.sol";
 
 import {HookTest} from "./utils/HookTest.sol";
 import {DynamicFeeHook, DynamicFeeFactory} from "../src/DynamicFeeFactory.sol";
 import {Call, CallType, GenericRouter} from "../src/GenericRouter.sol";
 
-contract DynamicFeeScript is HookTest, Deployers, GasSnapshot {
+contract DynamicFeeTest is HookTest, Deployers, GasSnapshot {
     using PoolIdLibrary for PoolKey;
     using CurrencyLibrary for Currency;
 
@@ -40,7 +42,13 @@ contract DynamicFeeScript is HookTest, Deployers, GasSnapshot {
         hook = DynamicFeeHook(factory.mineDeploy(manager));
 
         // Create the pool
-        poolKey = PoolKey(Currency.wrap(address(token0)), Currency.wrap(address(token1)), 3000, 60, IHooks(hook));
+        poolKey = PoolKey(
+            Currency.wrap(address(token0)),
+            Currency.wrap(address(token1)),
+            FeeLibrary.DYNAMIC_FEE_FLAG,
+            60,
+            IHooks(hook)
+        );
         poolId = poolKey.toId();
         manager.initialize(poolKey, SQRT_RATIO_1_1);
 
@@ -52,7 +60,17 @@ contract DynamicFeeScript is HookTest, Deployers, GasSnapshot {
         );
     }
 
-    function testOnlySwap() public {
+    function testHookFee() public {
+        // Check the hook fee
+        (Pool.Slot0 memory slot0,,,) = manager.pools(poolKey.toId());
+        // assertEq(slot0.hookSwapFee, FeeLibrary.DYNAMIC_FEE_FLAG);
+        assertEq(slot0.hookWithdrawFee, 0);
+
+        assertEq(manager.hookFeesAccrued(address(hook), poolKey.currency0), 0);
+        assertEq(manager.hookFeesAccrued(address(hook), poolKey.currency1), 0);
+    }
+
+    function testSwapSettleTake() public {
         Call[] memory calls = new Call[](4);
 
         // Swap 100 0 tokens for 1 tokens
@@ -75,5 +93,8 @@ contract DynamicFeeScript is HookTest, Deployers, GasSnapshot {
 
         // Check settle result
         assertEq(abi.decode(results[2], (uint256)), 100);
+
+        // assertGt(manager.hookFeesAccrued(address(hook), poolKey.currency0), 0);
+        // assertEq(manager.hookFeesAccrued(address(hook), poolKey.currency1), 0);
     }
 }

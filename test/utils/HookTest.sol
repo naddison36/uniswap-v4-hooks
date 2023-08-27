@@ -10,6 +10,7 @@ import {PoolSwapTest} from "@uniswap/v4-core/contracts/test/PoolSwapTest.sol";
 import {PoolDonateTest} from "@uniswap/v4-core/contracts/test/PoolDonateTest.sol";
 import {PoolKey} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 
+import {Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
 import {TestERC20} from "@uniswap/v4-core/contracts/test/TestERC20.sol";
 import {TickMath} from "@uniswap/v4-core/contracts/libraries/TickMath.sol";
 
@@ -40,6 +41,7 @@ contract HookTest is Test {
             token0 = _tokenB;
             token1 = _tokenA;
         }
+
         manager = new PoolManager(500000);
 
         // Helpers for interacting with the pool

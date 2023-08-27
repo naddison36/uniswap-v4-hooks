@@ -5,6 +5,7 @@ import "forge-std/Test.sol";
 import {GasSnapshot} from "forge-gas-snapshot/GasSnapshot.sol";
 import {IHooks} from "@uniswap/v4-core/contracts/interfaces/IHooks.sol";
 import {Hooks} from "@uniswap/v4-core/contracts/libraries/Hooks.sol";
+import {Pool} from "@uniswap/v4-core/contracts/libraries/Pool.sol";
 import {TickMath} from "@uniswap/v4-core/contracts/libraries/TickMath.sol";
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
 import {PoolKey, PoolId, PoolIdLibrary} from "@uniswap/v4-core/contracts/types/PoolId.sol";
@@ -17,9 +18,8 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
     using PoolIdLibrary for PoolKey;
     using CurrencyLibrary for Currency;
 
-    CounterHook counterHook;
+    CounterHook hook;
     PoolKey poolKey;
-    PoolId poolId;
 
     function setUp() public {
         // creates the pool manager, test tokens, and other utility routers
@@ -28,11 +28,10 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
         // Deploy the CounterHook factory
         CounterFactory counterFactory = new CounterFactory();
         // Use the factory to create a new CounterHook contract
-        counterHook = CounterHook(counterFactory.mineDeploy(manager));
+        hook = CounterHook(counterFactory.mineDeploy(manager));
 
         // Create the pool
-        poolKey = PoolKey(Currency.wrap(address(token0)), Currency.wrap(address(token1)), 3000, 60, IHooks(counterHook));
-        poolId = poolKey.toId();
+        poolKey = PoolKey(Currency.wrap(address(token0)), Currency.wrap(address(token1)), 3000, 60, IHooks(hook));
         manager.initialize(poolKey, SQRT_RATIO_1_1);
 
         // Provide liquidity to the pool
@@ -43,9 +42,19 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
         );
     }
 
+    function testHookFee() public {
+        // Check the hook fee
+        (Pool.Slot0 memory slot0,,,) = manager.pools(poolKey.toId());
+        // assertEq(slot0.hookSwapFee, 3000);
+        assertEq(slot0.hookWithdrawFee, 0);
+
+        assertEq(manager.hookFeesAccrued(address(hook), poolKey.currency0), 0);
+        assertEq(manager.hookFeesAccrued(address(hook), poolKey.currency1), 0);
+    }
+
     function testCounterHooks() public {
-        assertEq(counterHook.beforeSwapCounter(), 100);
-        assertEq(counterHook.afterSwapCounter(), 200);
+        assertEq(hook.beforeSwapCounter(), 100);
+        assertEq(hook.afterSwapCounter(), 200);
 
         // Perform a test swap //
         int256 amount = 100;
@@ -53,7 +62,10 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
         swap(poolKey, amount, zeroForOne);
         // ------------------- //
 
-        assertEq(counterHook.beforeSwapCounter(), 101);
-        assertEq(counterHook.afterSwapCounter(), 201);
+        assertEq(hook.beforeSwapCounter(), 101);
+        assertEq(hook.afterSwapCounter(), 201);
+
+        // assertGt(manager.hookFeesAccrued(address(hook), poolKey.currency0), 0);
+        // assertGt(manager.hookFeesAccrued(address(hook), poolKey.currency1), 0);
     }
 }
