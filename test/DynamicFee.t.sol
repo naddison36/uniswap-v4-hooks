@@ -8,6 +8,7 @@ import {FeeLibrary} from "@uniswap/v4-core/contracts/libraries/FeeLibrary.sol";
 import {Hooks} from "@uniswap/v4-core/contracts/libraries/Hooks.sol";
 import {TickMath} from "@uniswap/v4-core/contracts/libraries/TickMath.sol";
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
+import {BalanceDelta} from "@uniswap/v4-core/contracts/types/BalanceDelta.sol";
 import {PoolKey, PoolId, PoolIdLibrary} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 import {Deployers} from "@uniswap/v4-core/test/foundry-tests/utils/Deployers.sol";
 import {CurrencyLibrary, Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
@@ -74,7 +75,9 @@ contract DynamicFeeTest is HookTest, Deployers, GasSnapshot {
         bytes[] memory results = swap(poolKey, token0, 100);
 
         // Check settle result
-        assertEq(abi.decode(results[2], (uint256)), 100);
+        BalanceDelta delta = abi.decode(results[0], (BalanceDelta));
+        assertEq(delta.amount0(), 100);
+        assertEq(delta.amount1(), -98);
 
         // assertGt(manager.hookFeesAccrued(address(hook), poolKey.currency0), 0);
         // assertEq(manager.hookFeesAccrued(address(hook), poolKey.currency1), 0);

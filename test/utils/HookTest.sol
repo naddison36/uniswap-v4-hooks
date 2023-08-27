@@ -8,6 +8,7 @@ import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.s
 import {PoolModifyPositionTest} from "@uniswap/v4-core/contracts/test/PoolModifyPositionTest.sol";
 import {PoolSwapTest} from "@uniswap/v4-core/contracts/test/PoolSwapTest.sol";
 import {PoolDonateTest} from "@uniswap/v4-core/contracts/test/PoolDonateTest.sol";
+import {BalanceDelta} from "@uniswap/v4-core/contracts/types/BalanceDelta.sol";
 import {PoolKey} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 
 import {Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
@@ -83,31 +84,54 @@ contract HookTest is Test {
             amountSpecified: swapAmount,
             sqrtPriceLimitX96: zeroForOne ? MIN_PRICE_LIMIT : MAX_PRICE_LIMIT
         });
-        calls[0] =
-            Call(address(manager), CallType.Call, 0, abi.encodeWithSelector(manager.swap.selector, poolKey, params));
+        calls[0] = Call({
+            target: address(manager),
+            callType: CallType.Call,
+            value: 0,
+            data: abi.encodeWithSelector(manager.swap.selector, poolKey, params)
+        });
 
         // Transfer fromToken to Pool Manager
-        calls[1] = Call(
-            address(fromToken),
-            CallType.Call,
-            0,
-            abi.encodeWithSelector(token0.transferFrom.selector, address(this), address(manager), swapAmount)
-        );
+        calls[1] = Call({
+            target: address(fromToken),
+            callType: CallType.Call,
+            value: 0,
+            data: abi.encodeWithSelector(token0.transferFrom.selector, address(this), address(manager), swapAmount)
+        });
 
         // Settle fromToken
-        calls[2] =
-            Call(address(manager), CallType.Call, 0, abi.encodeWithSelector(manager.settle.selector, fromCurrency));
+        calls[2] = Call({
+            target: address(manager),
+            callType: CallType.Call,
+            value: 0,
+            data: abi.encodeWithSelector(manager.settle.selector, fromCurrency)
+        });
 
-        // Take toToken
-        calls[3] = Call(
-            address(manager),
-            CallType.Call,
-            0,
-            // TODO need to get this from the results
-            abi.encodeWithSelector(manager.take.selector, toCurrency, address(this), 98)
-        );
+        // Take toToken using a delegated call back to swapTake on this contract
+        bytes memory paramData = abi.encode(manager, toCurrency, address(this));
+        bytes memory swapTakeData = abi.encodeWithSelector(this.swapTake.selector, paramData, hex"");
+        calls[3] = Call({target: address(this), callType: CallType.Delegate, value: 0, data: swapTakeData});
+
+        // calls[3] = Call({
+        //     target: address(manager),
+        //     callType: CallType.Call,
+        //     value: 0,
+        //     data: abi.encodeWithSelector(manager.take.selector, toCurrency, address(this), 98)
+        // });
 
         results = router.process(calls);
+    }
+
+    function swapTake(bytes memory paramData, bytes memory resultData) external {
+        (PoolManager poolManager, Currency currency, address receipient) =
+            abi.decode(paramData, (PoolManager, Currency, address));
+
+        bytes[] memory results = abi.decode(resultData, (bytes[]));
+        BalanceDelta delta = abi.decode(results[0], (BalanceDelta));
+
+        uint128 takeAmount = uint128(-1 * delta.amount1());
+
+        poolManager.take(currency, receipient, takeAmount);
     }
 
     function mint(PoolKey memory poolKey, Currency currency, uint256 mintAmount)

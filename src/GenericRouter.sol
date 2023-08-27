@@ -12,10 +12,10 @@ enum CallType {
 }
 
 struct Call {
-    address target;
+    address target; // contract to be called, or account if no data
     CallType callType;
-    uint256 value;
-    bytes data;
+    uint256 value; // Ether value
+    bytes data; // call data
 }
 
 contract GenericRouter is ILockCallback {
@@ -37,15 +37,27 @@ contract GenericRouter is ILockCallback {
         bytes[] memory results = new bytes[](calls.length);
 
         bool success;
+        bytes memory result;
         for (uint256 i = 0; i < calls.length; ++i) {
             Call memory call = calls[i];
 
             if (call.callType == CallType.Delegate) {
-                (success, results[i]) = call.target.delegatecall(abi.encodeWithSelector(bytes4(call.data), results));
+                bytes4 selector = bytes4(call.data);
+                bytes memory dataNoSelector = removeSelector(call.data);
+                (bytes memory decodedCallData,) = abi.decode(dataNoSelector, (bytes, bytes));
+
+                bytes memory resultsData = abi.encode(results);
+
+                bytes memory dataWithResults = abi.encodeWithSelector(selector, decodedCallData, resultsData);
+
+                (success, results[i]) = call.target.delegatecall(dataWithResults);
             } else {
                 (success, results[i]) = call.target.call{value: call.value}(call.data);
+                console.log("results from call %s", i);
+                console.logBytes(results[i]);
             }
             if (success == false) {
+                console.log("call failed");
                 assembly {
                     let ptr := mload(0x40)
                     let size := returndatasize()
@@ -56,6 +68,16 @@ contract GenericRouter is ILockCallback {
         }
 
         return abi.encode(results);
+    }
+
+    function removeSelector(bytes memory data) public pure returns (bytes memory remainingData) {
+        require(data.length >= 4, "no selecor");
+
+        remainingData = new bytes(data.length - 4);
+
+        for (uint256 i = 0; i < remainingData.length; ++i) {
+            remainingData[i] = data[i + 4];
+        }
     }
 
     function onERC1155Received(address, address, uint256, uint256, bytes memory) public virtual returns (bytes4) {
