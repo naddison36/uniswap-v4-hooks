@@ -5,6 +5,7 @@ import "forge-std/Test.sol";
 import {GasSnapshot} from "forge-gas-snapshot/GasSnapshot.sol";
 import {IHooks} from "@uniswap/v4-core/contracts/interfaces/IHooks.sol";
 import {Hooks} from "@uniswap/v4-core/contracts/libraries/Hooks.sol";
+import {FeeLibrary} from "@uniswap/v4-core/contracts/libraries/FeeLibrary.sol";
 import {Pool} from "@uniswap/v4-core/contracts/libraries/Pool.sol";
 import {TickMath} from "@uniswap/v4-core/contracts/libraries/TickMath.sol";
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
@@ -34,7 +35,13 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
         hook = CounterHook(factory.mineDeploy(manager));
 
         // Create the pool
-        poolKey = PoolKey(Currency.wrap(address(token0)), Currency.wrap(address(token1)), 3000, 60, IHooks(hook));
+        poolKey = PoolKey(
+            Currency.wrap(address(token0)),
+            Currency.wrap(address(token1)),
+            FeeLibrary.HOOK_SWAP_FEE_FLAG | FeeLibrary.HOOK_WITHDRAW_FEE_FLAG | uint24(3000),
+            60,
+            IHooks(hook)
+        );
         manager.initialize(poolKey, SQRT_RATIO_1_1);
 
         // Provide liquidity over different ranges to the pool
@@ -49,11 +56,12 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
         router.addLiquidity(manager, poolKey, address(this), -60, 60, 10 ether);
     }
 
-    function testCounterHookFee() public {
+    function testCounterHookFees() public {
         // Check the hook fee
         (Pool.Slot0 memory slot0,,,) = manager.pools(poolKey.toId());
-        // assertEq(slot0.hookSwapFee, 3000);
-        assertEq(slot0.hookWithdrawFee, 0);
+        console.log("swap fee %s", slot0.hookSwapFee);
+        assertEq(slot0.hookSwapFee, 85);
+        assertEq(slot0.hookWithdrawFee, 51);
 
         assertEq(manager.hookFeesAccrued(address(hook), poolKey.currency0), 0);
         assertEq(manager.hookFeesAccrued(address(hook), poolKey.currency1), 0);
@@ -64,12 +72,12 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
         assertEq(hook.afterSwapCounter(), 200);
 
         // Perform a test swap
-        router.swap(manager, poolKey, address(this), address(this), poolKey.currency0, 100);
+        router.swap(manager, poolKey, address(this), address(this), poolKey.currency0, 1e18);
 
         assertEq(hook.beforeSwapCounter(), 101);
         assertEq(hook.afterSwapCounter(), 201);
 
-        // assertGt(manager.hookFeesAccrued(address(hook), poolKey.currency0), 0);
-        // assertGt(manager.hookFeesAccrued(address(hook), poolKey.currency1), 0);
+        assertGt(manager.hookFeesAccrued(address(hook), poolKey.currency0), 0);
+        assertEq(manager.hookFeesAccrued(address(hook), poolKey.currency1), 0);
     }
 }

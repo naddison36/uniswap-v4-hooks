@@ -2,12 +2,13 @@
 pragma solidity ^0.8.15;
 
 import {Hooks} from "@uniswap/v4-core/contracts/libraries/Hooks.sol";
+import {IHookFeeManager} from "@uniswap/v4-core/contracts/interfaces/IHookFeeManager.sol";
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
 import {PoolKey, PoolId, PoolIdLibrary} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 import {BalanceDelta} from "@uniswap/v4-core/contracts/types/BalanceDelta.sol";
 import {BaseHook} from "v4-periphery/BaseHook.sol";
 
-contract CounterHook is BaseHook {
+contract CounterHook is BaseHook, IHookFeeManager {
     using PoolIdLibrary for PoolKey;
 
     uint256 public beforeSwapCounter = 100;
@@ -33,6 +34,14 @@ contract CounterHook is BaseHook {
             beforeDonate: false,
             afterDonate: false
         });
+    }
+
+    function getHookSwapFee(PoolKey calldata key) external view returns (uint8 fee) {
+        fee = 85; // 20% fee as 85 = hex55 which is 5 in both directions. 1/5 = 20%
+    }
+
+    function getHookWithdrawFee(PoolKey calldata key) external view returns (uint8 fee) {
+        fee = 51; // 33% fee as 51 = hex33 which is 3 in both directions. 1/3 = 33%
     }
 
     function beforeModifyPosition(

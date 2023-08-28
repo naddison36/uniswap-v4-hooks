@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
+import {console} from "forge-std/console.sol";
 import "forge-std/Script.sol";
 import {Hooks} from "@uniswap/v4-core/contracts/libraries/Hooks.sol";
 import {IHooks} from "@uniswap/v4-core/contracts/interfaces/IHooks.sol";
@@ -14,7 +15,6 @@ import {GenericRouter, GenericRouterLibrary} from "../src/router/GenericRouterLi
 import {CounterHook, CounterFactory} from "../src/CounterFactory.sol";
 import {TestPoolManager} from "../test/utils/TestPoolManager.sol";
 
-import {console} from "forge-std/console.sol";
 
 /// @notice Forge script for deploying v4 & hooks to **anvil**
 /// @dev This script only works on an anvil RPC because v4 exceeds bytecode limits
