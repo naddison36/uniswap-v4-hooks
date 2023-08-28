@@ -37,11 +37,11 @@ contract CounterHook is BaseHook, IHookFeeManager {
     }
 
     function getHookSwapFee(PoolKey calldata key) external view returns (uint8 fee) {
-        fee = 85; // 20% fee as 85 = hex55 which is 5 in both directions. 1/5 = 20%
+        fee = 0x55; // 20% fee as 85 = hex55 which is 5 in both directions. 1/5 = 20%
     }
 
     function getHookWithdrawFee(PoolKey calldata key) external view returns (uint8 fee) {
-        fee = 51; // 33% fee as 51 = hex33 which is 3 in both directions. 1/3 = 33%
+        fee = 0x33; // 33% fee as 51 = hex33 which is 3 in both directions. 1/3 = 33%
     }
 
     function beforeModifyPosition(

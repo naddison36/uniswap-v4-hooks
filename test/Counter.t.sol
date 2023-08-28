@@ -60,8 +60,8 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
         // Check the hook fee
         (Pool.Slot0 memory slot0,,,) = manager.pools(poolKey.toId());
         console.log("swap fee %s", slot0.hookSwapFee);
-        assertEq(slot0.hookSwapFee, 85);
-        assertEq(slot0.hookWithdrawFee, 51);
+        assertEq(slot0.hookSwapFee, 0x55);
+        assertEq(slot0.hookWithdrawFee, 0x33);
 
         assertEq(manager.hookFeesAccrued(address(hook), poolKey.currency0), 0);
         assertEq(manager.hookFeesAccrued(address(hook), poolKey.currency1), 0);
