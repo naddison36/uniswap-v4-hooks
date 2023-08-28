@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
+import {console} from "forge-std/console.sol";
+
 import {IERC20Minimal} from "@uniswap/v4-core/contracts/interfaces/external/IERC20Minimal.sol";
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
 import {BalanceDelta} from "@uniswap/v4-core/contracts/types/BalanceDelta.sol";
@@ -20,6 +22,7 @@ library GenericRouterLibrary {
         GenericRouter router,
         IPoolManager manager,
         PoolKey memory poolKey,
+        address sender,
         int24 tickLower,
         int24 tickUpper,
         int256 liquidityAmount
@@ -38,7 +41,7 @@ library GenericRouterLibrary {
         });
 
         // Transfer token0 to Pool Manager
-        bytes memory paramData = abi.encode(poolKey.currency0, address(this), address(manager), true);
+        bytes memory paramData = abi.encode(Currency.unwrap(poolKey.currency0), sender, address(manager), true);
         calls[1] = Call({
             target: address(this),
             callType: CallType.Delegate,
@@ -57,7 +60,7 @@ library GenericRouterLibrary {
         });
 
         // Transfer token1 to Pool Manager
-        paramData = abi.encode(poolKey.currency1, address(this), address(manager), false);
+        paramData = abi.encode(Currency.unwrap(poolKey.currency1), sender, address(manager), false);
         calls[3] = Call({
             target: address(this),
             callType: CallType.Delegate,
@@ -79,21 +82,29 @@ library GenericRouterLibrary {
     }
 
     function transferToPool(bytes memory callData, bytes memory resultData) external {
-        (IERC20Minimal token, address sender, address receipient, bool zeroToken) =
-            abi.decode(callData, (IERC20Minimal, address, address, bool));
+        (address token, address sender, address receipient, bool zeroToken) =
+            abi.decode(callData, (address, address, address, bool));
 
         bytes[] memory results = abi.decode(resultData, (bytes[]));
         BalanceDelta delta = abi.decode(results[0], (BalanceDelta));
 
         uint128 amount = zeroToken ? uint128(delta.amount0()) : uint128(delta.amount1());
 
-        token.transferFrom(sender, receipient, amount);
+        console.log("\nabout to transfer %s from %s to %s ", amount, sender, receipient);
+        console.log("token %s", token);
+
+        require(IERC20Minimal(token).transferFrom(sender, receipient, amount), "transfer failed");
+
+        uint256 poolBalance = IERC20Minimal(token).balanceOf(receipient);
+        console.log("pool manager token balance %s", poolBalance);
     }
 
     function swap(
         GenericRouter router,
         IPoolManager manager,
         PoolKey memory poolKey,
+        address swapper,
+        address recipient,
         Currency fromCurrency,
         int256 swapAmount
     ) internal returns (bytes[] memory results) {
@@ -122,7 +133,7 @@ library GenericRouterLibrary {
             callType: CallType.Call,
             results: false,
             value: 0,
-            data: abi.encodeWithSelector(IERC20Minimal.transferFrom.selector, address(this), address(manager), swapAmount)
+            data: abi.encodeWithSelector(IERC20Minimal.transferFrom.selector, swapper, address(manager), swapAmount)
         });
 
         // Settle fromToken
@@ -135,7 +146,7 @@ library GenericRouterLibrary {
         });
 
         // Take toToken using a delegated call back to swapTake on this contract
-        bytes memory callData = abi.encode(manager, toCurrency, address(this), zeroForOne);
+        bytes memory callData = abi.encode(manager, toCurrency, recipient, zeroForOne);
         bytes memory swapTakeData =
             abi.encodeWithSelector(GenericRouterLibrary.swapTake.selector, callData, EmptyResults);
         calls[3] =

@@ -8,68 +8,62 @@ import {PoolManager} from "@uniswap/v4-core/contracts/PoolManager.sol";
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
 import {TickMath} from "@uniswap/v4-core/contracts/libraries/TickMath.sol";
 import {Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
-import {PoolKey, PoolId, PoolIdLibrary} from "@uniswap/v4-core/contracts/types/PoolId.sol";
+import {PoolKey} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 
-import {PoolModifyPositionTest} from "@uniswap/v4-core/contracts/test/PoolModifyPositionTest.sol";
-import {PoolSwapTest} from "@uniswap/v4-core/contracts/test/PoolSwapTest.sol";
-import {TestERC20} from "@uniswap/v4-core/contracts/test/TestERC20.sol";
-
+import {GenericRouter, GenericRouterLibrary} from "../src/router/GenericRouterLibrary.sol";
 import {CounterHook, CounterFactory} from "../src/CounterFactory.sol";
+import {TestPoolManager} from "../test/utils/TestPoolManager.sol";
+
+import {console} from "forge-std/console.sol";
 
 /// @notice Forge script for deploying v4 & hooks to **anvil**
 /// @dev This script only works on an anvil RPC because v4 exceeds bytecode limits
-contract CounterScript is Script {
-    PoolManager poolManager;
-    PoolModifyPositionTest modifyPositionRouter;
-    PoolSwapTest swapRouter;
-    TestERC20 token0;
-    TestERC20 token1;
+contract CounterScript is Script, TestPoolManager {
+    using GenericRouterLibrary for GenericRouter;
 
     PoolKey poolKey;
     uint256 privateKey;
     address signerAddr;
 
     uint160 public constant SQRT_RATIO_1_1 = 79228162514264337593543950336;
-    uint160 public constant MIN_PRICE_LIMIT = TickMath.MIN_SQRT_RATIO + 1;
-    uint160 public constant MAX_PRICE_LIMIT = TickMath.MAX_SQRT_RATIO - 1;
 
     function setUp() public {
         privateKey = vm.envUint("PRIVATE_KEY");
         signerAddr = vm.addr(privateKey);
+        console.log("signer %s", signerAddr);
+        console.log("script %s", address(this));
         vm.startBroadcast(privateKey);
 
-        uint256 approvalAmount = 2 ** 128;
-        // Deploy test tokens
-        deployTestTokens(approvalAmount);
-
-        // Deploy a new Uniswap Pool Manager
-        poolManager = new PoolManager(500000);
-
-        // Deploy the test routers
-        deployTestHelpers(approvalAmount);
+        TestPoolManager.initialize();
 
         // Deploy the hook
-        CounterFactory counterFactory = new CounterFactory();
+        CounterFactory factory = new CounterFactory();
 
         // Deploy has to mine a salt to match the Uniswap hook flags so can use a lot of gas
-        // If Counter.s.sol script is executed against a new Anvil node,
-        // the PoolManager address will be 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0.
-        // The first salt from 0 to get the required address perfix is 385
+        // If this counter script is executed against a new Anvil node,
+        // the PoolManager address will be 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9.
+        // The first salt from 0 to get the required address perfix is 82
         // so starting from that to not burn up too much gas.
-        IHooks hook = IHooks(counterFactory.mineDeploy(poolManager, 385));
+        IHooks hook = IHooks(factory.mineDeploy(manager, 82));
         console.log("Deployed hook to address %s", address(hook));
 
         // Derive the key for the new pool
         poolKey = PoolKey(Currency.wrap(address(token0)), Currency.wrap(address(token1)), 3000, 60, hook);
         // Create the pool in the Uniswap Pool Manager
-        poolManager.initialize(poolKey, SQRT_RATIO_1_1);
+        manager.initialize(poolKey, SQRT_RATIO_1_1);
+
+        console.log("currency0 %s", Currency.unwrap(poolKey.currency0));
+        console.log("currency1 %s", Currency.unwrap(poolKey.currency1));
+
+        // token0.transfer(address(manager), 1);
+        // token1.transfer(address(manager), 1);
 
         // Provide liquidity to the pool
-        modifyPositionRouter.modifyPosition(poolKey, IPoolManager.ModifyPositionParams(-60, 60, 10 ether));
-        modifyPositionRouter.modifyPosition(poolKey, IPoolManager.ModifyPositionParams(-120, 120, 10 ether));
-        modifyPositionRouter.modifyPosition(
-            poolKey, IPoolManager.ModifyPositionParams(TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 10 ether)
-        );
+        router.addLiquidity(manager, poolKey, signerAddr, -60, 60, 10 ether);
+        // router.addLiquidity(manager, poolKey, signerAddr, -120, 120, 10 ether);
+        // router.addLiquidity(
+        //     manager, poolKey, signerAddr, TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 10 ether
+        // );
 
         vm.stopBroadcast();
     }
@@ -78,52 +72,8 @@ contract CounterScript is Script {
         vm.startBroadcast(privateKey);
 
         // Perform a test swap
-        int256 amount = 100;
-        bool zeroForOne = true;
-        swap(poolKey, amount, zeroForOne);
+        // router.swap(manager, poolKey, signerAddr, signerAddr, poolKey.currency0, 100);
 
         vm.stopBroadcast();
-    }
-
-    function swap(PoolKey memory key, int256 amountSpecified, bool zeroForOne) internal {
-        IPoolManager.SwapParams memory params = IPoolManager.SwapParams({
-            zeroForOne: zeroForOne,
-            amountSpecified: amountSpecified,
-            sqrtPriceLimitX96: zeroForOne ? MIN_PRICE_LIMIT : MAX_PRICE_LIMIT // unlimited impact
-        });
-
-        PoolSwapTest.TestSettings memory testSettings =
-            PoolSwapTest.TestSettings({withdrawTokens: true, settleUsingTransfer: true});
-
-        swapRouter.swap(key, params, testSettings);
-    }
-
-    function deployTestTokens(uint256 amount) public {
-        TestERC20 _tokenA = new TestERC20(amount);
-        TestERC20 _tokenB = new TestERC20(amount);
-
-        // pools alphabetically sort tokens by address
-        // so align `token0` with `pool.token0` for consistency
-        if (address(_tokenA) < address(_tokenB)) {
-            token0 = _tokenA;
-            token1 = _tokenB;
-        } else {
-            token0 = _tokenB;
-            token1 = _tokenA;
-        }
-    }
-
-    function deployTestHelpers(uint256 amount) public {
-        // Helpers for interacting with the pool
-        modifyPositionRouter = new PoolModifyPositionTest(IPoolManager(address(poolManager)));
-        swapRouter = new PoolSwapTest(IPoolManager(address(poolManager)));
-
-        // Approve for liquidity provision
-        token0.approve(address(modifyPositionRouter), amount);
-        token1.approve(address(modifyPositionRouter), amount);
-
-        // Approve for swapping
-        token0.approve(address(swapRouter), amount);
-        token1.approve(address(swapRouter), amount);
     }
 }

@@ -64,7 +64,7 @@ contract GenericRouter is ILockCallback {
             }
 
             if (success == false) {
-                console.log("call failed");
+                console.log("%s call failed", i);
                 assembly {
                     let ptr := mload(0x40)
                     let size := returndatasize()
@@ -72,6 +72,7 @@ contract GenericRouter is ILockCallback {
                     revert(ptr, size)
                 }
             }
+            console.log("%s call succeeded", i);
         }
 
         return abi.encode(results);

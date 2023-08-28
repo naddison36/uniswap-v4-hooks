@@ -38,9 +38,15 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
         manager.initialize(poolKey, SQRT_RATIO_1_1);
 
         // Provide liquidity over different ranges to the pool
-        router.addLiquidity(manager, poolKey, -60, 60, 10 ether);
-        router.addLiquidity(manager, poolKey, -120, 120, 10 ether);
-        router.addLiquidity(manager, poolKey, TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 10 ether);
+        router.addLiquidity(manager, poolKey, address(this), -60, 60, 10 ether);
+        router.addLiquidity(manager, poolKey, address(this), -120, 120, 10 ether);
+        router.addLiquidity(
+            manager, poolKey, address(this), TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 10 ether
+        );
+    }
+
+    function testAddLiquidity() public {
+        router.addLiquidity(manager, poolKey, address(this), -60, 60, 10 ether);
     }
 
     function testCounterHookFee() public {
@@ -58,7 +64,7 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
         assertEq(hook.afterSwapCounter(), 200);
 
         // Perform a test swap
-        router.swap(manager, poolKey, poolKey.currency0, 100);
+        router.swap(manager, poolKey, address(this), address(this), poolKey.currency0, 100);
 
         assertEq(hook.beforeSwapCounter(), 101);
         assertEq(hook.afterSwapCounter(), 201);
