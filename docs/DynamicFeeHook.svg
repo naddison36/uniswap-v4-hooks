@@ -9,9 +9,9 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 205.8)">
 <title>UmlClassDiagram</title>
 <polygon fill="white" stroke="transparent" points="-4,4 -4,-205.8 815.09,-205.8 815.09,4 -4,4"/>
-<!-- 4 -->
+<!-- 5 -->
 <g id="node1" class="node">
-<title>4</title>
+<title>5</title>
 <polygon fill="#f2f2f2" stroke="black" points="0,-0.5 0,-201.3 811.09,-201.3 811.09,-0.5 0,-0.5"/>
 <text text-anchor="middle" x="405.55" y="-184.7" font-family="Times,serif" font-size="14.00">DynamicFeeHook</text>
 <text text-anchor="middle" x="405.55" y="-167.9" font-family="Times,serif" font-size="14.00">../src/DynamicFeeHook.sol</text>

@@ -14,9 +14,9 @@ import {TickMath} from "@uniswap/v4-core/contracts/libraries/TickMath.sol";
 import {Call, CallType, GenericRouter} from "../../src/router/GenericRouter.sol";
 
 library GenericRouterLibrary {
-    uint160 public constant MIN_PRICE_LIMIT = TickMath.MIN_SQRT_RATIO + 1;
-    uint160 public constant MAX_PRICE_LIMIT = TickMath.MAX_SQRT_RATIO - 1;
-    bytes constant EmptyResults = hex"";
+    uint160 internal constant MIN_PRICE_LIMIT = TickMath.MIN_SQRT_RATIO + 1;
+    uint160 internal constant MAX_PRICE_LIMIT = TickMath.MAX_SQRT_RATIO - 1;
+    bytes internal constant EMPTY_RESULTS = hex"";
 
     function addLiquidity(
         GenericRouter router,
@@ -27,7 +27,7 @@ library GenericRouterLibrary {
         int24 tickLower,
         int24 tickUpper,
         int256 liquidityAmount
-    ) internal returns (bytes[] memory results) {
+    ) external returns (bytes[] memory results) {
         Call[] memory calls = new Call[](5);
 
         // Add liquidity to the pool
@@ -48,7 +48,7 @@ library GenericRouterLibrary {
             callType: CallType.Delegate,
             results: true,
             value: 0,
-            data: abi.encodeWithSelector(GenericRouterLibrary.addLiquidityCallback.selector, paramData, EmptyResults)
+            data: abi.encodeWithSelector(GenericRouterLibrary.addLiquidityCallback.selector, paramData, EMPTY_RESULTS)
         });
 
         // Settle token0
@@ -67,7 +67,7 @@ library GenericRouterLibrary {
             callType: CallType.Delegate,
             results: true,
             value: 0,
-            data: abi.encodeWithSelector(GenericRouterLibrary.addLiquidityCallback.selector, paramData, EmptyResults)
+            data: abi.encodeWithSelector(GenericRouterLibrary.addLiquidityCallback.selector, paramData, EMPTY_RESULTS)
         });
 
         // Settle token1
@@ -103,7 +103,7 @@ library GenericRouterLibrary {
         address recipient,
         Currency fromCurrency,
         int256 swapAmount
-    ) internal returns (bytes[] memory results) {
+    ) external returns (bytes[] memory results) {
         Call[] memory calls = new Call[](4);
 
         bool zeroForOne = fromCurrency == poolKey.currency0;
@@ -144,7 +144,7 @@ library GenericRouterLibrary {
         // Take toToken using swapCallback
         bytes memory callData = abi.encode(manager, toCurrency, recipient, zeroForOne);
         bytes memory callbackData =
-            abi.encodeWithSelector(GenericRouterLibrary.swapCallback.selector, callData, EmptyResults);
+            abi.encodeWithSelector(GenericRouterLibrary.swapCallback.selector, callData, EMPTY_RESULTS);
         calls[3] =
             Call({target: routerCallback, callType: CallType.Delegate, results: true, value: 0, data: callbackData});
 
@@ -164,7 +164,7 @@ library GenericRouterLibrary {
     }
 
     function mint(GenericRouter router, IPoolManager manager, Currency currency, uint256 mintAmount)
-        internal
+        external
         returns (bytes[] memory results)
     {
         Call[] memory calls = new Call[](3);
@@ -208,7 +208,7 @@ library GenericRouterLibrary {
         int24 tickLower,
         int24 tickUpper,
         int256 liquidityAmount
-    ) internal returns (bytes[] memory results) {
+    ) external returns (bytes[] memory results) {
         Call[] memory calls = new Call[](2);
 
         // Add liquidity to the pool
@@ -225,7 +225,7 @@ library GenericRouterLibrary {
         // Take toToken using swapCallback
         bytes memory callData = abi.encode(manager, poolKey.currency0, poolKey.currency1, recipient);
         bytes memory callbackData =
-            abi.encodeWithSelector(GenericRouterLibrary.removeLiquidityCallback.selector, callData, EmptyResults);
+            abi.encodeWithSelector(GenericRouterLibrary.removeLiquidityCallback.selector, callData, EMPTY_RESULTS);
         calls[1] =
             Call({target: routerCallback, callType: CallType.Delegate, results: true, value: 0, data: callbackData});
 

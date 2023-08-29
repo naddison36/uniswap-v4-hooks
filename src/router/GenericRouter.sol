@@ -77,7 +77,7 @@ contract GenericRouter is ILockCallback {
     }
 
     // TODO use a more efficient method than this
-    function removeSelector(bytes memory data) public pure returns (bytes memory remainingData) {
+    function removeSelector(bytes memory data) internal pure returns (bytes memory remainingData) {
         require(data.length >= 4, "no selector");
 
         remainingData = new bytes(data.length - 4);
@@ -86,12 +86,12 @@ contract GenericRouter is ILockCallback {
         }
     }
 
-    function onERC1155Received(address, address, uint256, uint256, bytes memory) public virtual returns (bytes4) {
+    function onERC1155Received(address, address, uint256, uint256, bytes memory) external virtual returns (bytes4) {
         return this.onERC1155Received.selector;
     }
 
     function onERC1155BatchReceived(address, address, uint256[] memory, uint256[] memory, bytes memory)
-        public
+        external
         virtual
         returns (bytes4)
     {
