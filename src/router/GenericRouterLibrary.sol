@@ -20,6 +20,7 @@ library GenericRouterLibrary {
 
     function addLiquidity(
         GenericRouter router,
+        address routerCallback,
         IPoolManager manager,
         PoolKey memory poolKey,
         address sender,
@@ -43,11 +44,11 @@ library GenericRouterLibrary {
         // Transfer token0 to Pool Manager
         bytes memory paramData = abi.encode(Currency.unwrap(poolKey.currency0), sender, address(manager), true);
         calls[1] = Call({
-            target: address(this),
+            target: routerCallback,
             callType: CallType.Delegate,
             results: true,
             value: 0,
-            data: abi.encodeWithSelector(GenericRouterLibrary.transferToPool.selector, paramData, EmptyResults)
+            data: abi.encodeWithSelector(GenericRouterLibrary.addLiquidityCallback.selector, paramData, EmptyResults)
         });
 
         // Settle token0
@@ -62,11 +63,11 @@ library GenericRouterLibrary {
         // Transfer token1 to Pool Manager
         paramData = abi.encode(Currency.unwrap(poolKey.currency1), sender, address(manager), false);
         calls[3] = Call({
-            target: address(this),
+            target: routerCallback,
             callType: CallType.Delegate,
             results: true,
             value: 0,
-            data: abi.encodeWithSelector(GenericRouterLibrary.transferToPool.selector, paramData, EmptyResults)
+            data: abi.encodeWithSelector(GenericRouterLibrary.addLiquidityCallback.selector, paramData, EmptyResults)
         });
 
         // Settle token1
@@ -81,26 +82,21 @@ library GenericRouterLibrary {
         results = router.process(calls);
     }
 
-    function transferToPool(bytes memory callData, bytes memory resultData) external {
-        (address token, address sender, address receipient, bool zeroToken) =
-            abi.decode(callData, (address, address, address, bool));
+    function addLiquidityCallback(bytes memory callData, bytes memory resultData) external {
+        (IERC20Minimal token, address sender, address receipient, bool zeroToken) =
+            abi.decode(callData, (IERC20Minimal, address, address, bool));
 
         bytes[] memory results = abi.decode(resultData, (bytes[]));
         BalanceDelta delta = abi.decode(results[0], (BalanceDelta));
 
         uint128 amount = zeroToken ? uint128(delta.amount0()) : uint128(delta.amount1());
 
-        console.log("\nabout to transfer %s from %s to %s ", amount, sender, receipient);
-        console.log("token %s", token);
-
-        require(IERC20Minimal(token).transferFrom(sender, receipient, amount), "transfer failed");
-
-        uint256 poolBalance = IERC20Minimal(token).balanceOf(receipient);
-        console.log("pool manager token balance %s", poolBalance);
+        require(token.transferFrom(sender, receipient, amount), "transfer failed");
     }
 
     function swap(
         GenericRouter router,
+        address routerCallback,
         IPoolManager manager,
         PoolKey memory poolKey,
         address swapper,
@@ -148,14 +144,14 @@ library GenericRouterLibrary {
         // Take toToken using a delegated call back to swapTake on this contract
         bytes memory callData = abi.encode(manager, toCurrency, recipient, zeroForOne);
         bytes memory swapTakeData =
-            abi.encodeWithSelector(GenericRouterLibrary.swapTake.selector, callData, EmptyResults);
+            abi.encodeWithSelector(GenericRouterLibrary.swapCallback.selector, callData, EmptyResults);
         calls[3] =
-            Call({target: address(this), callType: CallType.Delegate, results: true, value: 0, data: swapTakeData});
+            Call({target: routerCallback, callType: CallType.Delegate, results: true, value: 0, data: swapTakeData});
 
         results = router.process(calls);
     }
 
-    function swapTake(bytes memory callData, bytes memory resultData) external {
+    function swapCallback(bytes memory callData, bytes memory resultData) external {
         (IPoolManager poolManager, Currency currency, address receipient, bool zeroForOne) =
             abi.decode(callData, (IPoolManager, Currency, address, bool));
 

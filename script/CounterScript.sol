@@ -15,7 +15,6 @@ import {GenericRouter, GenericRouterLibrary} from "../src/router/GenericRouterLi
 import {CounterHook, CounterFactory} from "../src/CounterFactory.sol";
 import {TestPoolManager} from "../test/utils/TestPoolManager.sol";
 
-
 /// @notice Forge script for deploying v4 & hooks to **anvil**
 /// @dev This script only works on an anvil RPC because v4 exceeds bytecode limits
 contract CounterScript is Script, TestPoolManager {
@@ -42,9 +41,9 @@ contract CounterScript is Script, TestPoolManager {
         // Deploy has to mine a salt to match the Uniswap hook flags so can use a lot of gas
         // If this counter script is executed against a new Anvil node,
         // the PoolManager address will be 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9.
-        // The first salt from 0 to get the required address perfix is 82
+        // The first salt from 0 to get the required address perfix is 248
         // so starting from that to not burn up too much gas.
-        IHooks hook = IHooks(factory.mineDeploy(manager, 82));
+        IHooks hook = IHooks(factory.mineDeploy(manager, 248));
         console.log("Deployed hook to address %s", address(hook));
 
         // Derive the key for the new pool
@@ -55,15 +54,18 @@ contract CounterScript is Script, TestPoolManager {
         console.log("currency0 %s", Currency.unwrap(poolKey.currency0));
         console.log("currency1 %s", Currency.unwrap(poolKey.currency1));
 
-        // token0.transfer(address(manager), 1);
-        // token1.transfer(address(manager), 1);
-
         // Provide liquidity to the pool
-        router.addLiquidity(manager, poolKey, signerAddr, -60, 60, 10 ether);
-        // router.addLiquidity(manager, poolKey, signerAddr, -120, 120, 10 ether);
-        // router.addLiquidity(
-        //     manager, poolKey, signerAddr, TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 10 ether
-        // );
+        router.addLiquidity(routerCallback, manager, poolKey, signerAddr, -60, 60, 10 ether);
+        router.addLiquidity(routerCallback, manager, poolKey, signerAddr, -120, 120, 10 ether);
+        router.addLiquidity(
+            routerCallback,
+            manager,
+            poolKey,
+            signerAddr,
+            TickMath.minUsableTick(60),
+            TickMath.maxUsableTick(60),
+            10 ether
+        );
 
         vm.stopBroadcast();
     }
@@ -72,7 +74,7 @@ contract CounterScript is Script, TestPoolManager {
         vm.startBroadcast(privateKey);
 
         // Perform a test swap
-        // router.swap(manager, poolKey, signerAddr, signerAddr, poolKey.currency0, 100);
+        router.swap(routerCallback, manager, poolKey, signerAddr, signerAddr, poolKey.currency0, 100);
 
         vm.stopBroadcast();
     }

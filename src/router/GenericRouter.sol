@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import {ILockCallback} from "@uniswap/v4-core/contracts//interfaces/callback/ILockCallback.sol";
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
+import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
 import {console} from "forge-std/console.sol";
 
@@ -58,13 +59,12 @@ contract GenericRouter is ILockCallback {
             }
 
             if (call.callType == CallType.Delegate) {
-                (success, results[i]) = call.target.delegatecall(callData);
+                results[i] = Address.functionDelegateCall(call.target, callData);
             } else {
                 (success, results[i]) = call.target.call{value: call.value}(callData);
             }
 
             if (success == false) {
-                console.log("%s call failed", i);
                 assembly {
                     let ptr := mload(0x40)
                     let size := returndatasize()
@@ -72,7 +72,6 @@ contract GenericRouter is ILockCallback {
                     revert(ptr, size)
                 }
             }
-            console.log("%s call succeeded", i);
         }
 
         return abi.encode(results);
