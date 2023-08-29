@@ -7,7 +7,7 @@ import {PoolKey, PoolId, PoolIdLibrary} from "@uniswap/v4-core/contracts/types/P
 import {BalanceDelta} from "@uniswap/v4-core/contracts/types/BalanceDelta.sol";
 import {BaseHook} from "v4-periphery/BaseHook.sol";
 
-import {BaseFactory} from "./BaseFactory.sol";
+import {BaseFactory} from "../BaseFactory.sol";
 
 contract NoHook is BaseHook {
     using PoolIdLibrary for PoolKey;

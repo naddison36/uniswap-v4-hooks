@@ -21,6 +21,7 @@ contract TestPoolManager {
 
     uint160 public constant MIN_PRICE_LIMIT = TickMath.MIN_SQRT_RATIO + 1;
     uint160 public constant MAX_PRICE_LIMIT = TickMath.MAX_SQRT_RATIO - 1;
+    uint160 public constant SQRT_RATIO_1_TO_1 = 79228162514264337593543950336;
     bytes constant EmptyResults = hex"";
     uint256 constant MaxAmount = type(uint128).max;
 

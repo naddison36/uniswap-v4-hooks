@@ -15,7 +15,7 @@ import {CurrencyLibrary, Currency} from "@uniswap/v4-core/contracts/types/Curren
 import {Pool} from "@uniswap/v4-core/contracts/libraries/Pool.sol";
 
 import {TestPoolManager} from "./utils/TestPoolManager.sol";
-import {DynamicFeeHook, DynamicFeeFactory} from "../src/DynamicFeeFactory.sol";
+import {DynamicFeeHook, DynamicFeeFactory} from "../src/hooks/DynamicFeeHook.sol";
 import {GenericRouter, GenericRouterLibrary} from "../src/router/GenericRouterLibrary.sol";
 
 contract DynamicFeeTest is Test, TestPoolManager, Deployers, GasSnapshot {

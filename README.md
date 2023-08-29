@@ -50,7 +50,6 @@ Because v4 exceeds the bytecode limit of Ethereum and it's _business licensed_, 
 The following runs the [script/CounterScript](./script/CounterScript.sol) Forge script against a local Anvil node that:
 
 - Deploys the Uniswap v4 PoolManager
-- Deploys the [CounterFactory](./src/CounterFactory.sol) contract.
 - Uses the `CounterFactory` to deploy a [CounterHook](./src/CounterHook.sol) contract with the correct address prefix.
 - Creates a new pool with `CounterHook` as the hook.
 - Adds token liquidity to the pool

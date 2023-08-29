@@ -4,8 +4,6 @@ pragma solidity ^0.8.15;
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
 import {Hooks} from "@uniswap/v4-core/contracts/libraries/Hooks.sol";
 
-import {CounterHook} from "./CounterHook.sol";
-
 import {console} from "forge-std/console.sol";
 
 abstract contract BaseFactory {

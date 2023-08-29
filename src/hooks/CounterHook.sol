@@ -8,6 +8,8 @@ import {PoolKey, PoolId, PoolIdLibrary} from "@uniswap/v4-core/contracts/types/P
 import {BalanceDelta} from "@uniswap/v4-core/contracts/types/BalanceDelta.sol";
 import {BaseHook} from "v4-periphery/BaseHook.sol";
 
+import {BaseFactory} from "../BaseFactory.sol";
+
 contract CounterHook is BaseHook, IHookFeeManager {
     using PoolIdLibrary for PoolKey;
 
@@ -88,5 +90,26 @@ contract CounterHook is BaseHook, IHookFeeManager {
         emit AfterSwap(afterSwapCounter);
 
         selector = BaseHook.afterSwap.selector;
+    }
+}
+
+contract CounterFactory is BaseFactory {
+    constructor()
+        BaseFactory(
+            address(
+                uint160(
+                    Hooks.BEFORE_MODIFY_POSITION_FLAG | Hooks.AFTER_MODIFY_POSITION_FLAG | Hooks.BEFORE_SWAP_FLAG
+                        | Hooks.AFTER_SWAP_FLAG
+                )
+            )
+        )
+    {}
+
+    function deploy(IPoolManager poolManager, bytes32 salt) public override returns (address) {
+        return address(new CounterHook{salt: salt}(poolManager));
+    }
+
+    function _hashBytecode(IPoolManager poolManager) internal pure override returns (bytes32 bytecodeHash) {
+        bytecodeHash = keccak256(abi.encodePacked(type(CounterHook).creationCode, abi.encode(poolManager)));
     }
 }

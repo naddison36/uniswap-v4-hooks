@@ -2,12 +2,15 @@
 pragma solidity ^0.8.15;
 
 import {Hooks} from "@uniswap/v4-core/contracts/libraries/Hooks.sol";
+import {IHookFeeManager} from "@uniswap/v4-core/contracts/interfaces/IHookFeeManager.sol";
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
 import {PoolKey, PoolId, PoolIdLibrary} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 import {BalanceDelta} from "@uniswap/v4-core/contracts/types/BalanceDelta.sol";
 import {BaseHook} from "v4-periphery/BaseHook.sol";
 
-contract MyHook is BaseHook {
+import {BaseFactory} from "../BaseFactory.sol";
+
+contract MyHook is BaseHook, IHookFeeManager {
     using PoolIdLibrary for PoolKey;
 
     constructor(IPoolManager _poolManager) BaseHook(_poolManager) {}
@@ -105,5 +108,35 @@ contract MyHook is BaseHook {
         // insert hook logic here
 
         selector = BaseHook.afterDonate.selector;
+    }
+
+    function getHookSwapFee(PoolKey calldata key) external view returns (uint8 fee) {
+        fee = 0;
+    }
+
+    function getHookWithdrawFee(PoolKey calldata key) external view returns (uint8 fee) {
+        fee = 0;
+    }
+}
+
+contract MyHookFactory is BaseFactory {
+    constructor()
+        BaseFactory(
+            address(
+                uint160(
+                    Hooks.BEFORE_INITIALIZE_FLAG | Hooks.AFTER_INITIALIZE_FLAG | Hooks.BEFORE_MODIFY_POSITION_FLAG
+                        | Hooks.AFTER_MODIFY_POSITION_FLAG | Hooks.BEFORE_SWAP_FLAG | Hooks.AFTER_SWAP_FLAG
+                        | Hooks.BEFORE_DONATE_FLAG | Hooks.AFTER_DONATE_FLAG
+                )
+            )
+        )
+    {}
+
+    function deploy(IPoolManager poolManager, bytes32 salt) public override returns (address) {
+        return address(new MyHook{salt: salt}(poolManager));
+    }
+
+    function _hashBytecode(IPoolManager poolManager) internal pure override returns (bytes32 bytecodeHash) {
+        bytecodeHash = keccak256(abi.encodePacked(type(MyHook).creationCode, abi.encode(poolManager)));
     }
 }

@@ -14,7 +14,7 @@ import {Deployers} from "@uniswap/v4-core/test/foundry-tests/utils/Deployers.sol
 import {CurrencyLibrary, Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
 
 import {TestPoolManager} from "./utils/TestPoolManager.sol";
-import {CounterHook, CounterFactory} from "../src/CounterFactory.sol";
+import {CounterHook, CounterFactory} from "../src/hooks/CounterHook.sol";
 import {GenericRouter, GenericRouterLibrary} from "../src/router/GenericRouterLibrary.sol";
 
 contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
@@ -48,7 +48,13 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
         router.addLiquidity(routerCallback, manager, poolKey, address(this), -60, 60, 10 ether);
         router.addLiquidity(routerCallback, manager, poolKey, address(this), -120, 120, 10 ether);
         router.addLiquidity(
-            routerCallback, manager, poolKey, address(this), TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 10 ether
+            routerCallback,
+            manager,
+            poolKey,
+            address(this),
+            TickMath.minUsableTick(60),
+            TickMath.maxUsableTick(60),
+            10 ether
         );
     }
 

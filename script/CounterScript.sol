@@ -12,7 +12,7 @@ import {TickMath} from "@uniswap/v4-core/contracts/libraries/TickMath.sol";
 import {Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
 import {PoolKey} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 
-import {CounterHook, CounterFactory} from "../src/CounterFactory.sol";
+import {CounterHook, CounterFactory} from "../src/hooks/CounterHook.sol";
 import {GenericRouter, GenericRouterLibrary} from "../src/router/GenericRouterLibrary.sol";
 import {TestPoolManager} from "../test/utils/TestPoolManager.sol";
 
@@ -24,8 +24,6 @@ contract CounterScript is Script, TestPoolManager {
     PoolKey poolKey;
     uint256 privateKey;
     address signerAddr;
-
-    uint160 public constant SQRT_RATIO_1_1 = 79228162514264337593543950336;
 
     function setUp() public {
         privateKey = vm.envUint("PRIVATE_KEY");
@@ -42,9 +40,9 @@ contract CounterScript is Script, TestPoolManager {
         // Deploy has to mine a salt to match the Uniswap hook flags so can use a lot of gas
         // If this counter script is executed against a new Anvil node,
         // the PoolManager address will be 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9.
-        // The first salt from 0 to get the required address perfix is 282
+        // The first salt from 0 to get the required address perfix is 471
         // so starting from that to not burn up too much gas.
-        IHooks hook = IHooks(factory.mineDeploy(manager, 282));
+        IHooks hook = IHooks(factory.mineDeploy(manager, 471));
         console.log("Deployed hook to address %s", address(hook));
 
         // Derive the key for the new pool
@@ -56,7 +54,7 @@ contract CounterScript is Script, TestPoolManager {
             hook
         );
         // Create the pool in the Uniswap Pool Manager
-        manager.initialize(poolKey, SQRT_RATIO_1_1);
+        manager.initialize(poolKey, SQRT_RATIO_1_TO_1);
 
         console.log("currency0 %s", Currency.unwrap(poolKey.currency0));
         console.log("currency1 %s", Currency.unwrap(poolKey.currency1));
