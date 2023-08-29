@@ -19,7 +19,7 @@ Deploy a `CounterHook` contract via the `CounterFactory` and initialize a new Un
 ```
 tx2uml --nodeType anvil --configFile counter.config.json --chain none -t -g -v \
     --noAddresses 0x000000000000000000636f6e736f6c652e6c6f67 \
-    0xd9fced18673bcd85b32ea84f899e47a7d4336e6977471fe995c9bbfc9390d0e5,0xafeafe6c046345f34878c8e2652e6c06b875f9ee558a7e6f90d2b0c03c42e40a \
+    0x3f17825b8fe0d777f7ddf35ee512a9258ef1234869bcf02f715ebd9f4af28358,0x3e8aa6240dfe1302a385bafc15dec04bf11322723d5a7a180e47fd0095a090a1 \
     -o counterSetup
 ```
 

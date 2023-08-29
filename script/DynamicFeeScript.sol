@@ -38,9 +38,9 @@ contract DynamicFeeScript is Script, TestPoolManager {
         DynamicFeeFactory factory = new DynamicFeeFactory();
 
         // If the PoolManager address is 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0,
-        // the first salt from 0 to get the required address perfix is 65.
+        // the first salt from 0 to get the required address perfix is 53.
         // Any changes to the DynamicFee contract will mean a different salt will be needed
-        IHooks hook = IHooks(factory.mineDeploy(manager, 65));
+        IHooks hook = IHooks(factory.mineDeploy(manager, 53));
         console.log("Deployed hook to address %s", address(hook));
 
         // Derive the key for the new pool

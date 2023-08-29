@@ -1,5 +1,5 @@
 {
-  "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6": {
+  "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853": {
     "contractName": "CounterFactory",
     "abi": [
       {
@@ -816,6 +816,98 @@
             "internalType": "uint256",
             "name": "",
             "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "components": [
+              {
+                "internalType": "Currency",
+                "name": "currency0",
+                "type": "address"
+              },
+              {
+                "internalType": "Currency",
+                "name": "currency1",
+                "type": "address"
+              },
+              {
+                "internalType": "uint24",
+                "name": "fee",
+                "type": "uint24"
+              },
+              {
+                "internalType": "int24",
+                "name": "tickSpacing",
+                "type": "int24"
+              },
+              {
+                "internalType": "contract IHooks",
+                "name": "hooks",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct PoolKey",
+            "name": "key",
+            "type": "tuple"
+          }
+        ],
+        "name": "getHookSwapFee",
+        "outputs": [
+          {
+            "internalType": "uint8",
+            "name": "fee",
+            "type": "uint8"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "components": [
+              {
+                "internalType": "Currency",
+                "name": "currency0",
+                "type": "address"
+              },
+              {
+                "internalType": "Currency",
+                "name": "currency1",
+                "type": "address"
+              },
+              {
+                "internalType": "uint24",
+                "name": "fee",
+                "type": "uint24"
+              },
+              {
+                "internalType": "int24",
+                "name": "tickSpacing",
+                "type": "int24"
+              },
+              {
+                "internalType": "contract IHooks",
+                "name": "hooks",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct PoolKey",
+            "name": "key",
+            "type": "tuple"
+          }
+        ],
+        "name": "getHookWithdrawFee",
+        "outputs": [
+          {
+            "internalType": "uint8",
+            "name": "fee",
+            "type": "uint8"
           }
         ],
         "stateMutability": "view",
