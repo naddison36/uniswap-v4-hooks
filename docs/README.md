@@ -33,7 +33,7 @@ tx2uml --nodeType anvil --configFile counter.config.json --chain none -p -g -t -
     -o counterModifySummary
 ```
 
-![Counter Modify Detailed](./counterModifyDetailed.svg)
+See the full trace with parameters in [counterModifyDetailed.svg](./counterModifyDetailed.svg)
 
 ```
 tx2uml --nodeType anvil --configFile counter.config.json --chain none -g -t -v \
@@ -51,7 +51,7 @@ tx2uml --nodeType anvil --configFile counter.config.json --chain none -p -g -t -
     -o counterSwapSummary
 ```
 
-![Counter Swap Detailed](./counterSwapDetailed.svg)
+See the full trace with parameters in [counterSwapDetailed.svg](./counterSwapDetailed.svg)
 
 ```
 tx2uml --nodeType anvil --configFile counter.config.json --chain none -g -t -v \
@@ -78,7 +78,7 @@ tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -p -g -
     -o dynamicFeeSwapSummary
 ```
 
-![Dynamic Fee Swap Detailed](./dynamicFeeSwapDetailed.svg)
+See the full trace with parameters in [dynamicFeeSwapDetailed.svg](./dynamicFeeSwapDetailed.svg)
 
 ```
 tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -v \
@@ -96,7 +96,7 @@ tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -p -g -
     -o dynamicFeeDepositSummary
 ```
 
-![Dynamic Fee Deposit Detailed](./dynamicFeeDepositDetailed.svg)
+See the full trace with parameters in [dynamicFeeDepositDetailed](./dynamicFeeDepositDetailed.svg)
 
 ```
 tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -v \
@@ -112,7 +112,7 @@ tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -
 tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -p -g -t -v 0x58f377de805864a0d355eade323de8c65ebfbd1c1cf4072934612e102fed3328 -o dynamicFeeWithdrawSummary
 ```
 
-![Dynamic Fee Withdraw Detailed](./dynamicFeeWithdrawDetailed.svg)
+See the full trace with parameters in [dynamicFeeWithdrawDetailed.svg](./dynamicFeeWithdrawDetailed.svg)
 
 ```
 tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -v 0x58f377de805864a0d355eade323de8c65ebfbd1c1cf4072934612e102fed3328 -o dynamicFeeWithdrawDetailed
