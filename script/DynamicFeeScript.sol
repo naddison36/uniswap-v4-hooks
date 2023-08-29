@@ -54,16 +54,10 @@ contract DynamicFeeScript is Script, TestPoolManager {
         console.log("currency1 %s", Currency.unwrap(poolKey.currency1));
 
         // Provide liquidity to the pool
-        router.addLiquidity(routerCallback, manager, poolKey, signerAddr, -60, 60, 10 ether);
-        router.addLiquidity(routerCallback, manager, poolKey, signerAddr, -120, 120, 20 ether);
+        router.addLiquidity(routerCallback, manager, poolKey, signerAddr, -60, 60, 10e18);
+        router.addLiquidity(routerCallback, manager, poolKey, signerAddr, -120, 120, 20e18);
         router.addLiquidity(
-            routerCallback,
-            manager,
-            poolKey,
-            signerAddr,
-            TickMath.minUsableTick(60),
-            TickMath.maxUsableTick(60),
-            30 ether
+            routerCallback, manager, poolKey, signerAddr, TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 30e18
         );
 
         vm.stopBroadcast();
@@ -74,9 +68,14 @@ contract DynamicFeeScript is Script, TestPoolManager {
 
         // Perform a test swap
         router.swap(routerCallback, manager, poolKey, signerAddr, signerAddr, poolKey.currency0, 1e18);
+        console.log("swapped token 0 for token 1");
 
         // Remove liquidity from the pool
-        router.removeLiquidity(routerCallback, manager, poolKey, signerAddr, -60, 60, 4 ether);
+        router.removeLiquidity(routerCallback, manager, poolKey, signerAddr, -60, 60, 4e18);
+        console.log("removed liquidity");
+
+        // Deposit token 0 to the pool manager
+        // router.deposit(manager, address(token0), signerAddr, signerAddr, 6e18);
 
         vm.stopBroadcast();
     }

@@ -68,7 +68,7 @@ tx2uml --nodeType anvil --configFile counter.config.json --chain none -g -t -v \
 sol2uml class ../src,../lib -b DynamicFeeHook
 ```
 
-### Swap
+### Swap tokens using a pool
 
 ![Dynamic Fee Swap Summary](./dynamicFeeSwapSummary.svg)
 
@@ -86,7 +86,7 @@ tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -
     -o dynamicFeeSwapDetailed
 ```
 
-## Deposit
+## Add liquidity to a pool
 
 ![Dynamic Fee Deposit Summary](./dynamicFeeDepositSummary.svg)
 
@@ -104,7 +104,7 @@ tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -
     -o dynamicFeeDepositDetailed
 ```
 
-## Withdraw
+## Remove liquidity from a pool
 
 ![Dynamic Fee Withdraw Summary](./dynamicFeeWithdrawSummary.svg)
 

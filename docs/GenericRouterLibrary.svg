@@ -88,11 +88,11 @@
 <text text-anchor="start" x="8" y="-126.3" font-family="Times,serif" font-size="14.00">External:</text>
 <text text-anchor="start" x="8" y="-109.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;addLiquidity(router: GenericRouter, routerCallback: address, manager: IPoolManager, poolKey: PoolKey, sender: address, tickLower: int24, tickUpper: int24, liquidityAmount: int256): (results: bytes[])</text>
 <text text-anchor="start" x="8" y="-92.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;addLiquidityCallback(callData: bytes, resultData: bytes)</text>
-<text text-anchor="start" x="8" y="-75.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;swap(router: GenericRouter, routerCallback: address, manager: IPoolManager, poolKey: PoolKey, swapper: address, recipient: address, fromCurrency: Currency, swapAmount: int256): (results: bytes[])</text>
-<text text-anchor="start" x="8" y="-59.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;swapCallback(callData: bytes, resultData: bytes)</text>
-<text text-anchor="start" x="8" y="-42.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;mint(router: GenericRouter, manager: IPoolManager, currency: Currency, mintAmount: uint256): (results: bytes[])</text>
-<text text-anchor="start" x="8" y="-25.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;removeLiquidity(router: GenericRouter, routerCallback: address, manager: IPoolManager, poolKey: PoolKey, recipient: address, tickLower: int24, tickUpper: int24, liquidityAmount: int256): (results: bytes[])</text>
-<text text-anchor="start" x="8" y="-8.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;removeLiquidityCallback(callData: bytes, resultData: bytes)</text>
+<text text-anchor="start" x="8" y="-75.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;removeLiquidity(router: GenericRouter, routerCallback: address, manager: IPoolManager, poolKey: PoolKey, recipient: address, tickLower: int24, tickUpper: int24, liquidityAmount: int256): (results: bytes[])</text>
+<text text-anchor="start" x="8" y="-59.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;removeLiquidityCallback(callData: bytes, resultData: bytes)</text>
+<text text-anchor="start" x="8" y="-42.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;swap(router: GenericRouter, routerCallback: address, manager: IPoolManager, poolKey: PoolKey, swapper: address, recipient: address, fromCurrency: Currency, swapAmount: int256): (results: bytes[])</text>
+<text text-anchor="start" x="8" y="-25.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;swapCallback(callData: bytes, resultData: bytes)</text>
+<text text-anchor="start" x="8" y="-8.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;deposit(router: GenericRouter, manager: IPoolManager, currency: Currency, sender: address, recipient: address, mintAmount: uint256): (results: bytes[])</text>
 </g>
 <!-- 13&#45;&gt;10 -->
 <g id="edge6" class="edge">

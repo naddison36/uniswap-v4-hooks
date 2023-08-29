@@ -59,10 +59,12 @@ contract DynamicFeeTest is Test, TestPoolManager, Deployers, GasSnapshot {
         );
     }
 
-    function testMintPoolManager() public {
-        uint256 mintAmount = 100;
+    function testDepositToken0() public {
+        router.deposit(manager, address(token0), address(this), address(this), 1e18);
+    }
 
-        router.mint(manager, poolKey.currency1, mintAmount);
+    function testDepositToken1() public {
+        router.deposit(manager, address(token1), address(this), address(this), 1e18);
     }
 
     function testHookFee() public {

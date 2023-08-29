@@ -94,6 +94,50 @@ library GenericRouterLibrary {
         require(token.transferFrom(sender, receipient, amount), "transfer failed");
     }
 
+    function removeLiquidity(
+        GenericRouter router,
+        address routerCallback,
+        IPoolManager manager,
+        PoolKey memory poolKey,
+        address recipient,
+        int24 tickLower,
+        int24 tickUpper,
+        int256 liquidityAmount
+    ) external returns (bytes[] memory results) {
+        Call[] memory calls = new Call[](2);
+
+        // Add liquidity to the pool
+        IPoolManager.ModifyPositionParams memory modifyPositionParams =
+            IPoolManager.ModifyPositionParams(tickLower, tickUpper, -1 * liquidityAmount);
+        calls[0] = Call({
+            target: address(manager),
+            callType: CallType.Call,
+            results: false,
+            value: 0,
+            data: abi.encodeWithSelector(manager.modifyPosition.selector, poolKey, modifyPositionParams)
+        });
+
+        // Take toToken using swapCallback
+        bytes memory callData = abi.encode(manager, poolKey.currency0, poolKey.currency1, recipient);
+        bytes memory callbackData =
+            abi.encodeWithSelector(GenericRouterLibrary.removeLiquidityCallback.selector, callData, EMPTY_RESULTS);
+        calls[1] =
+            Call({target: routerCallback, callType: CallType.Delegate, results: true, value: 0, data: callbackData});
+
+        results = router.process(calls);
+    }
+
+    function removeLiquidityCallback(bytes memory callData, bytes memory resultData) external {
+        (IPoolManager poolManager, Currency currency0, Currency currency1, address receipient) =
+            abi.decode(callData, (IPoolManager, Currency, Currency, address));
+
+        bytes[] memory results = abi.decode(resultData, (bytes[]));
+        BalanceDelta delta = abi.decode(results[0], (BalanceDelta));
+
+        poolManager.take(currency0, receipient, uint128(-1 * delta.amount0()));
+        poolManager.take(currency1, receipient, uint128(-1 * delta.amount1()));
+    }
+
     function swap(
         GenericRouter router,
         address routerCallback,
@@ -163,83 +207,44 @@ library GenericRouterLibrary {
         poolManager.take(currency, receipient, takeAmount);
     }
 
-    function mint(GenericRouter router, IPoolManager manager, Currency currency, uint256 mintAmount)
-        external
-        returns (bytes[] memory results)
-    {
+    function deposit(
+        GenericRouter router,
+        IPoolManager manager,
+        address token,
+        address sender,
+        address recipient,
+        uint256 amount
+    ) external returns (bytes[] memory results) {
         Call[] memory calls = new Call[](3);
 
-        // Router transfers token0 from this test contract to Pool Manager
+        // Router transfers tokens from the spender to Pool Manager
+        // This assumes the spender has approved the router to transfer the tokens
         calls[0] = Call({
-            target: Currency.unwrap(currency),
+            target: token,
             callType: CallType.Call,
             results: false,
             value: 0,
-            data: abi.encodeWithSelector(IERC20Minimal.transferFrom.selector, address(this), address(manager), mintAmount)
+            data: abi.encodeWithSelector(IERC20Minimal.transferFrom.selector, sender, address(manager), amount)
         });
 
-        // Mint token1 to the router
+        // Mint tokens in the PoolManager and assign to the router
         calls[1] = Call({
             target: address(manager),
             callType: CallType.Call,
             results: false,
             value: 0,
-            data: abi.encodeWithSelector(manager.mint.selector, currency, address(this), mintAmount)
+            data: abi.encodeWithSelector(manager.mint.selector, token, recipient, amount)
         });
 
-        // Settle token1 in the Pool Manager
+        // Settle token in the Pool Manager
         calls[2] = Call({
             target: address(manager),
             callType: CallType.Call,
             results: false,
             value: 0,
-            data: abi.encodeWithSelector(manager.settle.selector, currency)
+            data: abi.encodeWithSelector(manager.settle.selector, token)
         });
 
         results = router.process(calls);
-    }
-
-    function removeLiquidity(
-        GenericRouter router,
-        address routerCallback,
-        IPoolManager manager,
-        PoolKey memory poolKey,
-        address recipient,
-        int24 tickLower,
-        int24 tickUpper,
-        int256 liquidityAmount
-    ) external returns (bytes[] memory results) {
-        Call[] memory calls = new Call[](2);
-
-        // Add liquidity to the pool
-        IPoolManager.ModifyPositionParams memory modifyPositionParams =
-            IPoolManager.ModifyPositionParams(tickLower, tickUpper, -1 * liquidityAmount);
-        calls[0] = Call({
-            target: address(manager),
-            callType: CallType.Call,
-            results: false,
-            value: 0,
-            data: abi.encodeWithSelector(manager.modifyPosition.selector, poolKey, modifyPositionParams)
-        });
-
-        // Take toToken using swapCallback
-        bytes memory callData = abi.encode(manager, poolKey.currency0, poolKey.currency1, recipient);
-        bytes memory callbackData =
-            abi.encodeWithSelector(GenericRouterLibrary.removeLiquidityCallback.selector, callData, EMPTY_RESULTS);
-        calls[1] =
-            Call({target: routerCallback, callType: CallType.Delegate, results: true, value: 0, data: callbackData});
-
-        results = router.process(calls);
-    }
-
-    function removeLiquidityCallback(bytes memory callData, bytes memory resultData) external {
-        (IPoolManager poolManager, Currency currency0, Currency currency1, address receipient) =
-            abi.decode(callData, (IPoolManager, Currency, Currency, address));
-
-        bytes[] memory results = abi.decode(resultData, (bytes[]));
-        BalanceDelta delta = abi.decode(results[0], (BalanceDelta));
-
-        poolManager.take(currency0, receipient, uint128(-1 * delta.amount0()));
-        poolManager.take(currency1, receipient, uint128(-1 * delta.amount1()));
     }
 }
