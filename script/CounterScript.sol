@@ -3,16 +3,16 @@ pragma solidity ^0.8.15;
 
 import {console} from "forge-std/console.sol";
 import "forge-std/Script.sol";
+
 import {Hooks} from "@uniswap/v4-core/contracts/libraries/Hooks.sol";
 import {IHooks} from "@uniswap/v4-core/contracts/interfaces/IHooks.sol";
 import {PoolManager} from "@uniswap/v4-core/contracts/PoolManager.sol";
-import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
 import {TickMath} from "@uniswap/v4-core/contracts/libraries/TickMath.sol";
 import {Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
 import {PoolKey} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 
-import {GenericRouter, GenericRouterLibrary} from "../src/router/GenericRouterLibrary.sol";
 import {CounterHook, CounterFactory} from "../src/CounterFactory.sol";
+import {GenericRouter, GenericRouterLibrary} from "../src/router/GenericRouterLibrary.sol";
 import {TestPoolManager} from "../test/utils/TestPoolManager.sol";
 
 /// @notice Forge script for deploying v4 & hooks to **anvil**
@@ -74,7 +74,7 @@ contract CounterScript is Script, TestPoolManager {
         vm.startBroadcast(privateKey);
 
         // Perform a test swap
-        router.swap(routerCallback, manager, poolKey, signerAddr, signerAddr, poolKey.currency0, 100);
+        router.swap(routerCallback, manager, poolKey, signerAddr, signerAddr, poolKey.currency0, 1e18);
 
         vm.stopBroadcast();
     }
