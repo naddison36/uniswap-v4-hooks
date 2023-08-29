@@ -28,13 +28,19 @@ contract GenericRouter is ILockCallback {
     }
 
     function process(Call[] calldata calls) external payable returns (bytes[] memory results) {
-        results = abi.decode(manager.lock(abi.encode(calls)), (bytes[]));
+        // encode the calls array into bytes
+        bytes memory encodedCalls = abi.encode(calls);
+        // Call lock on the PoolManagr
+        bytes memory resultsData = manager.lock(encodedCalls);
+        // decode the results to a bytes array
+        results = abi.decode(resultsData, (bytes[]));
     }
 
-    function lockAcquired(bytes calldata rawData) external returns (bytes memory) {
+    function lockAcquired(bytes calldata encodedCalls) external returns (bytes memory) {
         require(msg.sender == address(manager));
 
-        Call[] memory calls = abi.decode(rawData, (Call[]));
+        // Decode the calls array from bytes
+        Call[] memory calls = abi.decode(encodedCalls, (Call[]));
 
         bytes[] memory results = new bytes[](calls.length);
 
@@ -61,22 +67,16 @@ contract GenericRouter is ILockCallback {
             if (call.callType == CallType.Delegate) {
                 results[i] = Address.functionDelegateCall(call.target, callData);
             } else {
-                (success, results[i]) = call.target.call{value: call.value}(callData);
-            }
-
-            if (success == false) {
-                assembly {
-                    let ptr := mload(0x40)
-                    let size := returndatasize()
-                    returndatacopy(ptr, 0, size)
-                    revert(ptr, size)
-                }
+                results[i] = Address.functionCallWithValue(call.target, callData, call.value);
             }
         }
 
+        // Encode the results array into bytes
+        // so we are flattening an array of bytes down to just bytes
         return abi.encode(results);
     }
 
+    // TODO use a more efficient method than this
     function removeSelector(bytes memory data) public pure returns (bytes memory remainingData) {
         require(data.length >= 4, "no selector");
 

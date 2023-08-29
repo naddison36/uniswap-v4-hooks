@@ -55,7 +55,7 @@ contract DynamicFeeScript is Script, TestPoolManager {
 
         // Provide liquidity to the pool
         router.addLiquidity(routerCallback, manager, poolKey, signerAddr, -60, 60, 10 ether);
-        router.addLiquidity(routerCallback, manager, poolKey, signerAddr, -120, 120, 10 ether);
+        router.addLiquidity(routerCallback, manager, poolKey, signerAddr, -120, 120, 20 ether);
         router.addLiquidity(
             routerCallback,
             manager,
@@ -63,7 +63,7 @@ contract DynamicFeeScript is Script, TestPoolManager {
             signerAddr,
             TickMath.minUsableTick(60),
             TickMath.maxUsableTick(60),
-            10 ether
+            30 ether
         );
 
         vm.stopBroadcast();
@@ -74,6 +74,9 @@ contract DynamicFeeScript is Script, TestPoolManager {
 
         // Perform a test swap
         router.swap(routerCallback, manager, poolKey, signerAddr, signerAddr, poolKey.currency0, 1e18);
+
+        // Remove liquidity from the pool
+        router.removeLiquidity(routerCallback, manager, poolKey, signerAddr, -60, 60, 4 ether);
 
         vm.stopBroadcast();
     }

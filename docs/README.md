@@ -17,21 +17,28 @@ Deploy a `CounterHook` contract via the `CounterFactory` and initialize a new Un
 ![Counter Hook Setup](./counterSetup.svg)
 
 ```
-tx2uml --nodeType anvil --configFile counter.config.json --chain none -t -g -v 0xaf292eedd8b6188bd7fa91efccfe337b820d2526f34966853baf03dc58e97fbd,0x48c4082ffe451e41c9cbaeb0ff77867e498af1a94175e1fcf5115538783535ca -o counterSetup
+tx2uml --nodeType anvil --configFile counter.config.json --chain none -t -g -v \
+    --noAddresses 0x000000000000000000636f6e736f6c652e6c6f67 \
+    0xd9fced18673bcd85b32ea84f899e47a7d4336e6977471fe995c9bbfc9390d0e5,0xafeafe6c046345f34878c8e2652e6c06b875f9ee558a7e6f90d2b0c03c42e40a \
+    -o counterSetup
 ```
 
-### Modify Liquidity
+### Add Liquidity to Pool
 
 ![Counter Modify Summary](./counterModifySummary.svg)
 
 ```
-tx2uml --nodeType anvil --configFile counter.config.json --chain none -pv -g -t -v 0xedad69b97461dc5bb65e6ec01cc35b47cc5e1c410d87a1c96c648fad8b81b1e8 -o counterModifySummary
+tx2uml --nodeType anvil --configFile counter.config.json --chain none -p -g -t -v \
+    0x834f3d9c9817753ee9e6fecbb10680ceb912d3a2ea7b84010488886600091d22 \
+    -o counterModifySummary
 ```
 
 ![Counter Modify Detailed](./counterModifyDetailed.svg)
 
 ```
-tx2uml --nodeType anvil --configFile counter.config.json --chain none -g -t -v 0xedad69b97461dc5bb65e6ec01cc35b47cc5e1c410d87a1c96c648fad8b81b1e8 -o counterModifyDetailed
+tx2uml --nodeType anvil --configFile counter.config.json --chain none -g -t -v \
+    0x834f3d9c9817753ee9e6fecbb10680ceb912d3a2ea7b84010488886600091d22 \
+    -o counterModifyDetailed
 ```
 
 ### Swap
@@ -39,13 +46,18 @@ tx2uml --nodeType anvil --configFile counter.config.json --chain none -g -t -v 0
 ![Counter Swap Summary](./counterSwapSummary.svg)
 
 ```
-tx2uml --nodeType anvil --configFile counter.config.json --chain none -pv -g -t -v 0x8bf2dcb4a75e71fdda9139fe0539ba22bcfe0dcb31e41559897b7e20d440beb1 -o counterSwapSummary
+tx2uml --nodeType anvil --configFile counter.config.json --chain none -p -g -t -v  \
+    0x76f7a801d8f2240a93b754891a5da8ce855a9e6e0bada535d2a77556720bcc75 \
+    -o counterSwapSummary
 ```
 
 ![Counter Swap Detailed](./counterSwapDetailed.svg)
 
 ```
-tx2uml --nodeType anvil --configFile counter.config.json --chain none -g -t -v 0x8bf2dcb4a75e71fdda9139fe0539ba22bcfe0dcb31e41559897b7e20d440beb1 -o counterSwapDetailed
+tx2uml --nodeType anvil --configFile counter.config.json --chain none -g -t -v \
+    --noAddresses 0x5FbDB2315678afecb367f032d93F642f64180aa3 \
+    0x76f7a801d8f2240a93b754891a5da8ce855a9e6e0bada535d2a77556720bcc75 \
+    -o counterSwapDetailed
 ```
 
 ### DynamicFeeHook Contract
@@ -61,13 +73,17 @@ sol2uml class ../src,../lib -b DynamicFeeHook
 ![Dynamic Fee Swap Summary](./dynamicFeeSwapSummary.svg)
 
 ```
-tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -pv -g -t -v 0x3308a33a04fd35a176026c3a68f264baca83a0e2f151838b7f1291170463a049 -o dynamicFeeSwapSummary
+tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -p -g -t -v \
+    0xb54aa9311e8030b76f6356bd4bf2d1f7cf5fc1f94b98b6dff49bbf701e6e04e0 \
+    -o dynamicFeeSwapSummary
 ```
 
 ![Dynamic Fee Swap Detailed](./dynamicFeeSwapDetailed.svg)
 
 ```
-tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -v 0x3308a33a04fd35a176026c3a68f264baca83a0e2f151838b7f1291170463a049 -o dynamicFeeSwapDetailed
+tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -v \
+    0xb54aa9311e8030b76f6356bd4bf2d1f7cf5fc1f94b98b6dff49bbf701e6e04e0 \
+    -o dynamicFeeSwapDetailed
 ```
 
 ## Deposit
@@ -75,13 +91,17 @@ tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -
 ![Dynamic Fee Deposit Summary](./dynamicFeeDepositSummary.svg)
 
 ```
-tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -pv -g -t -v 0xb89adc24b12077a794a25c1012a0e993950551521b253f2087847d9e0b291e7a -o dynamicFeeDepositSummary
+tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -p -g -t -v \
+    0x74539b4194fa7f9fe03aa5e5337fd76521ec43eac28ac2010e5554b3262eb8fc \
+    -o dynamicFeeDepositSummary
 ```
 
 ![Dynamic Fee Deposit Detailed](./dynamicFeeDepositDetailed.svg)
 
 ```
-tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -v 0xb89adc24b12077a794a25c1012a0e993950551521b253f2087847d9e0b291e7a -o dynamicFeeDepositDetailed
+tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -v \
+    0x74539b4194fa7f9fe03aa5e5337fd76521ec43eac28ac2010e5554b3262eb8fc \
+    -o dynamicFeeDepositDetailed
 ```
 
 ## Withdraw
@@ -89,11 +109,11 @@ tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -
 ![Dynamic Fee Withdraw Summary](./dynamicFeeWithdrawSummary.svg)
 
 ```
-tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -pv -g -t -v 0xfa251126a2003db9eedaf37f0c295dd502cdb650afb6bfe055b9c9cdcd724130 -o dynamicFeeWithdrawSummary
+tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -p -g -t -v 0x58f377de805864a0d355eade323de8c65ebfbd1c1cf4072934612e102fed3328 -o dynamicFeeWithdrawSummary
 ```
 
 ![Dynamic Fee Withdraw Detailed](./dynamicFeeWithdrawDetailed.svg)
 
 ```
-tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -v 0xfa251126a2003db9eedaf37f0c295dd502cdb650afb6bfe055b9c9cdcd724130 -o dynamicFeeWithdrawDetailed
+tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -v 0x58f377de805864a0d355eade323de8c65ebfbd1c1cf4072934612e102fed3328 -o dynamicFeeWithdrawDetailed
 ```

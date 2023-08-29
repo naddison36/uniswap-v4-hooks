@@ -141,12 +141,12 @@ library GenericRouterLibrary {
             data: abi.encodeWithSelector(manager.settle.selector, fromCurrency)
         });
 
-        // Take toToken using a delegated call back to swapTake on this contract
+        // Take toToken using swapCallback
         bytes memory callData = abi.encode(manager, toCurrency, recipient, zeroForOne);
-        bytes memory swapTakeData =
+        bytes memory callbackData =
             abi.encodeWithSelector(GenericRouterLibrary.swapCallback.selector, callData, EmptyResults);
         calls[3] =
-            Call({target: routerCallback, callType: CallType.Delegate, results: true, value: 0, data: swapTakeData});
+            Call({target: routerCallback, callType: CallType.Delegate, results: true, value: 0, data: callbackData});
 
         results = router.process(calls);
     }
@@ -197,5 +197,49 @@ library GenericRouterLibrary {
         });
 
         results = router.process(calls);
+    }
+
+    function removeLiquidity(
+        GenericRouter router,
+        address routerCallback,
+        IPoolManager manager,
+        PoolKey memory poolKey,
+        address recipient,
+        int24 tickLower,
+        int24 tickUpper,
+        int256 liquidityAmount
+    ) internal returns (bytes[] memory results) {
+        Call[] memory calls = new Call[](2);
+
+        // Add liquidity to the pool
+        IPoolManager.ModifyPositionParams memory modifyPositionParams =
+            IPoolManager.ModifyPositionParams(tickLower, tickUpper, -1 * liquidityAmount);
+        calls[0] = Call({
+            target: address(manager),
+            callType: CallType.Call,
+            results: false,
+            value: 0,
+            data: abi.encodeWithSelector(manager.modifyPosition.selector, poolKey, modifyPositionParams)
+        });
+
+        // Take toToken using swapCallback
+        bytes memory callData = abi.encode(manager, poolKey.currency0, poolKey.currency1, recipient);
+        bytes memory callbackData =
+            abi.encodeWithSelector(GenericRouterLibrary.removeLiquidityCallback.selector, callData, EmptyResults);
+        calls[1] =
+            Call({target: routerCallback, callType: CallType.Delegate, results: true, value: 0, data: callbackData});
+
+        results = router.process(calls);
+    }
+
+    function removeLiquidityCallback(bytes memory callData, bytes memory resultData) external {
+        (IPoolManager poolManager, Currency currency0, Currency currency1, address receipient) =
+            abi.decode(callData, (IPoolManager, Currency, Currency, address));
+
+        bytes[] memory results = abi.decode(resultData, (bytes[]));
+        BalanceDelta delta = abi.decode(results[0], (BalanceDelta));
+
+        poolManager.take(currency0, receipient, uint128(-1 * delta.amount0()));
+        poolManager.take(currency1, receipient, uint128(-1 * delta.amount1()));
     }
 }

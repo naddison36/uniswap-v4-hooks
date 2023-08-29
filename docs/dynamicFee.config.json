@@ -1,5 +1,5 @@
 {
-  "0x610178dA211FEF7D417bC0e6FeD39F05609AD788": {
+  "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853": {
     "contractName": "DynamicFeeFactory",
     "abi": [
       {
@@ -102,7 +102,7 @@
       }
     ]
   },
-  "0x3CFeFf84Bec4242ee52149676c0c94DE888C9feE": {
+  "0x3c5c69e168A86EBF5B3C9Bfc63036FDAb5a28363": {
     "contractName": "DynamicFeeHook",
     "abi": [
       {
@@ -830,6 +830,7 @@
   },
   "0x5FbDB2315678afecb367f032d93F642f64180aa3": {
     "contractName": "TestERC20",
+    "tokenName": "token0",
     "abi": [
       {
         "inputs": [
@@ -1034,6 +1035,7 @@
   },
   "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512": {
     "contractName": "TestERC20",
+    "tokenName": "token1",
     "abi": [
       {
         "inputs": [
@@ -3116,7 +3118,7 @@
     ]
   },
   "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9": {
-    "contractName": "PoolModifyPositionTest",
+    "contractName": "GenericRouter",
     "abi": [
       {
         "inputs": [
@@ -3128,16 +3130,6 @@
         ],
         "stateMutability": "nonpayable",
         "type": "constructor"
-      },
-      {
-        "inputs": [],
-        "name": "ERC20TransferFailed",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "NativeTransferFailed",
-        "type": "error"
       },
       {
         "inputs": [
@@ -3174,326 +3166,185 @@
       {
         "inputs": [
           {
-            "components": [
-              {
-                "internalType": "Currency",
-                "name": "currency0",
-                "type": "address"
-              },
-              {
-                "internalType": "Currency",
-                "name": "currency1",
-                "type": "address"
-              },
-              {
-                "internalType": "uint24",
-                "name": "fee",
-                "type": "uint24"
-              },
-              {
-                "internalType": "int24",
-                "name": "tickSpacing",
-                "type": "int24"
-              },
-              {
-                "internalType": "contract IHooks",
-                "name": "hooks",
-                "type": "address"
-              }
-            ],
-            "internalType": "struct PoolKey",
-            "name": "key",
-            "type": "tuple"
+            "internalType": "address",
+            "name": "",
+            "type": "address"
           },
           {
-            "components": [
-              {
-                "internalType": "int24",
-                "name": "tickLower",
-                "type": "int24"
-              },
-              {
-                "internalType": "int24",
-                "name": "tickUpper",
-                "type": "int24"
-              },
-              {
-                "internalType": "int256",
-                "name": "liquidityDelta",
-                "type": "int256"
-              }
-            ],
-            "internalType": "struct IPoolManager.ModifyPositionParams",
-            "name": "params",
-            "type": "tuple"
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "bytes",
+            "name": "",
+            "type": "bytes"
           }
         ],
-        "name": "modifyPosition",
+        "name": "onERC1155BatchReceived",
         "outputs": [
           {
-            "internalType": "BalanceDelta",
-            "name": "delta",
-            "type": "int256"
+            "internalType": "bytes4",
+            "name": "",
+            "type": "bytes4"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes",
+            "name": "",
+            "type": "bytes"
+          }
+        ],
+        "name": "onERC1155Received",
+        "outputs": [
+          {
+            "internalType": "bytes4",
+            "name": "",
+            "type": "bytes4"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "target",
+                "type": "address"
+              },
+              {
+                "internalType": "enum CallType",
+                "name": "callType",
+                "type": "uint8"
+              },
+              {
+                "internalType": "bool",
+                "name": "results",
+                "type": "bool"
+              },
+              {
+                "internalType": "uint256",
+                "name": "value",
+                "type": "uint256"
+              },
+              {
+                "internalType": "bytes",
+                "name": "data",
+                "type": "bytes"
+              }
+            ],
+            "internalType": "struct Call[]",
+            "name": "calls",
+            "type": "tuple[]"
+          }
+        ],
+        "name": "process",
+        "outputs": [
+          {
+            "internalType": "bytes[]",
+            "name": "results",
+            "type": "bytes[]"
           }
         ],
         "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes",
+            "name": "data",
+            "type": "bytes"
+          }
+        ],
+        "name": "removeSelector",
+        "outputs": [
+          {
+            "internalType": "bytes",
+            "name": "remainingData",
+            "type": "bytes"
+          }
+        ],
+        "stateMutability": "pure",
         "type": "function"
       }
     ]
   },
   "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9": {
-    "contractName": "PoolSwapTest",
+    "contractName": "RouterCallbacks",
     "abi": [
       {
         "inputs": [
           {
-            "internalType": "contract IPoolManager",
-            "name": "_manager",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-      },
-      {
-        "inputs": [],
-        "name": "ERC20TransferFailed",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "NativeTransferFailed",
-        "type": "error"
-      },
-      {
-        "inputs": [
+            "internalType": "bytes",
+            "name": "callData",
+            "type": "bytes"
+          },
           {
             "internalType": "bytes",
-            "name": "rawData",
+            "name": "resultData",
             "type": "bytes"
           }
         ],
-        "name": "lockAcquired",
-        "outputs": [
-          {
-            "internalType": "bytes",
-            "name": "",
-            "type": "bytes"
-          }
-        ],
+        "name": "addLiquidityCallback",
+        "outputs": [],
         "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "manager",
-        "outputs": [
-          {
-            "internalType": "contract IPoolManager",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "components": [
-              {
-                "internalType": "Currency",
-                "name": "currency0",
-                "type": "address"
-              },
-              {
-                "internalType": "Currency",
-                "name": "currency1",
-                "type": "address"
-              },
-              {
-                "internalType": "uint24",
-                "name": "fee",
-                "type": "uint24"
-              },
-              {
-                "internalType": "int24",
-                "name": "tickSpacing",
-                "type": "int24"
-              },
-              {
-                "internalType": "contract IHooks",
-                "name": "hooks",
-                "type": "address"
-              }
-            ],
-            "internalType": "struct PoolKey",
-            "name": "key",
-            "type": "tuple"
-          },
-          {
-            "components": [
-              {
-                "internalType": "bool",
-                "name": "zeroForOne",
-                "type": "bool"
-              },
-              {
-                "internalType": "int256",
-                "name": "amountSpecified",
-                "type": "int256"
-              },
-              {
-                "internalType": "uint160",
-                "name": "sqrtPriceLimitX96",
-                "type": "uint160"
-              }
-            ],
-            "internalType": "struct IPoolManager.SwapParams",
-            "name": "params",
-            "type": "tuple"
-          },
-          {
-            "components": [
-              {
-                "internalType": "bool",
-                "name": "withdrawTokens",
-                "type": "bool"
-              },
-              {
-                "internalType": "bool",
-                "name": "settleUsingTransfer",
-                "type": "bool"
-              }
-            ],
-            "internalType": "struct PoolSwapTest.TestSettings",
-            "name": "testSettings",
-            "type": "tuple"
-          }
-        ],
-        "name": "swap",
-        "outputs": [
-          {
-            "internalType": "BalanceDelta",
-            "name": "delta",
-            "type": "int256"
-          }
-        ],
-        "stateMutability": "payable",
-        "type": "function"
-      }
-    ]
-  },
-  "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707": {
-    "contractName": "PoolDonateTest",
-    "abi": [
-      {
-        "inputs": [
-          {
-            "internalType": "contract IPoolManager",
-            "name": "_manager",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-      },
-      {
-        "inputs": [],
-        "name": "ERC20TransferFailed",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "NativeTransferFailed",
-        "type": "error"
-      },
-      {
-        "inputs": [
-          {
-            "components": [
-              {
-                "internalType": "Currency",
-                "name": "currency0",
-                "type": "address"
-              },
-              {
-                "internalType": "Currency",
-                "name": "currency1",
-                "type": "address"
-              },
-              {
-                "internalType": "uint24",
-                "name": "fee",
-                "type": "uint24"
-              },
-              {
-                "internalType": "int24",
-                "name": "tickSpacing",
-                "type": "int24"
-              },
-              {
-                "internalType": "contract IHooks",
-                "name": "hooks",
-                "type": "address"
-              }
-            ],
-            "internalType": "struct PoolKey",
-            "name": "key",
-            "type": "tuple"
-          },
-          {
-            "internalType": "uint256",
-            "name": "amount0",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "amount1",
-            "type": "uint256"
-          }
-        ],
-        "name": "donate",
-        "outputs": [
-          {
-            "internalType": "BalanceDelta",
-            "name": "delta",
-            "type": "int256"
-          }
-        ],
-        "stateMutability": "payable",
         "type": "function"
       },
       {
         "inputs": [
           {
             "internalType": "bytes",
-            "name": "rawData",
+            "name": "callData",
             "type": "bytes"
-          }
-        ],
-        "name": "lockAcquired",
-        "outputs": [
+          },
           {
             "internalType": "bytes",
-            "name": "",
+            "name": "resultData",
             "type": "bytes"
           }
         ],
+        "name": "swapCallback",
+        "outputs": [],
         "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "manager",
-        "outputs": [
-          {
-            "internalType": "contract IPoolManager",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "view",
         "type": "function"
       }
     ]
