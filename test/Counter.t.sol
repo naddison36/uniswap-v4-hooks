@@ -86,4 +86,10 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
         assertGt(manager.hookFeesAccrued(address(hook), poolKey.currency0), 0);
         assertEq(manager.hookFeesAccrued(address(hook), poolKey.currency1), 0);
     }
+
+    function testFlashLoan() public {
+        // Perform a flash loan
+        bytes memory callbackData = abi.encodeWithSelector(token0.balanceOf.selector, router);
+        router.flashLoan(address(token0), manager, address(token0), 1e6, callbackData);
+    }
 }

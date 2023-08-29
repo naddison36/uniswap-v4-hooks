@@ -247,4 +247,48 @@ library GenericRouterLibrary {
 
         results = router.process(calls);
     }
+
+    function flashLoan(
+        GenericRouter router,
+        address routerCallback,
+        IPoolManager manager,
+        address token,
+        uint256 amount,
+        bytes calldata callbackData
+    ) external returns (bytes[] memory results) {
+        Call[] memory calls = new Call[](4);
+
+        // borrow (take) tokens from the Pool Manager to the router
+        calls[0] = Call({
+            target: address(manager),
+            callType: CallType.Call,
+            results: false,
+            value: 0,
+            data: abi.encodeWithSelector(manager.take.selector, token, address(router), amount)
+        });
+
+        // Flash loan callback
+        calls[1] =
+            Call({target: routerCallback, callType: CallType.Delegate, results: false, value: 0, data: callbackData});
+
+        // transfer tokens from this router back to the Pool Manager
+        calls[2] = Call({
+            target: token,
+            callType: CallType.Call,
+            results: false,
+            value: 0,
+            data: abi.encodeWithSelector(IERC20Minimal.transfer.selector, address(manager), amount)
+        });
+
+        // Settle the borrowed tokens with the Pool Manager
+        calls[3] = Call({
+            target: address(manager),
+            callType: CallType.Call,
+            results: false,
+            value: 0,
+            data: abi.encodeWithSelector(manager.settle.selector, token)
+        });
+
+        results = router.process(calls);
+    }
 }
