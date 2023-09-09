@@ -73,7 +73,7 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
         assertEq(manager.hookFeesAccrued(address(hook), poolKey.currency1), 0);
     }
 
-    function testCounterHooks() public {
+    function testCounterSwap() public {
         assertEq(hook.beforeSwapCounter(), 100);
         assertEq(hook.afterSwapCounter(), 200);
 
@@ -85,6 +85,50 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
 
         assertGt(manager.hookFeesAccrued(address(hook), poolKey.currency0), 0);
         assertEq(manager.hookFeesAccrued(address(hook), poolKey.currency1), 0);
+    }
+
+    function testCounterSwapFromPoolManager() public {
+        // Perform a deposit to the pool manager
+        router.deposit(manager, address(token1), address(this), address(this), 2e18);
+
+        // The tester needs to approve the router to spend their tokens in the Pool Manager
+        manager.setApprovalForAll(address(router), true);
+        assertTrue(manager.isApprovedForAll(address(this), address(router)));
+
+        // Perform a test swap
+        router.managerSwap(routerCallback, manager, poolKey, address(this), address(this), poolKey.currency1, 2e18);
+
+        // Revoke the tester's approval of the router as anyone can send calls to the router
+        manager.setApprovalForAll(address(router), false);
+    }
+
+    function testDepositToken0() public {
+        assertEq(manager.balanceOf(address(this), uint160(address(token0))), 0);
+        assertEq(manager.balanceOf(address(this), uint160(address(token1))), 0);
+
+        // Perform a deposit to the pool manager
+        router.deposit(manager, address(token0), address(this), address(this), 1e18);
+
+        // Check tester's balance has been updated
+        assertEq(manager.balanceOf(address(this), uint160(address(token0))), 1e18);
+        assertEq(manager.balanceOf(address(this), uint160(address(token1))), 0);
+    }
+
+    function testWithdrawToken0() public {
+        // Perform a deposit to the pool manager
+        router.deposit(manager, address(token0), address(this), address(this), 10e18);
+        assertEq(manager.balanceOf(address(this), uint160(address(token0))), 10e18);
+        assertEq(manager.balanceOf(address(this), uint160(address(token1))), 0);
+
+        // The tester needs to approve the router to spend their tokens in the Pool Manager
+        manager.setApprovalForAll(address(router), true);
+
+        router.withdraw(manager, address(token0), address(this), 6e18);
+
+        manager.setApprovalForAll(address(router), false);
+
+        assertEq(manager.balanceOf(address(this), uint160(address(token0))), 4e18);
+        assertEq(manager.balanceOf(address(this), uint160(address(token1))), 0);
     }
 
     function testFlashLoan() public {

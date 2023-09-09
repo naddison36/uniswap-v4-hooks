@@ -26,6 +26,8 @@ contract TestPoolManager {
     uint256 constant MaxAmount = type(uint128).max;
 
     function initialize() public {
+        console.log("test sender %s", address(this));
+
         TestERC20 _tokenA = new TestERC20(MaxAmount);
         TestERC20 _tokenB = new TestERC20(MaxAmount);
 
@@ -48,6 +50,7 @@ contract TestPoolManager {
         router = new GenericRouter(manager);
         console.log("router %s", address(router));
         routerCallback = address(new RouterCallbacks());
+        console.log("router callbacks %s", address(routerCallback));
 
         token0.approve(address(router), MaxAmount);
         token1.approve(address(router), MaxAmount);

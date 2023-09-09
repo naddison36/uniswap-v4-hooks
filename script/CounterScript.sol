@@ -81,6 +81,11 @@ contract CounterScript is Script, TestPoolManager {
         // Perform a test swap
         router.swap(routerCallback, manager, poolKey, signerAddr, signerAddr, poolKey.currency0, 1e18);
 
+        // Perform a flash loan
+        bytes memory callbackData = abi.encodeWithSelector(token0.balanceOf.selector, router);
+        router.flashLoan(address(token0), manager, address(token0), 1e6, callbackData);
+
         vm.stopBroadcast();
     }
+
 }

@@ -60,7 +60,7 @@ tx2uml --nodeType anvil --configFile counter.config.json --chain none -g -t -v \
     -o counterSwapDetailed
 ```
 
-### DynamicFeeHook Contract
+## DynamicFeeHook
 
 ![DynamicFeeHook Contract](./DynamicFeeHook.svg)
 
@@ -86,7 +86,7 @@ tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -
     -o dynamicFeeSwapDetailed
 ```
 
-## Add liquidity to a pool
+### Add liquidity to a pool
 
 ![Dynamic Fee Deposit Summary](./dynamicFeeDepositSummary.svg)
 
@@ -104,7 +104,7 @@ tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -
     -o dynamicFeeDepositDetailed
 ```
 
-## Remove liquidity from a pool
+### Remove liquidity from a pool
 
 ![Dynamic Fee Withdraw Summary](./dynamicFeeWithdrawSummary.svg)
 
@@ -116,4 +116,20 @@ See the full trace with parameters in [dynamicFeeWithdrawDetailed.svg](./dynamic
 
 ```
 tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -v 0x58f377de805864a0d355eade323de8c65ebfbd1c1cf4072934612e102fed3328 -o dynamicFeeWithdrawDetailed
+```
+
+## Pool Manager
+
+## Flash loan from the Pool Manager
+
+![Flash Loan Summary](./flashLoanSummary.svg)
+
+```
+tx2uml --nodeType anvil --configFile counter.config.json --chain none -p -g -t -v 0xb3ee845923d8f202dd8d4326e87c39d7ee00d2ba341c7794d0f392327ecc41ff -o flashLoanSummary
+```
+
+See the full trace with parameters in [flashLoanDetailed.svg](./flashLoanDetailed.svg)
+
+```
+tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -v 0xb3ee845923d8f202dd8d4326e87c39d7ee00d2ba341c7794d0f392327ecc41ff -o flashLoanDetailed
 ```

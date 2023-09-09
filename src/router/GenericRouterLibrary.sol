@@ -3,11 +3,12 @@ pragma solidity ^0.8.15;
 
 import {console} from "forge-std/console.sol";
 
+import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+
 import {IERC20Minimal} from "@uniswap/v4-core/contracts/interfaces/external/IERC20Minimal.sol";
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
 import {BalanceDelta} from "@uniswap/v4-core/contracts/types/BalanceDelta.sol";
 import {PoolKey} from "@uniswap/v4-core/contracts/types/PoolId.sol";
-
 import {Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
 import {TickMath} from "@uniswap/v4-core/contracts/libraries/TickMath.sol";
 
@@ -83,7 +84,7 @@ library GenericRouterLibrary {
     }
 
     function addLiquidityCallback(bytes memory callData, bytes memory resultData) external {
-        (IERC20Minimal token, address sender, address receipient, bool zeroToken) =
+        (IERC20Minimal token, address sender, address recipient, bool zeroToken) =
             abi.decode(callData, (IERC20Minimal, address, address, bool));
 
         bytes[] memory results = abi.decode(resultData, (bytes[]));
@@ -91,7 +92,7 @@ library GenericRouterLibrary {
 
         uint128 amount = zeroToken ? uint128(delta.amount0()) : uint128(delta.amount1());
 
-        require(token.transferFrom(sender, receipient, amount), "transfer failed");
+        require(token.transferFrom(sender, recipient, amount), "transfer failed");
     }
 
     function removeLiquidity(
@@ -128,14 +129,14 @@ library GenericRouterLibrary {
     }
 
     function removeLiquidityCallback(bytes memory callData, bytes memory resultData) external {
-        (IPoolManager poolManager, Currency currency0, Currency currency1, address receipient) =
+        (IPoolManager poolManager, Currency currency0, Currency currency1, address recipient) =
             abi.decode(callData, (IPoolManager, Currency, Currency, address));
 
         bytes[] memory results = abi.decode(resultData, (bytes[]));
         BalanceDelta delta = abi.decode(results[0], (BalanceDelta));
 
-        poolManager.take(currency0, receipient, uint128(-1 * delta.amount0()));
-        poolManager.take(currency1, receipient, uint128(-1 * delta.amount1()));
+        poolManager.take(currency0, recipient, uint128(-1 * delta.amount0()));
+        poolManager.take(currency1, recipient, uint128(-1 * delta.amount1()));
     }
 
     function swap(
@@ -196,7 +197,7 @@ library GenericRouterLibrary {
     }
 
     function swapCallback(bytes memory callData, bytes memory resultData) external {
-        (IPoolManager poolManager, Currency currency, address receipient, bool zeroForOne) =
+        (IPoolManager poolManager, Currency currency, address recipient, bool zeroForOne) =
             abi.decode(callData, (IPoolManager, Currency, address, bool));
 
         bytes[] memory results = abi.decode(resultData, (bytes[]));
@@ -204,9 +205,89 @@ library GenericRouterLibrary {
 
         uint128 takeAmount = zeroForOne ? uint128(-1 * delta.amount1()) : uint128(-1 * delta.amount0());
 
-        poolManager.take(currency, receipient, takeAmount);
+        poolManager.take(currency, recipient, takeAmount);
     }
 
+    function managerSwap(
+        GenericRouter router,
+        address routerCallback,
+        IPoolManager manager,
+        PoolKey memory poolKey,
+        address swapper,
+        address recipient,
+        Currency fromCurrency,
+        int256 swapAmount
+    ) external returns (bytes[] memory results) {
+        Call[] memory calls = new Call[](4);
+
+        bool zeroForOne = fromCurrency == poolKey.currency0;
+        Currency toCurrency = zeroForOne ? poolKey.currency1 : poolKey.currency0;
+
+        // Swap
+        IPoolManager.SwapParams memory params = IPoolManager.SwapParams({
+            zeroForOne: zeroForOne,
+            amountSpecified: swapAmount,
+            sqrtPriceLimitX96: zeroForOne ? MIN_PRICE_LIMIT : MAX_PRICE_LIMIT
+        });
+        calls[0] = Call({
+            target: address(manager),
+            callType: CallType.Call,
+            results: false,
+            value: 0,
+            data: abi.encodeWithSelector(manager.swap.selector, poolKey, params)
+        });
+
+        // Safe transfer from swapper account in Pool Manager to the Pool Manager
+        calls[1] = Call({
+            target: address(manager),
+            callType: CallType.Call,
+            results: false,
+            value: 0,
+            data: abi.encodeWithSelector(
+                ERC1155.safeTransferFrom.selector,
+                swapper,
+                address(manager),
+                uint160(Currency.unwrap(fromCurrency)),
+                swapAmount,
+                ""
+                )
+        });
+
+        // Settle fromToken
+        calls[2] = Call({
+            target: address(manager),
+            callType: CallType.Call,
+            results: false,
+            value: 0,
+            data: abi.encodeWithSelector(manager.settle.selector, fromCurrency)
+        });
+
+        // Transfer toToken using managerSwapCallback
+        bytes memory callData = abi.encode(manager, toCurrency, router, recipient, zeroForOne);
+        bytes memory callbackData =
+            abi.encodeWithSelector(GenericRouterLibrary.managerSwapCallback.selector, callData, EMPTY_RESULTS);
+        calls[3] =
+            Call({target: routerCallback, callType: CallType.Delegate, results: true, value: 0, data: callbackData});
+
+        results = router.process(calls);
+    }
+
+    function managerSwapCallback(bytes memory callData, bytes memory resultData) external {
+        (IPoolManager poolManager, Currency currency, address router, address recipient, bool zeroForOne) =
+            abi.decode(callData, (IPoolManager, Currency, address, address, bool));
+
+        bytes[] memory results = abi.decode(resultData, (bytes[]));
+        BalanceDelta delta = abi.decode(results[0], (BalanceDelta));
+
+        uint128 takeAmount = zeroForOne ? uint128(-1 * delta.amount1()) : uint128(-1 * delta.amount0());
+
+        poolManager.take(currency, recipient, takeAmount);
+        // poolManager.safeTransferFrom(router, recipient, uint160(Currency.unwrap(currency)), takeAmount, "");
+    }
+
+    /**
+     * @notice Deposit tokens into the Pool Manager
+     */
     function deposit(
         GenericRouter router,
         IPoolManager manager,
@@ -243,6 +324,38 @@ library GenericRouterLibrary {
             results: false,
             value: 0,
             data: abi.encodeWithSelector(manager.settle.selector, token)
+        });
+
+        results = router.process(calls);
+    }
+
+    /**
+     * @notice Withdraw tokens from the Pool Manager
+     */
+    function withdraw(GenericRouter router, IPoolManager manager, address token, address recipient, uint256 amount)
+        external
+        returns (bytes[] memory results)
+    {
+        Call[] memory calls = new Call[](2);
+
+        // Safe transfer from swapper account in Pool Manager to the Pool Manager
+        calls[0] = Call({
+            target: address(manager),
+            callType: CallType.Call,
+            results: false,
+            value: 0,
+            data: abi.encodeWithSelector(
+                ERC1155.safeTransferFrom.selector, address(this), address(manager), uint160(token), amount, ""
+                )
+        });
+
+        // Take tokens from the Pool Manager
+        calls[1] = Call({
+            target: address(manager),
+            callType: CallType.Call,
+            results: false,
+            value: 0,
+            data: abi.encodeWithSelector(manager.take.selector, token, recipient, amount)
         });
 
         results = router.process(calls);

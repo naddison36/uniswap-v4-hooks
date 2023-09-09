@@ -28,12 +28,15 @@ contract DynamicFeeScript is Script, TestPoolManager {
     function setUp() public {
         privateKey = vm.envUint("PRIVATE_KEY");
         signerAddr = vm.addr(privateKey);
+        console.log("signer %s", signerAddr);
+        console.log("script %s", address(this));
         vm.startBroadcast(privateKey);
 
         TestPoolManager.initialize();
 
         // Deploy the hook
         DynamicFeeFactory factory = new DynamicFeeFactory();
+        console.log("Deployed hook factory to address %s", address(factory));
 
         // If the PoolManager address is 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0,
         // the first salt from 0 to get the required address perfix is 1210.
@@ -73,7 +76,11 @@ contract DynamicFeeScript is Script, TestPoolManager {
         console.log("removed liquidity");
 
         // Deposit token 0 to the pool manager
-        // router.deposit(manager, address(token0), signerAddr, signerAddr, 6e18);
+        router.deposit(manager, address(token0), signerAddr, signerAddr, 6e18);
+
+        // Perform a flash loan
+        bytes memory callbackData = abi.encodeWithSelector(token0.balanceOf.selector, router);
+        router.flashLoan(address(token0), manager, address(token0), 1e6, callbackData);
 
         vm.stopBroadcast();
     }
