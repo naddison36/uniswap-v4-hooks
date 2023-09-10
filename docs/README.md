@@ -73,63 +73,118 @@ sol2uml class ../src,../lib -b DynamicFeeHook
 ![Dynamic Fee Swap Summary](./dynamicFeeSwapSummary.svg)
 
 ```
-tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -p -g -t -v \
-    0xb54aa9311e8030b76f6356bd4bf2d1f7cf5fc1f94b98b6dff49bbf701e6e04e0 \
+tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
+    --title "Uniswap v4 - Swap Tokens" -hf -hc -x -l -p -g -t -v \
+    0x8b9670014172f3cf9918785f02d809abda16151701fdc1883df1e5677d0c8ea8 \
     -o dynamicFeeSwapSummary
 ```
 
 See the full trace with parameters in [dynamicFeeSwapDetailed.svg](./dynamicFeeSwapDetailed.svg)
 
 ```
-tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -v \
-    0xb54aa9311e8030b76f6356bd4bf2d1f7cf5fc1f94b98b6dff49bbf701e6e04e0 \
+tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
+    --title "Uniswap v4 - Swap Tokens" -v \
+    0x8b9670014172f3cf9918785f02d809abda16151701fdc1883df1e5677d0c8ea8 \
     -o dynamicFeeSwapDetailed
 ```
 
 ### Add liquidity to a pool
 
-![Dynamic Fee Deposit Summary](./dynamicFeeDepositSummary.svg)
+![Dynamic Fee Add Liquidity Summary](./dynamicFeeAddSummary.svg)
 
 ```
-tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -p -g -t -v \
-    0x74539b4194fa7f9fe03aa5e5337fd76521ec43eac28ac2010e5554b3262eb8fc \
-    -o dynamicFeeDepositSummary
+tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
+    --title "Uniswap v4 - Remove Liquidity to a Pool" -hf -hc -x -l -p -g -t -v \
+    0xb3e53a056b74cbc873c1b886148a170ef628f0e43ac453d88aaa89ca97c016ee \
+    -o dynamicFeeAddSummary
 ```
 
-See the full trace with parameters in [dynamicFeeDepositDetailed](./dynamicFeeDepositDetailed.svg)
+See the full trace with parameters in [dynamicFeeAddDetailed](./dynamicFeeAddDetailed.svg)
 
 ```
 tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -v \
-    0x74539b4194fa7f9fe03aa5e5337fd76521ec43eac28ac2010e5554b3262eb8fc \
-    -o dynamicFeeDepositDetailed
+    --title "Uniswap v4 - Add Liquidity to a Pool" -v \
+    0xb3e53a056b74cbc873c1b886148a170ef628f0e43ac453d88aaa89ca97c016ee \
+    -o dynamicFeeAddDetailed
 ```
 
 ### Remove liquidity from a pool
 
-![Dynamic Fee Withdraw Summary](./dynamicFeeWithdrawSummary.svg)
+![Dynamic Fee Remove Summary](./dynamicFeeRemoveSummary.svg)
 
 ```
-tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -p -g -t -v 0x58f377de805864a0d355eade323de8c65ebfbd1c1cf4072934612e102fed3328 -o dynamicFeeWithdrawSummary
+tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
+    --title "Uniswap v4 - Remove Liquidity from a Pool" -hf -hc -x -l -p -g -t -v \
+    0x96b06d70ad4ffdfd685ea2db7262120531ea144b2a2449c51d8cd85559b37cd3 -o dynamicFeeRemoveSummary
 ```
 
-See the full trace with parameters in [dynamicFeeWithdrawDetailed.svg](./dynamicFeeWithdrawDetailed.svg)
+See the full trace with parameters in [dynamicFeeRemoveDetailed.svg](./dynamicFeeRemoveDetailed.svg)
 
 ```
-tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -v 0x58f377de805864a0d355eade323de8c65ebfbd1c1cf4072934612e102fed3328 -o dynamicFeeWithdrawDetailed
+tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
+    --title "Uniswap v4 - Remove Liquidity from a Pool" -v \
+    0x96b06d70ad4ffdfd685ea2db7262120531ea144b2a2449c51d8cd85559b37cd3 \
+    -o dynamicFeeRemoveDetailed
 ```
 
 ## Pool Manager
+
+## Deposit tokens into the Pool Manager
+
+![Deposit Summary](./depositSummary.svg)
+
+```
+tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
+    --title "Uniswap v4 - Deposit" -hf -hc -x -l -p -g -t -v \
+    0xf60a246c192bdbd214622dcee34e068b05ee1b553c6ee20ed08b4f154065d44f \
+    -o depositSummary
+```
+
+See the full trace with parameters in [depositDetailed.svg](./depositDetailed.svg)
+
+```
+tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
+    --title "Uniswap v4 - Deposit" -v \
+    0xf60a246c192bdbd214622dcee34e068b05ee1b553c6ee20ed08b4f154065d44f \
+    -o depositDetailed
+```
+
+## Withdraw tokens from the Pool Manager
+
+![Withdraw Summary](./withdrawSummary.svg)
+
+```
+tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
+    --title "Uniswap v4 - Withdraw" -hf -hc -x -l -p -g -t -v \
+    0xd10f2f71df88516cd6b5438200ac870470e7a57435884214be1f3c08ffdef262 \
+    -o withdrawSummary
+```
+
+See the full trace with parameters in [withdrawDetailed.svg](./withdrawDetailed.svg)
+
+```
+tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
+    --title "Uniswap v4 - Withdraw" -v \
+    0x7d70ae5613a54a8c3e4fa28ecd0b617082c8ff8cda93939bcb3d6b57134c45c2,0xd10f2f71df88516cd6b5438200ac870470e7a57435884214be1f3c08ffdef262,0x8ebb7e072e294b9bddada36d0883752eca4f3056de184e9dd6f8ea313f3084e6 \
+    -o withdrawDetailed
+```
 
 ## Flash loan from the Pool Manager
 
 ![Flash Loan Summary](./flashLoanSummary.svg)
 
 ```
-tx2uml --nodeType anvil --configFile counter.config.json --chain none -p -g -t -v 0xb3ee845923d8f202dd8d4326e87c39d7ee00d2ba341c7794d0f392327ecc41ff -o flashLoanSummary
+tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
+    --title "Uniswap v4 - Flash Loan" -hf -hc -x -l -p -g -t -v \
+    0xb182171fa5739540ac0b1b89ba4ee8550fe6470632d495272a88a6548d3f5e6b \
+    -o lashLoanSummary
 ```
 
 See the full trace with parameters in [flashLoanDetailed.svg](./flashLoanDetailed.svg)
 
 ```
-tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none -g -t -v 0xb3ee845923d8f202dd8d4326e87c39d7ee00d2ba341c7794d0f392327ecc41ff -o flashLoanDetailed
+tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
+    --title "Uniswap v4 - Flash Loan" -v \
+    0xb182171fa5739540ac0b1b89ba4ee8550fe6470632d495272a88a6548d3f5e6b \
+    -o flashLoanDetailed
 ```

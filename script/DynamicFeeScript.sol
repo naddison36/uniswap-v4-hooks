@@ -12,15 +12,13 @@ import {FeeLibrary} from "@uniswap/v4-core/contracts/libraries/FeeLibrary.sol";
 import {Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
 import {PoolKey} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 
-import {DynamicFeeHook, DynamicFeeFactory} from "../src/hooks/DynamicFeeHook.sol";
-import {GenericRouter, GenericRouterLibrary} from "../src/router/GenericRouterLibrary.sol";
+import {DynamicFeeFactory} from "../src/hooks/DynamicFeeHook.sol";
+import {CallType, UniswapV4Router} from "../src/router/UniswapV4Router.sol";
 import {TestPoolManager} from "../test/utils/TestPoolManager.sol";
 
 /// @notice Forge script for deploying v4 & hooks to **anvil**
 /// @dev This script only works on an anvil RPC because v4 exceeds bytecode limits
 contract DynamicFeeScript is Script, TestPoolManager {
-    using GenericRouterLibrary for GenericRouter;
-
     PoolKey poolKey;
     uint256 privateKey;
     address signerAddr;
@@ -55,11 +53,9 @@ contract DynamicFeeScript is Script, TestPoolManager {
         console.log("currency1 %s", Currency.unwrap(poolKey.currency1));
 
         // Provide liquidity to the pool
-        router.addLiquidity(routerCallback, manager, poolKey, signerAddr, -60, 60, 10e18);
-        router.addLiquidity(routerCallback, manager, poolKey, signerAddr, -120, 120, 20e18);
-        router.addLiquidity(
-            routerCallback, manager, poolKey, signerAddr, TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 30e18
-        );
+        caller.addLiquidity(poolKey, signerAddr, -60, 60, 10e18);
+        caller.addLiquidity(poolKey, signerAddr, -120, 120, 20e18);
+        caller.addLiquidity(poolKey, signerAddr, TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 30e18);
 
         vm.stopBroadcast();
     }
@@ -68,19 +64,24 @@ contract DynamicFeeScript is Script, TestPoolManager {
         vm.startBroadcast(privateKey);
 
         // Perform a test swap
-        router.swap(routerCallback, manager, poolKey, signerAddr, signerAddr, poolKey.currency0, 1e18);
+        caller.swap(poolKey, signerAddr, signerAddr, poolKey.currency0, 1e18);
         console.log("swapped token 0 for token 1");
 
         // Remove liquidity from the pool
-        router.removeLiquidity(routerCallback, manager, poolKey, signerAddr, -60, 60, 4e18);
+        caller.removeLiquidity(poolKey, signerAddr, -60, 60, 4e18);
         console.log("removed liquidity");
 
         // Deposit token 0 to the pool manager
-        router.deposit(manager, address(token0), signerAddr, signerAddr, 6e18);
+        caller.deposit(address(token0), signerAddr, signerAddr, 6e18);
+
+        // Withdraw token 0 to the pool manager
+        manager.setApprovalForAll(address(router), true);
+        caller.withdraw(address(token0), signerAddr, signerAddr, 4e18);
+        manager.setApprovalForAll(address(router), false);
 
         // Perform a flash loan
         bytes memory callbackData = abi.encodeWithSelector(token0.balanceOf.selector, router);
-        router.flashLoan(address(token0), manager, address(token0), 1e6, callbackData);
+        caller.flashLoan(address(token0), 1e6, address(token0), CallType.Call, callbackData);
 
         vm.stopBroadcast();
     }

@@ -7,23 +7,23 @@ import {PoolManager} from "@uniswap/v4-core/contracts/PoolManager.sol";
 import {TestERC20} from "@uniswap/v4-core/contracts/test/TestERC20.sol";
 import {TickMath} from "@uniswap/v4-core/contracts/libraries/TickMath.sol";
 
-import {GenericRouter} from "../../src/router/GenericRouterLibrary.sol";
-import {RouterCallbacks} from "../../src/router/RouterCallbacks.sol";
+import {UniswapV4Router} from "../../src/router/UniswapV4Router.sol";
+import {UniswapV4Caller} from "../../src/router/UniswapV4Caller.sol";
 
 /// @notice Deploys a pool manager, test tokens and a generic router.
 /// @dev Minimal initialization. Inheriting contract should set up pools and provision liquidity
 contract TestPoolManager {
-    PoolManager manager;
-    TestERC20 token0;
-    TestERC20 token1;
-    GenericRouter router;
-    address routerCallback;
-
     uint160 public constant MIN_PRICE_LIMIT = TickMath.MIN_SQRT_RATIO + 1;
     uint160 public constant MAX_PRICE_LIMIT = TickMath.MAX_SQRT_RATIO - 1;
     uint160 public constant SQRT_RATIO_1_TO_1 = 79228162514264337593543950336;
     bytes constant EmptyResults = hex"";
     uint256 constant MaxAmount = type(uint128).max;
+
+    PoolManager manager;
+    TestERC20 token0;
+    TestERC20 token1;
+    UniswapV4Router router;
+    UniswapV4Caller caller;
 
     function initialize() public {
         console.log("test sender %s", address(this));
@@ -47,10 +47,10 @@ contract TestPoolManager {
         console.log("pool manager %s", address(manager));
 
         // Deploy a generic router
-        router = new GenericRouter(manager);
+        router = new UniswapV4Router(manager);
         console.log("router %s", address(router));
-        routerCallback = address(new RouterCallbacks());
-        console.log("router callbacks %s", address(routerCallback));
+        caller = new UniswapV4Caller(router, manager);
+        console.log("caller %s", address(caller));
 
         token0.approve(address(router), MaxAmount);
         token1.approve(address(router), MaxAmount);

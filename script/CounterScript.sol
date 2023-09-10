@@ -12,15 +12,13 @@ import {TickMath} from "@uniswap/v4-core/contracts/libraries/TickMath.sol";
 import {Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
 import {PoolKey} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 
-import {CounterHook, CounterFactory} from "../src/hooks/CounterHook.sol";
-import {GenericRouter, GenericRouterLibrary} from "../src/router/GenericRouterLibrary.sol";
+import {CounterFactory} from "../src/hooks/CounterHook.sol";
+import {CallType} from "../src/router/UniswapV4Router.sol";
 import {TestPoolManager} from "../test/utils/TestPoolManager.sol";
 
 /// @notice Forge script for deploying v4 & hooks to **anvil**
 /// @dev This script only works on an anvil RPC because v4 exceeds bytecode limits
 contract CounterScript is Script, TestPoolManager {
-    using GenericRouterLibrary for GenericRouter;
-
     PoolKey poolKey;
     uint256 privateKey;
     address signerAddr;
@@ -60,17 +58,9 @@ contract CounterScript is Script, TestPoolManager {
         console.log("currency1 %s", Currency.unwrap(poolKey.currency1));
 
         // Provide liquidity to the pool
-        router.addLiquidity(routerCallback, manager, poolKey, signerAddr, -60, 60, 10 ether);
-        router.addLiquidity(routerCallback, manager, poolKey, signerAddr, -120, 120, 10 ether);
-        router.addLiquidity(
-            routerCallback,
-            manager,
-            poolKey,
-            signerAddr,
-            TickMath.minUsableTick(60),
-            TickMath.maxUsableTick(60),
-            10 ether
-        );
+        caller.addLiquidity(poolKey, signerAddr, -60, 60, 10 ether);
+        caller.addLiquidity(poolKey, signerAddr, -120, 120, 10 ether);
+        caller.addLiquidity(poolKey, signerAddr, TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 10 ether);
 
         vm.stopBroadcast();
     }
@@ -79,13 +69,12 @@ contract CounterScript is Script, TestPoolManager {
         vm.startBroadcast(privateKey);
 
         // Perform a test swap
-        router.swap(routerCallback, manager, poolKey, signerAddr, signerAddr, poolKey.currency0, 1e18);
+        caller.swap(poolKey, signerAddr, signerAddr, poolKey.currency0, 1e18);
 
         // Perform a flash loan
         bytes memory callbackData = abi.encodeWithSelector(token0.balanceOf.selector, router);
-        router.flashLoan(address(token0), manager, address(token0), 1e6, callbackData);
+        caller.flashLoan(address(token0), 1e6, address(token0), CallType.Call, callbackData);
 
         vm.stopBroadcast();
     }
-
 }

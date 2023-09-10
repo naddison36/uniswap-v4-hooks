@@ -15,12 +15,11 @@ import {CurrencyLibrary, Currency} from "@uniswap/v4-core/contracts/types/Curren
 
 import {TestPoolManager} from "./utils/TestPoolManager.sol";
 import {CounterHook, CounterFactory} from "../src/hooks/CounterHook.sol";
-import {GenericRouter, GenericRouterLibrary} from "../src/router/GenericRouterLibrary.sol";
+import {CallType} from "../src/router/UniswapV4Router.sol";
 
 contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
     using PoolIdLibrary for PoolKey;
     using CurrencyLibrary for Currency;
-    using GenericRouterLibrary for GenericRouter;
 
     CounterHook hook;
     PoolKey poolKey;
@@ -45,21 +44,13 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
         manager.initialize(poolKey, SQRT_RATIO_1_1);
 
         // Provide liquidity over different ranges to the pool
-        router.addLiquidity(routerCallback, manager, poolKey, address(this), -60, 60, 10 ether);
-        router.addLiquidity(routerCallback, manager, poolKey, address(this), -120, 120, 10 ether);
-        router.addLiquidity(
-            routerCallback,
-            manager,
-            poolKey,
-            address(this),
-            TickMath.minUsableTick(60),
-            TickMath.maxUsableTick(60),
-            10 ether
-        );
+        caller.addLiquidity(poolKey, address(this), -60, 60, 10 ether);
+        caller.addLiquidity(poolKey, address(this), -120, 120, 10 ether);
+        caller.addLiquidity(poolKey, address(this), TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 10 ether);
     }
 
     function testAddLiquidity() public {
-        router.addLiquidity(routerCallback, manager, poolKey, address(this), -60, 60, 10 ether);
+        caller.addLiquidity(poolKey, address(this), -60, 60, 10 ether);
     }
 
     function testCounterHookFees() public {
@@ -78,7 +69,7 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
         assertEq(hook.afterSwapCounter(), 200);
 
         // Perform a test swap
-        router.swap(routerCallback, manager, poolKey, address(this), address(this), poolKey.currency0, 1e18);
+        caller.swap(poolKey, address(this), address(this), poolKey.currency0, 1e18);
 
         assertEq(hook.beforeSwapCounter(), 101);
         assertEq(hook.afterSwapCounter(), 201);
@@ -89,14 +80,14 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
 
     function testCounterSwapFromPoolManager() public {
         // Perform a deposit to the pool manager
-        router.deposit(manager, address(token1), address(this), address(this), 2e18);
+        caller.deposit(address(token1), address(this), address(this), 2e18);
 
         // The tester needs to approve the router to spend their tokens in the Pool Manager
         manager.setApprovalForAll(address(router), true);
         assertTrue(manager.isApprovedForAll(address(this), address(router)));
 
         // Perform a test swap
-        router.managerSwap(routerCallback, manager, poolKey, address(this), address(this), poolKey.currency1, 2e18);
+        caller.managerSwap(poolKey, address(this), address(this), poolKey.currency1, 2e18);
 
         // Revoke the tester's approval of the router as anyone can send calls to the router
         manager.setApprovalForAll(address(router), false);
@@ -107,7 +98,7 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
         assertEq(manager.balanceOf(address(this), uint160(address(token1))), 0);
 
         // Perform a deposit to the pool manager
-        router.deposit(manager, address(token0), address(this), address(this), 1e18);
+        caller.deposit(address(token0), address(this), address(this), 1e18);
 
         // Check tester's balance has been updated
         assertEq(manager.balanceOf(address(this), uint160(address(token0))), 1e18);
@@ -116,14 +107,14 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
 
     function testWithdrawToken0() public {
         // Perform a deposit to the pool manager
-        router.deposit(manager, address(token0), address(this), address(this), 10e18);
+        caller.deposit(address(token0), address(this), address(this), 10e18);
         assertEq(manager.balanceOf(address(this), uint160(address(token0))), 10e18);
         assertEq(manager.balanceOf(address(this), uint160(address(token1))), 0);
 
         // The tester needs to approve the router to spend their tokens in the Pool Manager
         manager.setApprovalForAll(address(router), true);
 
-        router.withdraw(manager, address(token0), address(this), 6e18);
+        caller.withdraw(address(token0), address(this), address(this), 6e18);
 
         manager.setApprovalForAll(address(router), false);
 
@@ -134,6 +125,6 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
     function testFlashLoan() public {
         // Perform a flash loan
         bytes memory callbackData = abi.encodeWithSelector(token0.balanceOf.selector, router);
-        router.flashLoan(address(token0), manager, address(token0), 1e6, callbackData);
+        caller.flashLoan(address(token0), 1e6, address(token0), CallType.Call, callbackData);
     }
 }

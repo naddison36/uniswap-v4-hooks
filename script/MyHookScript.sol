@@ -9,15 +9,13 @@ import {CurrencyLibrary, Currency} from "@uniswap/v4-core/contracts/types/Curren
 import {PoolKey} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 import {TestERC20} from "@uniswap/v4-core/contracts/test/TestERC20.sol";
 
-import {MyHook, MyHookFactory} from "../src/hooks/MyHook.sol";
-import {GenericRouter, GenericRouterLibrary} from "../src/router/GenericRouterLibrary.sol";
+import {MyHookFactory} from "../src/hooks/MyHook.sol";
 import {TestPoolManager} from "../test/utils/TestPoolManager.sol";
 
 /// @notice Forge script for deploying v4 & hooks to **anvil**
 /// @dev This script only works on an anvil RPC because v4 exceeds bytecode limits
 contract MyHookScript is Script, TestPoolManager {
     using CurrencyLibrary for Currency;
-    using GenericRouterLibrary for GenericRouter;
 
     PoolKey poolKey;
     uint256 privateKey;
@@ -44,11 +42,9 @@ contract MyHookScript is Script, TestPoolManager {
         manager.initialize(poolKey, SQRT_RATIO_1_TO_1);
 
         // Provide liquidity to the pool
-        router.addLiquidity(routerCallback, manager, poolKey, signerAddr, -60, 60, 10e18);
-        router.addLiquidity(routerCallback, manager, poolKey, signerAddr, -120, 120, 20e18);
-        router.addLiquidity(
-            routerCallback, manager, poolKey, signerAddr, TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 30e18
-        );
+        caller.addLiquidity(poolKey, signerAddr, -60, 60, 10e18);
+        caller.addLiquidity(poolKey, signerAddr, -120, 120, 20e18);
+        caller.addLiquidity(poolKey, signerAddr, TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 30e18);
 
         vm.stopBroadcast();
     }
@@ -57,15 +53,15 @@ contract MyHookScript is Script, TestPoolManager {
         vm.startBroadcast(privateKey);
 
         // Perform a test swap
-        router.swap(routerCallback, manager, poolKey, signerAddr, signerAddr, poolKey.currency0, 1e18);
+        caller.swap(poolKey, signerAddr, signerAddr, poolKey.currency0, 1e18);
         console.log("swapped token 0 for token 1");
 
         // Remove liquidity from the pool
-        router.removeLiquidity(routerCallback, manager, poolKey, signerAddr, -60, 60, 4e18);
+        caller.removeLiquidity(poolKey, signerAddr, -60, 60, 4e18);
         console.log("removed liquidity");
 
         // Deposit token 0 to the pool manager
-        // router.deposit(manager, address(token0), signerAddr, signerAddr, 6e18);
+        // caller.deposit(address(token0), signerAddr, signerAddr, 6e18);
 
         vm.stopBroadcast();
     }

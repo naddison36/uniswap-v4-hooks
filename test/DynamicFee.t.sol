@@ -16,12 +16,10 @@ import {Pool} from "@uniswap/v4-core/contracts/libraries/Pool.sol";
 
 import {TestPoolManager} from "./utils/TestPoolManager.sol";
 import {DynamicFeeHook, DynamicFeeFactory} from "../src/hooks/DynamicFeeHook.sol";
-import {GenericRouter, GenericRouterLibrary} from "../src/router/GenericRouterLibrary.sol";
 
 contract DynamicFeeTest is Test, TestPoolManager, Deployers, GasSnapshot {
     using PoolIdLibrary for PoolKey;
     using CurrencyLibrary for Currency;
-    using GenericRouterLibrary for GenericRouter;
 
     DynamicFeeHook hook;
     PoolKey poolKey;
@@ -46,25 +44,17 @@ contract DynamicFeeTest is Test, TestPoolManager, Deployers, GasSnapshot {
         manager.initialize(poolKey, SQRT_RATIO_1_1);
 
         // Provide liquidity over different ranges to the pool
-        router.addLiquidity(routerCallback, manager, poolKey, address(this), -60, 60, 10 ether);
-        router.addLiquidity(routerCallback, manager, poolKey, address(this), -120, 120, 10 ether);
-        router.addLiquidity(
-            routerCallback,
-            manager,
-            poolKey,
-            address(this),
-            TickMath.minUsableTick(60),
-            TickMath.maxUsableTick(60),
-            10 ether
-        );
+        caller.addLiquidity(poolKey, address(this), -60, 60, 10 ether);
+        caller.addLiquidity(poolKey, address(this), -120, 120, 10 ether);
+        caller.addLiquidity(poolKey, address(this), TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 10 ether);
     }
 
     function testDepositToken0() public {
-        router.deposit(manager, address(token0), address(this), address(this), 1e18);
+        caller.deposit(address(token0), address(this), address(this), 1e18);
     }
 
     function testDepositToken1() public {
-        router.deposit(manager, address(token1), address(this), address(this), 1e18);
+        caller.deposit(address(token1), address(this), address(this), 1e18);
     }
 
     function testHookFee() public {
@@ -79,8 +69,7 @@ contract DynamicFeeTest is Test, TestPoolManager, Deployers, GasSnapshot {
 
     function testSwap0_1() public {
         // Swap token0 for token1
-        bytes[] memory results =
-            router.swap(routerCallback, manager, poolKey, address(this), address(this), poolKey.currency0, 100);
+        bytes[] memory results = caller.swap(poolKey, address(this), address(this), poolKey.currency0, 100);
 
         // Check settle result
         BalanceDelta delta = abi.decode(results[0], (BalanceDelta));
@@ -93,8 +82,7 @@ contract DynamicFeeTest is Test, TestPoolManager, Deployers, GasSnapshot {
 
     function testSwap1_0() public {
         // Swap token1 for token0
-        bytes[] memory results =
-            router.swap(routerCallback, manager, poolKey, address(this), address(this), poolKey.currency1, 100);
+        bytes[] memory results = caller.swap(poolKey, address(this), address(this), poolKey.currency1, 100);
 
         // Check settle result
         BalanceDelta delta = abi.decode(results[0], (BalanceDelta));
@@ -103,17 +91,16 @@ contract DynamicFeeTest is Test, TestPoolManager, Deployers, GasSnapshot {
     }
 
     function testImbalancedAdd() public {
-        router.addLiquidity(routerCallback, manager, poolKey, address(this), -60, 0, 10 ether);
-        router.addLiquidity(routerCallback, manager, poolKey, address(this), 0, 120, 10 ether);
-        router.addLiquidity(routerCallback, manager, poolKey, address(this), 60, 180, 10 ether);
+        caller.addLiquidity(poolKey, address(this), -60, 0, 10 ether);
+        caller.addLiquidity(poolKey, address(this), 0, 120, 10 ether);
+        caller.addLiquidity(poolKey, address(this), 60, 180, 10 ether);
     }
 
     function testSwap1_0_tilt0() public {
-        router.addLiquidity(routerCallback, manager, poolKey, address(this), 0, 60, 10 ether);
+        caller.addLiquidity(poolKey, address(this), 0, 60, 10 ether);
 
         // Swap token1 for token0
-        bytes[] memory results =
-            router.swap(routerCallback, manager, poolKey, address(this), address(this), poolKey.currency1, 100);
+        bytes[] memory results = caller.swap(poolKey, address(this), address(this), poolKey.currency1, 100);
 
         // Check settle result
         BalanceDelta delta = abi.decode(results[0], (BalanceDelta));

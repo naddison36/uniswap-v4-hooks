@@ -12,15 +12,15 @@ import {PoolKey} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 import {Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
 import {TickMath} from "@uniswap/v4-core/contracts/libraries/TickMath.sol";
 
-import {Call, CallType, GenericRouter} from "../../src/router/GenericRouter.sol";
+import {Call, CallType, UniswapV4Router} from "../../src/router/UniswapV4Router.sol";
 
-library GenericRouterLibrary {
+library UniswapV4RouterLibrary {
     uint160 internal constant MIN_PRICE_LIMIT = TickMath.MIN_SQRT_RATIO + 1;
     uint160 internal constant MAX_PRICE_LIMIT = TickMath.MAX_SQRT_RATIO - 1;
     bytes internal constant EMPTY_RESULTS = hex"";
 
     function addLiquidity(
-        GenericRouter router,
+        UniswapV4Router router,
         address routerCallback,
         IPoolManager manager,
         PoolKey memory poolKey,
@@ -49,7 +49,7 @@ library GenericRouterLibrary {
             callType: CallType.Delegate,
             results: true,
             value: 0,
-            data: abi.encodeWithSelector(GenericRouterLibrary.addLiquidityCallback.selector, paramData, EMPTY_RESULTS)
+            data: abi.encodeWithSelector(UniswapV4RouterLibrary.addLiquidityCallback.selector, paramData, EMPTY_RESULTS)
         });
 
         // Settle token0
@@ -68,7 +68,7 @@ library GenericRouterLibrary {
             callType: CallType.Delegate,
             results: true,
             value: 0,
-            data: abi.encodeWithSelector(GenericRouterLibrary.addLiquidityCallback.selector, paramData, EMPTY_RESULTS)
+            data: abi.encodeWithSelector(UniswapV4RouterLibrary.addLiquidityCallback.selector, paramData, EMPTY_RESULTS)
         });
 
         // Settle token1
@@ -96,7 +96,7 @@ library GenericRouterLibrary {
     }
 
     function removeLiquidity(
-        GenericRouter router,
+        UniswapV4Router router,
         address routerCallback,
         IPoolManager manager,
         PoolKey memory poolKey,
@@ -121,7 +121,7 @@ library GenericRouterLibrary {
         // Take toToken using swapCallback
         bytes memory callData = abi.encode(manager, poolKey.currency0, poolKey.currency1, recipient);
         bytes memory callbackData =
-            abi.encodeWithSelector(GenericRouterLibrary.removeLiquidityCallback.selector, callData, EMPTY_RESULTS);
+            abi.encodeWithSelector(UniswapV4RouterLibrary.removeLiquidityCallback.selector, callData, EMPTY_RESULTS);
         calls[1] =
             Call({target: routerCallback, callType: CallType.Delegate, results: true, value: 0, data: callbackData});
 
@@ -140,7 +140,7 @@ library GenericRouterLibrary {
     }
 
     function swap(
-        GenericRouter router,
+        UniswapV4Router router,
         address routerCallback,
         IPoolManager manager,
         PoolKey memory poolKey,
@@ -189,7 +189,7 @@ library GenericRouterLibrary {
         // Take toToken using swapCallback
         bytes memory callData = abi.encode(manager, toCurrency, recipient, zeroForOne);
         bytes memory callbackData =
-            abi.encodeWithSelector(GenericRouterLibrary.swapCallback.selector, callData, EMPTY_RESULTS);
+            abi.encodeWithSelector(UniswapV4RouterLibrary.swapCallback.selector, callData, EMPTY_RESULTS);
         calls[3] =
             Call({target: routerCallback, callType: CallType.Delegate, results: true, value: 0, data: callbackData});
 
@@ -209,7 +209,7 @@ library GenericRouterLibrary {
     }
 
     function managerSwap(
-        GenericRouter router,
+        UniswapV4Router router,
         address routerCallback,
         IPoolManager manager,
         PoolKey memory poolKey,
@@ -265,7 +265,7 @@ library GenericRouterLibrary {
         // Transfer toToken using managerSwapCallback
         bytes memory callData = abi.encode(manager, toCurrency, router, recipient, zeroForOne);
         bytes memory callbackData =
-            abi.encodeWithSelector(GenericRouterLibrary.managerSwapCallback.selector, callData, EMPTY_RESULTS);
+            abi.encodeWithSelector(UniswapV4RouterLibrary.managerSwapCallback.selector, callData, EMPTY_RESULTS);
         calls[3] =
             Call({target: routerCallback, callType: CallType.Delegate, results: true, value: 0, data: callbackData});
 
@@ -289,7 +289,7 @@ library GenericRouterLibrary {
      * @notice Deposit tokens into the Pool Manager
      */
     function deposit(
-        GenericRouter router,
+        UniswapV4Router router,
         IPoolManager manager,
         address token,
         address sender,
@@ -332,10 +332,14 @@ library GenericRouterLibrary {
     /**
      * @notice Withdraw tokens from the Pool Manager
      */
-    function withdraw(GenericRouter router, IPoolManager manager, address token, address recipient, uint256 amount)
-        external
-        returns (bytes[] memory results)
-    {
+    function withdraw(
+        UniswapV4Router router,
+        IPoolManager manager,
+        address token,
+        address owner,
+        address recipient,
+        uint256 amount
+    ) external returns (bytes[] memory results) {
         Call[] memory calls = new Call[](2);
 
         // Safe transfer from swapper account in Pool Manager to the Pool Manager
@@ -345,7 +349,7 @@ library GenericRouterLibrary {
             results: false,
             value: 0,
             data: abi.encodeWithSelector(
-                ERC1155.safeTransferFrom.selector, address(this), address(manager), uint160(token), amount, ""
+                ERC1155.safeTransferFrom.selector, owner, address(manager), uint160(token), amount, ""
                 )
         });
 
@@ -362,11 +366,12 @@ library GenericRouterLibrary {
     }
 
     function flashLoan(
-        GenericRouter router,
-        address routerCallback,
+        UniswapV4Router router,
         IPoolManager manager,
         address token,
         uint256 amount,
+        address callbackTarget,
+        CallType callbackType,
         bytes calldata callbackData
     ) external returns (bytes[] memory results) {
         Call[] memory calls = new Call[](4);
@@ -380,9 +385,8 @@ library GenericRouterLibrary {
             data: abi.encodeWithSelector(manager.take.selector, token, address(router), amount)
         });
 
-        // Flash loan callback
-        calls[1] =
-            Call({target: routerCallback, callType: CallType.Delegate, results: false, value: 0, data: callbackData});
+        // Callback the specified callback function on the target contract
+        calls[1] = Call({target: callbackTarget, callType: callbackType, results: false, value: 0, data: callbackData});
 
         // transfer tokens from this router back to the Pool Manager
         calls[2] = Call({

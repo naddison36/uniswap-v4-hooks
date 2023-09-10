@@ -5,8 +5,6 @@ import {ILockCallback} from "@uniswap/v4-core/contracts//interfaces/callback/ILo
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
-import {console} from "forge-std/console.sol";
-
 enum CallType {
     Call,
     Delegate
@@ -20,7 +18,7 @@ struct Call {
     bytes data; // call data
 }
 
-contract GenericRouter is ILockCallback {
+contract UniswapV4Router is ILockCallback {
     IPoolManager public immutable manager;
 
     constructor(IPoolManager _manager) {
