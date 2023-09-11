@@ -125,7 +125,7 @@ tx2uml value --configFile dynamicFee.config.json --chain none --onlyToken \
 ```
 tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
     --title "Uniswap v4 - Remove Liquidity from a Pool" -hf -hc -x -l -p -g -t -v \
-    0x96b06d70ad4ffdfd685ea2db7262120531ea144b2a2449c51d8cd85559b37cd3 -o dynamicFeeRemoveSummary
+    0x7eefd1c5df06a938c469bfbfdc290d1a6a7b5fb5ac41ca60d8556b877f8cf5ff -o dynamicFeeRemoveSummary
 ```
 
 See the full trace with parameters in [dynamicFeeRemoveDetailed.svg](./dynamicFeeRemoveDetailed.svg)
@@ -133,7 +133,7 @@ See the full trace with parameters in [dynamicFeeRemoveDetailed.svg](./dynamicFe
 ```
 tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
     --title "Uniswap v4 - Remove Liquidity from a Pool" -v \
-    0x96b06d70ad4ffdfd685ea2db7262120531ea144b2a2449c51d8cd85559b37cd3 \
+    0x7eefd1c5df06a938c469bfbfdc290d1a6a7b5fb5ac41ca60d8556b877f8cf5ff \
     -o dynamicFeeRemoveDetailed
 ```
 
@@ -146,7 +146,7 @@ tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
 ```
 tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
     --title "Uniswap v4 - Deposit" -hf -hc -x -l -p -g -t -v \
-    0xf60a246c192bdbd214622dcee34e068b05ee1b553c6ee20ed08b4f154065d44f \
+    0x3ae85792ccee5e53a97937814e03432cad4d2d723199433f1ddfe165d93a78ca \
     -o depositSummary
 ```
 
@@ -155,7 +155,7 @@ See the full trace with parameters in [depositDetailed.svg](./depositDetailed.sv
 ```
 tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
     --title "Uniswap v4 - Deposit" -v \
-    0xf60a246c192bdbd214622dcee34e068b05ee1b553c6ee20ed08b4f154065d44f \
+    0x3ae85792ccee5e53a97937814e03432cad4d2d723199433f1ddfe165d93a78ca \
     -o depositDetailed
 ```
 
@@ -218,3 +218,14 @@ tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
     0xd9058df9bde86f5b7254d903ca45f93671f08c45c454ab914322bc577bb1de17 \
     -o swapPoolManagerTokensDetailed
 ```
+
+<!-- 
+tx2uml needs to support ERC1155 transfers
+![Swap Pool Manager Tokens Value](./swapPoolManagerTokensValue.svg)
+
+```
+tx2uml value --configFile dynamicFee.config.json --chain none --onlyToken \
+    --title "Uniswap v4 - Swap ERC1155 Tokens in the Pool Manager" -hf -hc -v \
+    0xd9058df9bde86f5b7254d903ca45f93671f08c45c454ab914322bc577bb1de17 \
+    -o swapPoolManagerTokensValue
+``` -->
