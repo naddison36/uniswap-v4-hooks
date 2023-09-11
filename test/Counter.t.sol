@@ -111,12 +111,10 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
         assertEq(manager.balanceOf(address(this), uint160(address(token0))), 10e18);
         assertEq(manager.balanceOf(address(this), uint160(address(token1))), 0);
 
-        // The tester needs to approve the router to spend their tokens in the Pool Manager
-        manager.setApprovalForAll(address(router), true);
+        // The tester needs to approve the caller contract to spend their tokens in the Pool Manager
+        manager.setApprovalForAll(address(caller), true);
 
         caller.withdraw(address(token0), address(this), address(this), 6e18);
-
-        manager.setApprovalForAll(address(router), false);
 
         assertEq(manager.balanceOf(address(this), uint160(address(token0))), 4e18);
         assertEq(manager.balanceOf(address(this), uint160(address(token1))), 0);

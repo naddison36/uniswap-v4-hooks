@@ -1,6 +1,569 @@
 {
   "0x5FbDB2315678afecb367f032d93F642f64180aa3": {
-    "contractName": "UniswapV4RouterLibrary"
+    "contractName": "UniswapV4RouterLibrary",
+    "abi": [
+      {
+        "inputs": [
+          {
+            "internalType": "contract UniswapV4Router",
+            "name": "router",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "callback",
+            "type": "address"
+          },
+          {
+            "internalType": "contract IPoolManager",
+            "name": "manager",
+            "type": "address"
+          },
+          {
+            "components": [
+              {
+                "internalType": "Currency",
+                "name": "currency0",
+                "type": "address"
+              },
+              {
+                "internalType": "Currency",
+                "name": "currency1",
+                "type": "address"
+              },
+              {
+                "internalType": "uint24",
+                "name": "fee",
+                "type": "uint24"
+              },
+              {
+                "internalType": "int24",
+                "name": "tickSpacing",
+                "type": "int24"
+              },
+              {
+                "internalType": "contract IHooks",
+                "name": "hooks",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct PoolKey",
+            "name": "poolKey",
+            "type": "tuple"
+          },
+          {
+            "internalType": "address",
+            "name": "sender",
+            "type": "address"
+          },
+          {
+            "internalType": "int24",
+            "name": "tickLower",
+            "type": "int24"
+          },
+          {
+            "internalType": "int24",
+            "name": "tickUpper",
+            "type": "int24"
+          },
+          {
+            "internalType": "int256",
+            "name": "liquidityAmount",
+            "type": "int256"
+          }
+        ],
+        "name": "addLiquidity",
+        "outputs": [
+          {
+            "internalType": "bytes[]",
+            "name": "results",
+            "type": "bytes[]"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes",
+            "name": "callData",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes",
+            "name": "resultData",
+            "type": "bytes"
+          }
+        ],
+        "name": "addLiquidityCallback",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "contract UniswapV4Router",
+            "name": "router",
+            "type": "address"
+          },
+          {
+            "internalType": "contract IPoolManager",
+            "name": "manager",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "sender",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "recipient",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "name": "deposit",
+        "outputs": [
+          {
+            "internalType": "bytes[]",
+            "name": "results",
+            "type": "bytes[]"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "contract UniswapV4Router",
+            "name": "router",
+            "type": "address"
+          },
+          {
+            "internalType": "contract IPoolManager",
+            "name": "manager",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "callbackTarget",
+            "type": "address"
+          },
+          {
+            "internalType": "enum CallType",
+            "name": "callbackType",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bytes",
+            "name": "callbackData",
+            "type": "bytes"
+          }
+        ],
+        "name": "flashLoan",
+        "outputs": [
+          {
+            "internalType": "bytes[]",
+            "name": "results",
+            "type": "bytes[]"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "contract UniswapV4Router",
+            "name": "router",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "callback",
+            "type": "address"
+          },
+          {
+            "internalType": "contract IPoolManager",
+            "name": "manager",
+            "type": "address"
+          },
+          {
+            "components": [
+              {
+                "internalType": "Currency",
+                "name": "currency0",
+                "type": "address"
+              },
+              {
+                "internalType": "Currency",
+                "name": "currency1",
+                "type": "address"
+              },
+              {
+                "internalType": "uint24",
+                "name": "fee",
+                "type": "uint24"
+              },
+              {
+                "internalType": "int24",
+                "name": "tickSpacing",
+                "type": "int24"
+              },
+              {
+                "internalType": "contract IHooks",
+                "name": "hooks",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct PoolKey",
+            "name": "poolKey",
+            "type": "tuple"
+          },
+          {
+            "internalType": "address",
+            "name": "swapper",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "recipient",
+            "type": "address"
+          },
+          {
+            "internalType": "Currency",
+            "name": "fromCurrency",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "swapAmount",
+            "type": "int256"
+          }
+        ],
+        "name": "managerSwap",
+        "outputs": [
+          {
+            "internalType": "bytes[]",
+            "name": "results",
+            "type": "bytes[]"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes",
+            "name": "callData",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes",
+            "name": "resultData",
+            "type": "bytes"
+          }
+        ],
+        "name": "managerSwapCallback",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "contract UniswapV4Router",
+            "name": "router",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "callback",
+            "type": "address"
+          },
+          {
+            "internalType": "contract IPoolManager",
+            "name": "manager",
+            "type": "address"
+          },
+          {
+            "components": [
+              {
+                "internalType": "Currency",
+                "name": "currency0",
+                "type": "address"
+              },
+              {
+                "internalType": "Currency",
+                "name": "currency1",
+                "type": "address"
+              },
+              {
+                "internalType": "uint24",
+                "name": "fee",
+                "type": "uint24"
+              },
+              {
+                "internalType": "int24",
+                "name": "tickSpacing",
+                "type": "int24"
+              },
+              {
+                "internalType": "contract IHooks",
+                "name": "hooks",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct PoolKey",
+            "name": "poolKey",
+            "type": "tuple"
+          },
+          {
+            "internalType": "address",
+            "name": "recipient",
+            "type": "address"
+          },
+          {
+            "internalType": "int24",
+            "name": "tickLower",
+            "type": "int24"
+          },
+          {
+            "internalType": "int24",
+            "name": "tickUpper",
+            "type": "int24"
+          },
+          {
+            "internalType": "int256",
+            "name": "liquidityAmount",
+            "type": "int256"
+          }
+        ],
+        "name": "removeLiquidity",
+        "outputs": [
+          {
+            "internalType": "bytes[]",
+            "name": "results",
+            "type": "bytes[]"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes",
+            "name": "callData",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes",
+            "name": "resultData",
+            "type": "bytes"
+          }
+        ],
+        "name": "removeLiquidityCallback",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "contract UniswapV4Router",
+            "name": "router",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "callback",
+            "type": "address"
+          },
+          {
+            "internalType": "contract IPoolManager",
+            "name": "manager",
+            "type": "address"
+          },
+          {
+            "components": [
+              {
+                "internalType": "Currency",
+                "name": "currency0",
+                "type": "address"
+              },
+              {
+                "internalType": "Currency",
+                "name": "currency1",
+                "type": "address"
+              },
+              {
+                "internalType": "uint24",
+                "name": "fee",
+                "type": "uint24"
+              },
+              {
+                "internalType": "int24",
+                "name": "tickSpacing",
+                "type": "int24"
+              },
+              {
+                "internalType": "contract IHooks",
+                "name": "hooks",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct PoolKey",
+            "name": "poolKey",
+            "type": "tuple"
+          },
+          {
+            "internalType": "address",
+            "name": "swapper",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "recipient",
+            "type": "address"
+          },
+          {
+            "internalType": "Currency",
+            "name": "fromCurrency",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "swapAmount",
+            "type": "int256"
+          }
+        ],
+        "name": "swap",
+        "outputs": [
+          {
+            "internalType": "bytes[]",
+            "name": "results",
+            "type": "bytes[]"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes",
+            "name": "callData",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes",
+            "name": "resultData",
+            "type": "bytes"
+          }
+        ],
+        "name": "swapCallback",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "contract UniswapV4Router",
+            "name": "router",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "callback",
+            "type": "address"
+          },
+          {
+            "internalType": "contract IPoolManager",
+            "name": "manager",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "recipient",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "name": "withdraw",
+        "outputs": [
+          {
+            "internalType": "bytes[]",
+            "name": "results",
+            "type": "bytes[]"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "poolManager",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "name": "withdrawCallback",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      }
+    ]
   },
   "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6": {
     "contractName": "DynamicFeeFactory",
@@ -3325,7 +3888,7 @@
       {
         "inputs": [
           {
-            "internalType": "contract GenericRouter",
+            "internalType": "contract UniswapV4Router",
             "name": "_router",
             "type": "address"
           },
@@ -3681,7 +4244,7 @@
         "name": "router",
         "outputs": [
           {
-            "internalType": "contract GenericRouter",
+            "internalType": "contract UniswapV4Router",
             "name": "",
             "type": "address"
           }
@@ -3804,6 +4367,29 @@
             "type": "bytes[]"
           }
         ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "poolManager",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "name": "withdrawCallback",
+        "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
       }

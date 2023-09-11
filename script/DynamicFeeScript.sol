@@ -75,9 +75,8 @@ contract DynamicFeeScript is Script, TestPoolManager {
         caller.deposit(address(token0), signerAddr, signerAddr, 6e18);
 
         // Withdraw token 0 to the pool manager
-        manager.setApprovalForAll(address(router), true);
+        manager.setApprovalForAll(address(caller), true);
         caller.withdraw(address(token0), signerAddr, signerAddr, 4e18);
-        manager.setApprovalForAll(address(router), false);
 
         // Perform a flash loan
         bytes memory callbackData = abi.encodeWithSelector(token0.balanceOf.selector, router);

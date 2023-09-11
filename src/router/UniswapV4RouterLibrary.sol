@@ -3,7 +3,7 @@ pragma solidity ^0.8.15;
 
 import {console} from "forge-std/console.sol";
 
-import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import {IERC1155} from "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 
 import {IERC20Minimal} from "@uniswap/v4-core/contracts/interfaces/external/IERC20Minimal.sol";
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
@@ -21,7 +21,7 @@ library UniswapV4RouterLibrary {
 
     function addLiquidity(
         UniswapV4Router router,
-        address routerCallback,
+        address callback,
         IPoolManager manager,
         PoolKey memory poolKey,
         address sender,
@@ -45,7 +45,7 @@ library UniswapV4RouterLibrary {
         // Transfer token0 to Pool Manager
         bytes memory paramData = abi.encode(Currency.unwrap(poolKey.currency0), sender, address(manager), true);
         calls[1] = Call({
-            target: routerCallback,
+            target: callback,
             callType: CallType.Delegate,
             results: true,
             value: 0,
@@ -64,7 +64,7 @@ library UniswapV4RouterLibrary {
         // Transfer token1 to Pool Manager
         paramData = abi.encode(Currency.unwrap(poolKey.currency1), sender, address(manager), false);
         calls[3] = Call({
-            target: routerCallback,
+            target: callback,
             callType: CallType.Delegate,
             results: true,
             value: 0,
@@ -97,7 +97,7 @@ library UniswapV4RouterLibrary {
 
     function removeLiquidity(
         UniswapV4Router router,
-        address routerCallback,
+        address callback,
         IPoolManager manager,
         PoolKey memory poolKey,
         address recipient,
@@ -122,8 +122,7 @@ library UniswapV4RouterLibrary {
         bytes memory callData = abi.encode(manager, poolKey.currency0, poolKey.currency1, recipient);
         bytes memory callbackData =
             abi.encodeWithSelector(UniswapV4RouterLibrary.removeLiquidityCallback.selector, callData, EMPTY_RESULTS);
-        calls[1] =
-            Call({target: routerCallback, callType: CallType.Delegate, results: true, value: 0, data: callbackData});
+        calls[1] = Call({target: callback, callType: CallType.Delegate, results: true, value: 0, data: callbackData});
 
         results = router.process(calls);
     }
@@ -141,7 +140,7 @@ library UniswapV4RouterLibrary {
 
     function swap(
         UniswapV4Router router,
-        address routerCallback,
+        address callback,
         IPoolManager manager,
         PoolKey memory poolKey,
         address swapper,
@@ -190,8 +189,7 @@ library UniswapV4RouterLibrary {
         bytes memory callData = abi.encode(manager, toCurrency, recipient, zeroForOne);
         bytes memory callbackData =
             abi.encodeWithSelector(UniswapV4RouterLibrary.swapCallback.selector, callData, EMPTY_RESULTS);
-        calls[3] =
-            Call({target: routerCallback, callType: CallType.Delegate, results: true, value: 0, data: callbackData});
+        calls[3] = Call({target: callback, callType: CallType.Delegate, results: true, value: 0, data: callbackData});
 
         results = router.process(calls);
     }
@@ -210,7 +208,7 @@ library UniswapV4RouterLibrary {
 
     function managerSwap(
         UniswapV4Router router,
-        address routerCallback,
+        address callback,
         IPoolManager manager,
         PoolKey memory poolKey,
         address swapper,
@@ -244,7 +242,7 @@ library UniswapV4RouterLibrary {
             results: false,
             value: 0,
             data: abi.encodeWithSelector(
-                ERC1155.safeTransferFrom.selector,
+                IERC1155.safeTransferFrom.selector,
                 swapper,
                 address(manager),
                 uint160(Currency.unwrap(fromCurrency)),
@@ -266,8 +264,7 @@ library UniswapV4RouterLibrary {
         bytes memory callData = abi.encode(manager, toCurrency, router, recipient, zeroForOne);
         bytes memory callbackData =
             abi.encodeWithSelector(UniswapV4RouterLibrary.managerSwapCallback.selector, callData, EMPTY_RESULTS);
-        calls[3] =
-            Call({target: routerCallback, callType: CallType.Delegate, results: true, value: 0, data: callbackData});
+        calls[3] = Call({target: callback, callType: CallType.Delegate, results: true, value: 0, data: callbackData});
 
         results = router.process(calls);
     }
@@ -334,6 +331,7 @@ library UniswapV4RouterLibrary {
      */
     function withdraw(
         UniswapV4Router router,
+        address callback,
         IPoolManager manager,
         address token,
         address owner,
@@ -342,15 +340,13 @@ library UniswapV4RouterLibrary {
     ) external returns (bytes[] memory results) {
         Call[] memory calls = new Call[](2);
 
-        // Safe transfer from swapper account in Pool Manager to the Pool Manager
+        // Transfer ERC1155 tokens from the owner to Pool Manager using withdrawCallback
         calls[0] = Call({
-            target: address(manager),
+            target: callback,
             callType: CallType.Call,
             results: false,
             value: 0,
-            data: abi.encodeWithSelector(
-                ERC1155.safeTransferFrom.selector, owner, address(manager), uint160(token), amount, ""
-                )
+            data: abi.encodeWithSelector(UniswapV4RouterLibrary.withdrawCallback.selector, address(manager), token, amount)
         });
 
         // Take tokens from the Pool Manager
@@ -363,6 +359,10 @@ library UniswapV4RouterLibrary {
         });
 
         results = router.process(calls);
+    }
+
+    function withdrawCallback(address poolManager, address token, uint256 amount) external {
+        IERC1155(poolManager).safeTransferFrom(msg.sender, poolManager, uint160(token), amount, "");
     }
 
     function flashLoan(

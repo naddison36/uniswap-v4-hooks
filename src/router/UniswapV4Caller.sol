@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
+import {IERC1155} from "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
+import {Address} from "@openzeppelin/contracts/utils/Address.sol";
+
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
 import {PoolKey} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 import {Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
@@ -13,6 +16,10 @@ contract UniswapV4Caller {
 
     UniswapV4Router public immutable router;
     IPoolManager public immutable manager;
+    // TODO replace with transient storage
+    // Default to 1 to save gas
+    // Is only used by withdraw
+    address caller = address(1);
 
     constructor(UniswapV4Router _router, IPoolManager _manager) {
         router = _router;
@@ -84,7 +91,16 @@ contract UniswapV4Caller {
         external
         returns (bytes[] memory results)
     {
-        results = router.withdraw(manager, token, owner, recipient, amount);
+        // Store the caller so we can use it in the callback
+        caller = msg.sender;
+        results = router.withdraw(address(this), manager, token, owner, recipient, amount);
+
+        // Clear the caller. Ideally this would be transient storage so no need to clear
+        caller = address(1);
+    }
+
+    function withdrawCallback(address poolManager, address token, uint256 amount) external {
+        IERC1155(poolManager).safeTransferFrom(caller, address(poolManager), uint160(token), amount, "");
     }
 
     function flashLoan(
