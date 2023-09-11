@@ -87,7 +87,8 @@ contract DynamicFeeScript is Script, TestPoolManager {
             abi.encodeWithSelector(FlashLoanLogic.flashLoanCallback.selector, address(token0), amount);
         caller.flashLoan(address(token0), amount, address(flashLoanLogic), CallType.Delegate, callbackData);
 
-        caller.managerSwap(poolKey, signerAddr, poolKey.currency0, 2e18);
+        // Swap from token 0 in the Pool Manager to token 1 in the Pool Manager
+        caller.swapManagerTokens(poolKey, poolKey.currency0, 2e18, signerAddr);
         console.log("swapped token 0 for token 1 in the Pool Manager");
 
         vm.stopBroadcast();

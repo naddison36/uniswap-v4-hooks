@@ -66,21 +66,21 @@ contract UniswapV4Caller {
         UniswapV4RouterLibrary.swapCallback(callData, resultData);
     }
 
-    function managerSwap(PoolKey memory poolKey, address recipient, Currency fromCurrency, int256 swapAmount)
+    function swapManagerTokens(PoolKey memory poolKey, Currency fromCurrency, int256 fromAmount, address recipient)
         external
         returns (bytes[] memory results)
     {
         // Store the caller so we can use it in the callback
         caller = msg.sender;
 
-        results = router.managerSwap(address(this), manager, poolKey, recipient, fromCurrency, swapAmount);
+        results = router.swapManagerTokens(address(this), manager, poolKey, fromCurrency, fromAmount, recipient);
 
         // Clear the caller. Ideally this would be transient storage so no need to clear
         caller = address(1);
     }
 
-    function managerSwapCallback(bytes memory callData, bytes memory resultData) external {
-        UniswapV4RouterLibrary.managerSwapCallback(callData, resultData);
+    function swapManagerTokensCallback(bytes memory callData, bytes memory resultData) external {
+        UniswapV4RouterLibrary.swapManagerTokensCallback(callData, resultData);
     }
 
     function deposit(address token, address sender, address recipient, uint256 amount)

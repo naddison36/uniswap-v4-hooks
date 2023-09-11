@@ -206,14 +206,14 @@ library UniswapV4RouterLibrary {
         poolManager.take(currency, recipient, takeAmount);
     }
 
-    function managerSwap(
+    function swapManagerTokens(
         UniswapV4Router router,
         address callback,
         IPoolManager manager,
         PoolKey memory poolKey,
-        address recipient,
         Currency fromCurrency,
-        int256 swapAmount
+        int256 fromAmount,
+        address recipient
     ) external returns (bytes[] memory results) {
         Call[] memory calls = new Call[](4);
 
@@ -223,7 +223,7 @@ library UniswapV4RouterLibrary {
         // Swap
         IPoolManager.SwapParams memory params = IPoolManager.SwapParams({
             zeroForOne: zeroForOne,
-            amountSpecified: swapAmount,
+            amountSpecified: fromAmount,
             sqrtPriceLimitX96: zeroForOne ? MIN_PRICE_LIMIT : MAX_PRICE_LIMIT
         });
         calls[0] = Call({
@@ -241,7 +241,7 @@ library UniswapV4RouterLibrary {
             results: false,
             value: 0,
             data: abi.encodeWithSelector(
-                UniswapV4RouterLibrary.transferFromCallerToPoolManager.selector, Currency.unwrap(fromCurrency), swapAmount
+                UniswapV4RouterLibrary.transferFromCallerToPoolManager.selector, Currency.unwrap(fromCurrency), fromAmount
                 )
         });
 
@@ -257,13 +257,13 @@ library UniswapV4RouterLibrary {
         // Transfer toToken using managerSwapCallback
         bytes memory callData = abi.encode(manager, toCurrency, router, recipient, zeroForOne);
         bytes memory callbackData =
-            abi.encodeWithSelector(UniswapV4RouterLibrary.managerSwapCallback.selector, callData, EMPTY_RESULTS);
+            abi.encodeWithSelector(UniswapV4RouterLibrary.swapManagerTokensCallback.selector, callData, EMPTY_RESULTS);
         calls[3] = Call({target: callback, callType: CallType.Delegate, results: true, value: 0, data: callbackData});
 
         results = router.process(calls);
     }
 
-    function managerSwapCallback(bytes memory callData, bytes memory resultData) external {
+    function swapManagerTokensCallback(bytes memory callData, bytes memory resultData) external {
         (IPoolManager poolManager, Currency currency, address router, address recipient, bool zeroForOne) =
             abi.decode(callData, (IPoolManager, Currency, address, address, bool));
 

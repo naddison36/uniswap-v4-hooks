@@ -4278,85 +4278,6 @@
             "type": "address"
           },
           {
-            "internalType": "Currency",
-            "name": "fromCurrency",
-            "type": "address"
-          },
-          {
-            "internalType": "int256",
-            "name": "swapAmount",
-            "type": "int256"
-          }
-        ],
-        "name": "managerSwap",
-        "outputs": [
-          {
-            "internalType": "bytes[]",
-            "name": "results",
-            "type": "bytes[]"
-          }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "bytes",
-            "name": "callData",
-            "type": "bytes"
-          },
-          {
-            "internalType": "bytes",
-            "name": "resultData",
-            "type": "bytes"
-          }
-        ],
-        "name": "managerSwapCallback",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "components": [
-              {
-                "internalType": "Currency",
-                "name": "currency0",
-                "type": "address"
-              },
-              {
-                "internalType": "Currency",
-                "name": "currency1",
-                "type": "address"
-              },
-              {
-                "internalType": "uint24",
-                "name": "fee",
-                "type": "uint24"
-              },
-              {
-                "internalType": "int24",
-                "name": "tickSpacing",
-                "type": "int24"
-              },
-              {
-                "internalType": "contract IHooks",
-                "name": "hooks",
-                "type": "address"
-              }
-            ],
-            "internalType": "struct PoolKey",
-            "name": "poolKey",
-            "type": "tuple"
-          },
-          {
-            "internalType": "address",
-            "name": "recipient",
-            "type": "address"
-          },
-          {
             "internalType": "int24",
             "name": "tickLower",
             "type": "int24"
@@ -4494,6 +4415,85 @@
           }
         ],
         "name": "swapCallback",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "components": [
+              {
+                "internalType": "Currency",
+                "name": "currency0",
+                "type": "address"
+              },
+              {
+                "internalType": "Currency",
+                "name": "currency1",
+                "type": "address"
+              },
+              {
+                "internalType": "uint24",
+                "name": "fee",
+                "type": "uint24"
+              },
+              {
+                "internalType": "int24",
+                "name": "tickSpacing",
+                "type": "int24"
+              },
+              {
+                "internalType": "contract IHooks",
+                "name": "hooks",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct PoolKey",
+            "name": "poolKey",
+            "type": "tuple"
+          },
+          {
+            "internalType": "Currency",
+            "name": "fromCurrency",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "fromAmount",
+            "type": "int256"
+          },
+          {
+            "internalType": "address",
+            "name": "recipient",
+            "type": "address"
+          }
+        ],
+        "name": "swapManagerTokens",
+        "outputs": [
+          {
+            "internalType": "bytes[]",
+            "name": "results",
+            "type": "bytes[]"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes",
+            "name": "callData",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes",
+            "name": "resultData",
+            "type": "bytes"
+          }
+        ],
+        "name": "swapManagerTokensCallback",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

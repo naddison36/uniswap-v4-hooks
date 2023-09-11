@@ -220,7 +220,7 @@ tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
 ```
 tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
     --title "Uniswap v4 - Swap ERC1155 Tokens in the Pool Manager" -hf -hc -x -l -p -g -t -v \
-    0xe020752648cb3783227436cdd27c9eeef818c6e7071af10bb1512304ed81b1c9 \
+    0xe896d1315f0f24fc94677ec4c7ffed32a25cc389fad38daa53ab7f91a8baa13f \
     -o swapPoolManagerTokensSummary
 ```
 
@@ -229,6 +229,6 @@ See the full trace with parameters in [swapPoolManagerTokensDetailed.svg](./swap
 ```
 tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
     --title "Uniswap v4 - Swap ERC1155 Tokens in the Pool Manager" -v \
-    0xe020752648cb3783227436cdd27c9eeef818c6e7071af10bb1512304ed81b1c9 \
+    0xe896d1315f0f24fc94677ec4c7ffed32a25cc389fad38daa53ab7f91a8baa13f \
     -o swapPoolManagerTokensDetailed
 ```

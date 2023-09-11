@@ -87,7 +87,7 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
         assertTrue(manager.isApprovedForAll(address(this), address(caller)));
 
         // Perform a test swap of ERC1155 tokens
-        caller.managerSwap(poolKey, address(this), poolKey.currency1, 2e18);
+        caller.swapManagerTokens(poolKey, poolKey.currency1, 2e18, address(this));
 
         // Revoke the tester's approval of the router as anyone can send calls to the router
         manager.setApprovalForAll(address(caller), false);
