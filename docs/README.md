@@ -17,9 +17,10 @@ Deploy a `CounterHook` contract via the `CounterFactory` and initialize a new Un
 ![Counter Hook Setup](./counterSetup.svg)
 
 ```
-tx2uml --nodeType anvil --configFile counter.config.json --chain none -t -g -v \
+tx2uml --nodeType anvil --configFile counter.config.json --chain none -hf -hc -g -t -v \
+    --title "Uniswap v4 - Pool Setup" \
     --noAddresses 0x000000000000000000636f6e736f6c652e6c6f67 \
-    0x3f17825b8fe0d777f7ddf35ee512a9258ef1234869bcf02f715ebd9f4af28358,0x3e8aa6240dfe1302a385bafc15dec04bf11322723d5a7a180e47fd0095a090a1 \
+    0xfabb35401132c449e2ef6887892d1e2f43e62480e9f1932aa6c7e8308be7eba5,0xb3ee845923d8f202dd8d4326e87c39d7ee00d2ba341c7794d0f392327ecc41ff \
     -o counterSetup
 ```
 
@@ -28,16 +29,18 @@ tx2uml --nodeType anvil --configFile counter.config.json --chain none -t -g -v \
 ![Counter Modify Summary](./counterModifySummary.svg)
 
 ```
-tx2uml --nodeType anvil --configFile counter.config.json --chain none -p -g -t -v \
-    0x834f3d9c9817753ee9e6fecbb10680ceb912d3a2ea7b84010488886600091d22 \
+tx2uml --nodeType anvil --configFile counter.config.json --chain none  -hf -hc -p -l -x -g -t -v \
+    --title "Uniswap v4 - Add Liquidity to Pool" \
+    0xd2d9bcee460447a53dc4fcaed32cf121dcd3cbe730871bbb6d2092913f458145 \
     -o counterModifySummary
 ```
 
 See the full trace with parameters in [counterModifyDetailed.svg](./counterModifyDetailed.svg)
 
 ```
-tx2uml --nodeType anvil --configFile counter.config.json --chain none -g -t -v \
-    0x834f3d9c9817753ee9e6fecbb10680ceb912d3a2ea7b84010488886600091d22 \
+tx2uml --nodeType anvil --configFile counter.config.json --chain none -v \
+    --title "Uniswap v4 - Add Liquidity to Pool" \
+    0xd2d9bcee460447a53dc4fcaed32cf121dcd3cbe730871bbb6d2092913f458145 \
     -o counterModifyDetailed
 ```
 
@@ -46,17 +49,18 @@ tx2uml --nodeType anvil --configFile counter.config.json --chain none -g -t -v \
 ![Counter Swap Summary](./counterSwapSummary.svg)
 
 ```
-tx2uml --nodeType anvil --configFile counter.config.json --chain none -p -g -t -v  \
-    0x76f7a801d8f2240a93b754891a5da8ce855a9e6e0bada535d2a77556720bcc75 \
+tx2uml --nodeType anvil --configFile counter.config.json --chain none \
+    --title "Uniswap v4 - Swap token0 for token1" -hf -hc -x -l -p -g -t -v \
+    0x6e9c7e4cc12cc0719afa739b776bf95e592146622f2dd755c84c81ff98fd706f \
     -o counterSwapSummary
 ```
 
 See the full trace with parameters in [counterSwapDetailed.svg](./counterSwapDetailed.svg)
 
 ```
-tx2uml --nodeType anvil --configFile counter.config.json --chain none -g -t -v \
-    --noAddresses 0x5FbDB2315678afecb367f032d93F642f64180aa3 \
-    0x76f7a801d8f2240a93b754891a5da8ce855a9e6e0bada535d2a77556720bcc75 \
+tx2uml --nodeType anvil --configFile counter.config.json --chain none \
+    --title "Uniswap v4 - Swap token0 for token1" -v \
+    0x6e9c7e4cc12cc0719afa739b776bf95e592146622f2dd755c84c81ff98fd706f \
     -o counterSwapDetailed
 ```
 
