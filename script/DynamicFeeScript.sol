@@ -89,7 +89,7 @@ contract DynamicFeeScript is Script, TestPoolManager {
 
         // Swap from token 0 in the Pool Manager to token 1 in the Pool Manager
         caller.swapManagerTokens(poolKey, poolKey.currency0, 2e18, signerAddr);
-        console.log("swapped token 0 for token 1 in the Pool Manager");
+        console.log("swapped token 0 for token 1 in the Pool Manager ");
 
         vm.stopBroadcast();
     }

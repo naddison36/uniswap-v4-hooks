@@ -254,7 +254,7 @@ library UniswapV4RouterLibrary {
             data: abi.encodeWithSelector(manager.settle.selector, fromCurrency)
         });
 
-        // Transfer toToken using managerSwapCallback
+        // Transfer toToken using swapManagerTokensCallback
         bytes memory callData = abi.encode(manager, toCurrency, router, recipient, zeroForOne);
         bytes memory callbackData =
             abi.encodeWithSelector(UniswapV4RouterLibrary.swapManagerTokensCallback.selector, callData, EMPTY_RESULTS);
@@ -272,8 +272,8 @@ library UniswapV4RouterLibrary {
 
         uint128 takeAmount = zeroForOne ? uint128(-1 * delta.amount1()) : uint128(-1 * delta.amount0());
 
-        poolManager.take(currency, recipient, takeAmount);
-        // poolManager.safeTransferFrom(router, recipient, uint160(Currency.unwrap(currency)), takeAmount, "");
+        // Mint the tokens output from the swap as ERC1155 tokens in the Pool Manager
+        poolManager.mint(currency, recipient, takeAmount);
     }
 
     /**
