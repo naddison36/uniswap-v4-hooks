@@ -2,14 +2,6 @@
 
 ## Counter Hook
 
-### CounterHook Contract
-
-![CounterHook Contract](./CounterHook.svg)
-
-```
-sol2uml class ../src,../lib -b CounterHook
-```
-
 ### Pool Setup
 
 Deploy a `CounterHook` contract via the `CounterFactory` and initialize a new Uniswap v4 pool using the hook.
@@ -64,13 +56,7 @@ tx2uml --nodeType anvil --configFile counter.config.json --chain none \
     -o counterSwapDetailed
 ```
 
-## DynamicFeeHook
-
-![DynamicFeeHook Contract](./DynamicFeeHook.svg)
-
-```
-sol2uml class ../src,../lib -b DynamicFeeHook
-```
+## Dynamic Fee Hook
 
 ### Swap tokens using a pool
 

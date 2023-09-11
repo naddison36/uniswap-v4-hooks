@@ -128,6 +128,9 @@ Summary of the swap calls
 
 ![Dynamic Fee Swap Summary](./docs/dynamicFeeSwapSummary.svg)
 
+
+See [here](./docs/README.md#dynamicfeehook) for more examples and details.
+
 ### Local Testing
 
 ```bash
