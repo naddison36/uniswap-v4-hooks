@@ -175,9 +175,9 @@ tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
 
 ```
 tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
-    --title "Uniswap v4 - Flash Loan" -hf -hc -x -l -p -g -t -v \
-    0xb182171fa5739540ac0b1b89ba4ee8550fe6470632d495272a88a6548d3f5e6b \
-    -o lashLoanSummary
+    --title "Uniswap v4 - Flash Loan" -hf -hc -l -p -g -t -v \
+    0x78b6c2fc358b9bbac59abf59ff850359c68d4bdf59e2601d6499f978829470fa \
+    -o flashLoanSummary
 ```
 
 See the full trace with parameters in [flashLoanDetailed.svg](./flashLoanDetailed.svg)
@@ -185,6 +185,6 @@ See the full trace with parameters in [flashLoanDetailed.svg](./flashLoanDetaile
 ```
 tx2uml --nodeType anvil --configFile dynamicFee.config.json --chain none \
     --title "Uniswap v4 - Flash Loan" -v \
-    0xb182171fa5739540ac0b1b89ba4ee8550fe6470632d495272a88a6548d3f5e6b \
+    0x78b6c2fc358b9bbac59abf59ff850359c68d4bdf59e2601d6499f978829470fa \
     -o flashLoanDetailed
 ```

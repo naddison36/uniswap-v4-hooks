@@ -1806,6 +1806,7 @@
   },
   "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9": {
     "contractName": "PoolManager",
+    "tokenName": "Uniswap v4 Core",
     "abi": [
       {
         "inputs": [
@@ -4389,6 +4390,47 @@
           }
         ],
         "name": "withdrawCallback",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      }
+    ]
+  },
+  "0x3Aa5ebB10DC797CAC828524e59A333d0A371443c": {
+    "contractName": "FlashLoanLogic",
+    "abi": [
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "name": "flashLoanCallback",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address[]",
+            "name": "tokens",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "amounts",
+            "type": "uint256[]"
+          }
+        ],
+        "name": "flashLoansCallback",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

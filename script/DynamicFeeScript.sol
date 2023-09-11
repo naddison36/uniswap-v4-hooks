@@ -14,6 +14,7 @@ import {PoolKey} from "@uniswap/v4-core/contracts/types/PoolId.sol";
 
 import {DynamicFeeFactory} from "../src/hooks/DynamicFeeHook.sol";
 import {CallType, UniswapV4Router} from "../src/router/UniswapV4Router.sol";
+import {FlashLoanLogic} from "../src/FlashLoanLogic.sol";
 import {TestPoolManager} from "../test/utils/TestPoolManager.sol";
 
 /// @notice Forge script for deploying v4 & hooks to **anvil**
@@ -79,8 +80,12 @@ contract DynamicFeeScript is Script, TestPoolManager {
         caller.withdraw(address(token0), signerAddr, signerAddr, 4e18);
 
         // Perform a flash loan
-        bytes memory callbackData = abi.encodeWithSelector(token0.balanceOf.selector, router);
-        caller.flashLoan(address(token0), 1e6, address(token0), CallType.Call, callbackData);
+        // Deploy flash loan logic contract that will be delegated to
+        FlashLoanLogic flashLoanLogic = new FlashLoanLogic();
+        uint256 amount = 10000000e6; // 10 million for a 6 deicmal token
+        bytes memory callbackData =
+            abi.encodeWithSelector(FlashLoanLogic.flashLoanCallback.selector, address(token0), amount);
+        caller.flashLoan(address(token0), amount, address(flashLoanLogic), CallType.Delegate, callbackData);
 
         vm.stopBroadcast();
     }
