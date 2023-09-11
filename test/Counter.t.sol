@@ -83,14 +83,14 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
         caller.deposit(address(token1), address(this), address(this), 2e18);
 
         // The tester needs to approve the router to spend their tokens in the Pool Manager
-        manager.setApprovalForAll(address(router), true);
-        assertTrue(manager.isApprovedForAll(address(this), address(router)));
+        manager.setApprovalForAll(address(caller), true);
+        assertTrue(manager.isApprovedForAll(address(this), address(caller)));
 
-        // Perform a test swap
-        caller.managerSwap(poolKey, address(this), address(this), poolKey.currency1, 2e18);
+        // Perform a test swap of ERC1155 tokens
+        caller.managerSwap(poolKey, address(this), poolKey.currency1, 2e18);
 
         // Revoke the tester's approval of the router as anyone can send calls to the router
-        manager.setApprovalForAll(address(router), false);
+        manager.setApprovalForAll(address(caller), false);
     }
 
     function testDepositToken0() public {
@@ -114,7 +114,7 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
         // The tester needs to approve the caller contract to spend their tokens in the Pool Manager
         manager.setApprovalForAll(address(caller), true);
 
-        caller.withdraw(address(token0), address(this), address(this), 6e18);
+        caller.withdraw(address(token0), address(this), 6e18);
 
         assertEq(manager.balanceOf(address(this), uint160(address(token0))), 4e18);
         assertEq(manager.balanceOf(address(this), uint160(address(token1))), 0);

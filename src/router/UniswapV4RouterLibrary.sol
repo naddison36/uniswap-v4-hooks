@@ -211,7 +211,6 @@ library UniswapV4RouterLibrary {
         address callback,
         IPoolManager manager,
         PoolKey memory poolKey,
-        address swapper,
         address recipient,
         Currency fromCurrency,
         int256 swapAmount
@@ -235,19 +234,14 @@ library UniswapV4RouterLibrary {
             data: abi.encodeWithSelector(manager.swap.selector, poolKey, params)
         });
 
-        // Safe transfer from swapper account in Pool Manager to the Pool Manager
+        // Transfer ERC1155 tokens in the Pool Manager from the caller to Pool Manager using transferFromCallerToPoolManager callback
         calls[1] = Call({
-            target: address(manager),
+            target: callback,
             callType: CallType.Call,
             results: false,
             value: 0,
             data: abi.encodeWithSelector(
-                IERC1155.safeTransferFrom.selector,
-                swapper,
-                address(manager),
-                uint160(Currency.unwrap(fromCurrency)),
-                swapAmount,
-                ""
+                UniswapV4RouterLibrary.transferFromCallerToPoolManager.selector, Currency.unwrap(fromCurrency), swapAmount
                 )
         });
 
@@ -334,19 +328,18 @@ library UniswapV4RouterLibrary {
         address callback,
         IPoolManager manager,
         address token,
-        address owner,
         address recipient,
         uint256 amount
     ) external returns (bytes[] memory results) {
         Call[] memory calls = new Call[](2);
 
-        // Transfer ERC1155 tokens from the owner to Pool Manager using withdrawCallback
+        // Transfer ERC1155 tokens in the Pool Manager from the caller to Pool Manager using transferFromCallerToPoolManager callback
         calls[0] = Call({
             target: callback,
             callType: CallType.Call,
             results: false,
             value: 0,
-            data: abi.encodeWithSelector(UniswapV4RouterLibrary.withdrawCallback.selector, address(manager), token, amount)
+            data: abi.encodeWithSelector(UniswapV4RouterLibrary.transferFromCallerToPoolManager.selector, token, amount)
         });
 
         // Take tokens from the Pool Manager
@@ -361,9 +354,8 @@ library UniswapV4RouterLibrary {
         results = router.process(calls);
     }
 
-    function withdrawCallback(address poolManager, address token, uint256 amount) external {
-        IERC1155(poolManager).safeTransferFrom(msg.sender, poolManager, uint160(token), amount, "");
-    }
+    // This needs to be implemented on the callback contract. eg UniswapV4Caller
+    function transferFromCallerToPoolManager(address token, uint256 amount) external {}
 
     function flashLoan(
         UniswapV4Router router,

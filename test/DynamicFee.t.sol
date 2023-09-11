@@ -104,7 +104,7 @@ contract DynamicFeeTest is Test, TestPoolManager, Deployers, GasSnapshot {
 
         // Check settle result
         BalanceDelta delta = abi.decode(results[0], (BalanceDelta));
-        // assertEq(delta.amount0(), -98);
-        // assertEq(delta.amount1(), 100);
+        assertEq(delta.amount0(), -98);
+        assertEq(delta.amount1(), 100);
     }
 }

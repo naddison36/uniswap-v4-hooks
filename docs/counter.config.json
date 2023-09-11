@@ -4274,11 +4274,6 @@
           },
           {
             "internalType": "address",
-            "name": "swapper",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
             "name": "recipient",
             "type": "address"
           },
@@ -4511,8 +4506,21 @@
             "type": "address"
           },
           {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "name": "transferFromCallerToPoolManager",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
             "internalType": "address",
-            "name": "owner",
+            "name": "token",
             "type": "address"
           },
           {
@@ -4534,29 +4542,6 @@
             "type": "bytes[]"
           }
         ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "poolManager",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
-            "name": "token",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "amount",
-            "type": "uint256"
-          }
-        ],
-        "name": "withdrawCallback",
-        "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
       }

@@ -66,14 +66,17 @@ contract UniswapV4Caller {
         UniswapV4RouterLibrary.swapCallback(callData, resultData);
     }
 
-    function managerSwap(
-        PoolKey memory poolKey,
-        address swapper,
-        address recipient,
-        Currency fromCurrency,
-        int256 swapAmount
-    ) external returns (bytes[] memory results) {
-        results = router.managerSwap(address(this), manager, poolKey, swapper, recipient, fromCurrency, swapAmount);
+    function managerSwap(PoolKey memory poolKey, address recipient, Currency fromCurrency, int256 swapAmount)
+        external
+        returns (bytes[] memory results)
+    {
+        // Store the caller so we can use it in the callback
+        caller = msg.sender;
+
+        results = router.managerSwap(address(this), manager, poolKey, recipient, fromCurrency, swapAmount);
+
+        // Clear the caller. Ideally this would be transient storage so no need to clear
+        caller = address(1);
     }
 
     function managerSwapCallback(bytes memory callData, bytes memory resultData) external {
@@ -87,20 +90,18 @@ contract UniswapV4Caller {
         results = router.deposit(manager, token, sender, recipient, amount);
     }
 
-    function withdraw(address token, address owner, address recipient, uint256 amount)
-        external
-        returns (bytes[] memory results)
-    {
+    function withdraw(address token, address recipient, uint256 amount) external returns (bytes[] memory results) {
         // Store the caller so we can use it in the callback
         caller = msg.sender;
-        results = router.withdraw(address(this), manager, token, owner, recipient, amount);
+        results = router.withdraw(address(this), manager, token, recipient, amount);
 
         // Clear the caller. Ideally this would be transient storage so no need to clear
         caller = address(1);
     }
 
-    function withdrawCallback(address poolManager, address token, uint256 amount) external {
-        IERC1155(poolManager).safeTransferFrom(caller, address(poolManager), uint160(token), amount, "");
+    // is used by withdraw and managerSwap
+    function transferFromCallerToPoolManager(address token, uint256 amount) external {
+        IERC1155(manager).safeTransferFrom(caller, address(manager), uint160(token), amount, "");
     }
 
     function flashLoan(
