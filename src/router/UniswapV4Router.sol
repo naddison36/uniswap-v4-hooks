@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 import {ILockCallback} from "@uniswap/v4-core/contracts//interfaces/callback/ILockCallback.sol";
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
+import {UniswapV4RouterLibrary} from "./UniswapV4RouterLibrary.sol";
 
 enum CallType {
     Call,
@@ -42,7 +43,6 @@ contract UniswapV4Router is ILockCallback {
 
         bytes[] memory results = new bytes[](calls.length);
 
-        bool success;
         for (uint256 i = 0; i < calls.length; ++i) {
             Call memory call = calls[i];
 
@@ -51,7 +51,7 @@ contract UniswapV4Router is ILockCallback {
                 // decode the selector so we can re-encode the call with results data
                 bytes4 selector = bytes4(call.data);
                 // remove the selector from the in memory call data
-                bytes memory dataNoSelector = removeSelector(call.data);
+                bytes memory dataNoSelector = UniswapV4RouterLibrary.removeSelector(call.data);
                 // decode the param and ignore the result
                 (bytes memory decodedCallData,) = abi.decode(dataNoSelector, (bytes, bytes));
                 // encode the current results data into bytes
@@ -72,16 +72,6 @@ contract UniswapV4Router is ILockCallback {
         // Encode the results array into bytes
         // so we are flattening an array of bytes down to just bytes
         return abi.encode(results);
-    }
-
-    // TODO use a more efficient method than this
-    function removeSelector(bytes memory data) internal pure returns (bytes memory remainingData) {
-        require(data.length >= 4, "no selector");
-
-        remainingData = new bytes(data.length - 4);
-        for (uint256 i = 0; i < remainingData.length; ++i) {
-            remainingData[i] = data[i + 4];
-        }
     }
 
     function onERC1155Received(address, address, uint256, uint256, bytes memory) external virtual returns (bytes4) {

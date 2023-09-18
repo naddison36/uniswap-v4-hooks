@@ -19,6 +19,14 @@ library UniswapV4RouterLibrary {
     uint160 internal constant MAX_PRICE_LIMIT = TickMath.MAX_SQRT_RATIO - 1;
     bytes internal constant EMPTY_RESULTS = hex"";
 
+    /// @notice Removes the first 4 bytes from bytes data
+    /// @dev Array slices only work with calldata, not memory
+    function removeSelector(bytes calldata data) external pure returns (bytes memory remainingData) {
+        require(data.length >= 4, "no selector");
+
+        remainingData = data[4:];
+    }
+
     function addLiquidity(
         UniswapV4Router router,
         address callback,
