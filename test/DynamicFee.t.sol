@@ -35,8 +35,8 @@ contract DynamicFeeTest is Test, TestPoolManager, Deployers, GasSnapshot {
 
         // Create the pool
         poolKey = PoolKey(
-            Currency.wrap(address(token0)),
-            Currency.wrap(address(token1)),
+            Currency.wrap(address(tokenA)),
+            Currency.wrap(address(tokenB)),
             FeeLibrary.DYNAMIC_FEE_FLAG,
             60,
             IHooks(hook)
@@ -49,12 +49,12 @@ contract DynamicFeeTest is Test, TestPoolManager, Deployers, GasSnapshot {
         caller.addLiquidity(poolKey, address(this), TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 10 ether);
     }
 
-    function testDepositToken0() public {
-        caller.deposit(address(token0), address(this), address(this), 1e18);
+    function testDeposittokenA() public {
+        caller.deposit(address(tokenA), address(this), address(this), 1e18);
     }
 
-    function testDepositToken1() public {
-        caller.deposit(address(token1), address(this), address(this), 1e18);
+    function testDeposittokenB() public {
+        caller.deposit(address(tokenB), address(this), address(this), 1e18);
     }
 
     function testHookFee() public {
@@ -68,7 +68,7 @@ contract DynamicFeeTest is Test, TestPoolManager, Deployers, GasSnapshot {
     }
 
     function testSwap0_1() public {
-        // Swap token0 for token1
+        // Swap tokenA for tokenB
         bytes[] memory results = caller.swap(poolKey, address(this), address(this), poolKey.currency0, 100);
 
         // Check settle result
@@ -81,7 +81,7 @@ contract DynamicFeeTest is Test, TestPoolManager, Deployers, GasSnapshot {
     }
 
     function testSwap1_0() public {
-        // Swap token1 for token0
+        // Swap tokenB for tokenA
         bytes[] memory results = caller.swap(poolKey, address(this), address(this), poolKey.currency1, 100);
 
         // Check settle result
@@ -99,7 +99,7 @@ contract DynamicFeeTest is Test, TestPoolManager, Deployers, GasSnapshot {
     function testSwap1_0_tilt0() public {
         caller.addLiquidity(poolKey, address(this), 0, 60, 10 ether);
 
-        // Swap token1 for token0
+        // Swap tokenB for tokenA
         bytes[] memory results = caller.swap(poolKey, address(this), address(this), poolKey.currency1, 100);
 
         // Check settle result

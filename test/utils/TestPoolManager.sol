@@ -4,9 +4,9 @@ pragma solidity ^0.8.15;
 import {console} from "forge-std/console.sol";
 
 import {PoolManager} from "@uniswap/v4-core/contracts/PoolManager.sol";
-import {TestERC20} from "@uniswap/v4-core/contracts/test/TestERC20.sol";
 import {TickMath} from "@uniswap/v4-core/contracts/libraries/TickMath.sol";
 
+import {MockToken} from "../../src/mocks/MockToken.sol";
 import {UniswapV4Router} from "../../src/router/UniswapV4Router.sol";
 import {UniswapV4Caller} from "../../src/router/UniswapV4Caller.sol";
 
@@ -20,28 +20,30 @@ contract TestPoolManager {
     uint256 constant MaxAmount = type(uint128).max;
 
     PoolManager manager;
-    TestERC20 token0;
-    TestERC20 token1;
+    MockToken tokenA;
+    MockToken tokenB;
     UniswapV4Router router;
     UniswapV4Caller caller;
 
     function initialize() public {
         console.log("test sender %s", address(this));
 
-        TestERC20 _tokenA = new TestERC20(MaxAmount);
-        TestERC20 _tokenB = new TestERC20(MaxAmount);
+        MockToken _tokenA = new MockToken("Token A", "TOKA", MaxAmount);
+        MockToken _tokenB = new MockToken("Token B", "TOKB", MaxAmount);
+        MockToken _tokenC = new MockToken("Token C", "TOKC", MaxAmount);
+        MockToken _tokenD = new MockToken("Token D", "TOKD", MaxAmount);
 
         // pools alphabetically sort tokens by address
         // so align `token0` with `pool.token0` for consistency
         if (address(_tokenA) < address(_tokenB)) {
-            token0 = _tokenA;
-            token1 = _tokenB;
+            tokenA = _tokenA;
+            tokenB = _tokenB;
         } else {
-            token0 = _tokenB;
-            token1 = _tokenA;
+            tokenA = _tokenB;
+            tokenB = _tokenA;
         }
-        console.log("token0 %s", address(token0));
-        console.log("token1 %s", address(token1));
+        console.log("token0 %s", address(tokenA));
+        console.log("token1 %s", address(tokenB));
 
         manager = new PoolManager(500000);
         console.log("pool manager %s", address(manager));
@@ -52,8 +54,8 @@ contract TestPoolManager {
         caller = new UniswapV4Caller(router, manager);
         console.log("caller %s", address(caller));
 
-        token0.approve(address(router), MaxAmount);
-        token1.approve(address(router), MaxAmount);
+        tokenA.approve(address(router), MaxAmount);
+        tokenB.approve(address(router), MaxAmount);
     }
 
     function onERC1155Received(address, address, uint256, uint256, bytes memory) public virtual returns (bytes4) {

@@ -37,7 +37,7 @@ contract MyHookScript is Script, TestPoolManager {
         console.log("Deployed hook to address %s", address(hook));
 
         // Derive the key for the new pool
-        poolKey = PoolKey(Currency.wrap(address(token0)), Currency.wrap(address(token1)), 3000, 60, hook);
+        poolKey = PoolKey(Currency.wrap(address(tokenA)), Currency.wrap(address(tokenB)), 3000, 60, hook);
         // Create the pool in the Uniswap Pool Manager
         manager.initialize(poolKey, SQRT_RATIO_1_TO_1, "");
 
@@ -61,7 +61,7 @@ contract MyHookScript is Script, TestPoolManager {
         console.log("removed liquidity");
 
         // Deposit token 0 to the pool manager
-        // caller.deposit(address(token0), signerAddr, signerAddr, 6e18);
+        // caller.deposit(address(tokenA), signerAddr, signerAddr, 6e18);
 
         vm.stopBroadcast();
     }

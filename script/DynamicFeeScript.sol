@@ -45,7 +45,7 @@ contract DynamicFeeScript is Script, TestPoolManager {
 
         // Derive the key for the new pool
         poolKey = PoolKey(
-            Currency.wrap(address(token0)), Currency.wrap(address(token1)), FeeLibrary.DYNAMIC_FEE_FLAG, 60, hook
+            Currency.wrap(address(tokenA)), Currency.wrap(address(tokenB)), FeeLibrary.DYNAMIC_FEE_FLAG, 60, hook
         );
         // Create the pool in the Uniswap Pool Manager
         manager.initialize(poolKey, SQRT_RATIO_1_TO_1, "");
@@ -73,19 +73,19 @@ contract DynamicFeeScript is Script, TestPoolManager {
         console.log("removed liquidity");
 
         // Deposit token 0 to the pool manager
-        caller.deposit(address(token0), signerAddr, signerAddr, 6e18);
+        caller.deposit(address(tokenA), signerAddr, signerAddr, 6e18);
 
         // Withdraw token 0 to the pool manager
         manager.setApprovalForAll(address(caller), true);
-        caller.withdraw(address(token0), signerAddr, 4e18);
+        caller.withdraw(address(tokenA), signerAddr, 4e18);
 
         // Perform a flash loan
         // Deploy flash loan logic contract that will be delegated to
         FlashLoanLogic flashLoanLogic = new FlashLoanLogic();
         uint256 amount = 10000000e6; // 10 million for a 6 deicmal token
         bytes memory callbackData =
-            abi.encodeWithSelector(FlashLoanLogic.flashLoanCallback.selector, address(token0), amount);
-        caller.flashLoan(address(token0), amount, address(flashLoanLogic), CallType.Delegate, callbackData);
+            abi.encodeWithSelector(FlashLoanLogic.flashLoanCallback.selector, address(tokenA), amount);
+        caller.flashLoan(address(tokenA), amount, address(flashLoanLogic), CallType.Delegate, callbackData);
 
         // Swap from token 0 in the Pool Manager to token 1 in the Pool Manager
         caller.swapManagerTokens(poolKey, poolKey.currency0, 2e18, signerAddr);

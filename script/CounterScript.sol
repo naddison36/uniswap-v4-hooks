@@ -45,8 +45,8 @@ contract CounterScript is Script, TestPoolManager {
 
         // Derive the key for the new pool
         poolKey = PoolKey(
-            Currency.wrap(address(token0)),
-            Currency.wrap(address(token1)),
+            Currency.wrap(address(tokenA)),
+            Currency.wrap(address(tokenB)),
             FeeLibrary.HOOK_SWAP_FEE_FLAG | FeeLibrary.HOOK_WITHDRAW_FEE_FLAG | 3000,
             60,
             hook
@@ -72,8 +72,8 @@ contract CounterScript is Script, TestPoolManager {
         caller.swap(poolKey, signerAddr, signerAddr, poolKey.currency0, 1e18);
 
         // Perform a flash loan
-        bytes memory callbackData = abi.encodeWithSelector(token0.balanceOf.selector, router);
-        caller.flashLoan(address(token0), 1e6, address(token0), CallType.Call, callbackData);
+        bytes memory callbackData = abi.encodeWithSelector(tokenA.balanceOf.selector, router);
+        caller.flashLoan(address(tokenA), 1e6, address(tokenA), CallType.Call, callbackData);
 
         vm.stopBroadcast();
     }
