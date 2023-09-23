@@ -48,7 +48,7 @@ contract HookCoin is BaseHook, ERC20, Initializable {
     }
 
     function initialize() external initializer {
-        poolManager.initialize(poolKey, SQRT_RATIO_1_TO_1);
+        poolManager.initialize(poolKey, SQRT_RATIO_1_TO_1, "");
     }
 
     ////////////////////////////////////////////////////////////////
@@ -83,7 +83,7 @@ contract HookCoin is BaseHook, ERC20, Initializable {
         IPoolManager.ModifyPositionParams memory params =
             IPoolManager.ModifyPositionParams(tickLower, tickUpper, int256(amount));
 
-        BalanceDelta delta = poolManager.modifyPosition(poolKey, params);
+        BalanceDelta delta = poolManager.modifyPosition(poolKey, params, "");
 
         // transfer the minted HookCoin tokens to the pool manager
         _transfer(address(this), address(poolManager), uint128(delta.amount0()));
@@ -121,7 +121,7 @@ contract HookCoin is BaseHook, ERC20, Initializable {
         IPoolManager.ModifyPositionParams memory params =
             IPoolManager.ModifyPositionParams(tickLower, tickUpper, -1 * int256(amount));
 
-        poolManager.modifyPosition(poolKey, params);
+        poolManager.modifyPosition(poolKey, params, "");
 
         // Tak the HookCoin tokens from the pool manager
         poolManager.take(Currency.wrap(address(this)), address(this), amount);
@@ -161,7 +161,7 @@ contract HookCoin is BaseHook, ERC20, Initializable {
         });
     }
 
-    function beforeInitialize(address sender, PoolKey calldata key, uint160 sqrtPriceX96)
+    function beforeInitialize(address sender, PoolKey calldata key, uint160 sqrtPriceX96, bytes calldata data)
         external
         override
         returns (bytes4 selector)
