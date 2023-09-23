@@ -28,7 +28,12 @@ contract DynamicFeeHook is BaseHook, IDynamicFeeManager {
         });
     }
 
-    function getFee(PoolKey calldata key) external returns (uint24 fee) {
+    /// @notice The dynamic fee manager determines fees for pools
+    /// @dev note that this pool is only called if the PoolKey fee value is equal to the DYNAMIC_FEE magic value
+    function getFee(address sender, PoolKey calldata key, IPoolManager.SwapParams calldata params, bytes calldata data)
+        external
+        returns (uint24 fee)
+    {
         // insert hook logic here
         fee = 3000;
     }
@@ -36,7 +41,8 @@ contract DynamicFeeHook is BaseHook, IDynamicFeeManager {
     function beforeModifyPosition(
         address sender,
         PoolKey calldata key,
-        IPoolManager.ModifyPositionParams calldata params
+        IPoolManager.ModifyPositionParams calldata params,
+        bytes calldata
     ) external override returns (bytes4 selector) {
         // insert hook logic here
 
@@ -47,14 +53,15 @@ contract DynamicFeeHook is BaseHook, IDynamicFeeManager {
         address sender,
         PoolKey calldata key,
         IPoolManager.ModifyPositionParams calldata params,
-        BalanceDelta delta
+        BalanceDelta delta,
+        bytes calldata
     ) external override returns (bytes4 selector) {
         // insert hook logic here
 
         selector = BaseHook.afterModifyPosition.selector;
     }
 
-    function beforeSwap(address sender, PoolKey calldata key, IPoolManager.SwapParams calldata params)
+    function beforeSwap(address sender, PoolKey calldata key, IPoolManager.SwapParams calldata params, bytes calldata)
         external
         override
         returns (bytes4 selector)
@@ -68,7 +75,8 @@ contract DynamicFeeHook is BaseHook, IDynamicFeeManager {
         address sender,
         PoolKey calldata key,
         IPoolManager.SwapParams calldata params,
-        BalanceDelta delta
+        BalanceDelta delta,
+        bytes calldata
     ) external override returns (bytes4 selector) {
         // insert hook logic here
 

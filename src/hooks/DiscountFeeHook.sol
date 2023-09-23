@@ -26,7 +26,10 @@ contract DiscountFeeHook is BaseHook, IDynamicFeeManager {
         });
     }
 
-    function getFee(PoolKey calldata key) external returns (uint24 fee) {
+    function getFee(address sender, PoolKey calldata key, IPoolManager.SwapParams calldata params, bytes calldata data)
+        external
+        returns (uint24 fee)
+    {
         // insert hook logic here
         fee = 3000;
     }

@@ -48,7 +48,7 @@ contract DynamicFeeScript is Script, TestPoolManager {
             Currency.wrap(address(token0)), Currency.wrap(address(token1)), FeeLibrary.DYNAMIC_FEE_FLAG, 60, hook
         );
         // Create the pool in the Uniswap Pool Manager
-        manager.initialize(poolKey, SQRT_RATIO_1_TO_1);
+        manager.initialize(poolKey, SQRT_RATIO_1_TO_1, "");
 
         console.log("currency0 %s", Currency.unwrap(poolKey.currency0));
         console.log("currency1 %s", Currency.unwrap(poolKey.currency1));

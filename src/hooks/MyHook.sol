@@ -28,7 +28,7 @@ contract MyHook is BaseHook, IHookFeeManager {
         });
     }
 
-    function beforeInitialize(address sender, PoolKey calldata key, uint160 sqrtPriceX96)
+    function beforeInitialize(address sender, PoolKey calldata key, uint160 sqrtPriceX96, bytes calldata)
         external
         override
         returns (bytes4 selector)
@@ -38,7 +38,7 @@ contract MyHook is BaseHook, IHookFeeManager {
         selector = BaseHook.beforeInitialize.selector;
     }
 
-    function afterInitialize(address sender, PoolKey calldata key, uint160 sqrtPriceX96, int24 tick)
+    function afterInitialize(address sender, PoolKey calldata key, uint160 sqrtPriceX96, int24 tick, bytes calldata)
         external
         override
         returns (bytes4 selector)
@@ -51,7 +51,8 @@ contract MyHook is BaseHook, IHookFeeManager {
     function beforeModifyPosition(
         address sender,
         PoolKey calldata key,
-        IPoolManager.ModifyPositionParams calldata params
+        IPoolManager.ModifyPositionParams calldata params,
+        bytes calldata
     ) external override returns (bytes4 selector) {
         // insert hook logic here
 
@@ -62,14 +63,15 @@ contract MyHook is BaseHook, IHookFeeManager {
         address sender,
         PoolKey calldata key,
         IPoolManager.ModifyPositionParams calldata params,
-        BalanceDelta delta
+        BalanceDelta delta,
+        bytes calldata
     ) external override returns (bytes4 selector) {
         // insert hook logic here
 
         selector = BaseHook.afterModifyPosition.selector;
     }
 
-    function beforeSwap(address sender, PoolKey calldata key, IPoolManager.SwapParams calldata params)
+    function beforeSwap(address sender, PoolKey calldata key, IPoolManager.SwapParams calldata params, bytes calldata)
         external
         override
         returns (bytes4 selector)
@@ -83,14 +85,15 @@ contract MyHook is BaseHook, IHookFeeManager {
         address sender,
         PoolKey calldata key,
         IPoolManager.SwapParams calldata params,
-        BalanceDelta delta
+        BalanceDelta delta,
+        bytes calldata
     ) external override returns (bytes4 selector) {
         // insert hook logic here
 
         selector = BaseHook.afterSwap.selector;
     }
 
-    function beforeDonate(address sender, PoolKey calldata key, uint256 amount0, uint256 amount1)
+    function beforeDonate(address sender, PoolKey calldata key, uint256 amount0, uint256 amount1, bytes calldata)
         external
         override
         returns (bytes4 selector)
@@ -100,7 +103,7 @@ contract MyHook is BaseHook, IHookFeeManager {
         selector = BaseHook.beforeDonate.selector;
     }
 
-    function afterDonate(address sender, PoolKey calldata key, uint256 amount0, uint256 amount1)
+    function afterDonate(address sender, PoolKey calldata key, uint256 amount0, uint256 amount1, bytes calldata)
         external
         override
         returns (bytes4 selector)
@@ -110,11 +113,7 @@ contract MyHook is BaseHook, IHookFeeManager {
         selector = BaseHook.afterDonate.selector;
     }
 
-    function getHookSwapFee(PoolKey calldata key) external view returns (uint8 fee) {
-        fee = 0;
-    }
-
-    function getHookWithdrawFee(PoolKey calldata key) external view returns (uint8 fee) {
+    function getHookFees(PoolKey calldata key) external view returns (uint24 fee) {
         fee = 0;
     }
 }

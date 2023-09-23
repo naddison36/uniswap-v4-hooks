@@ -41,7 +41,7 @@ contract DynamicFeeTest is Test, TestPoolManager, Deployers, GasSnapshot {
             60,
             IHooks(hook)
         );
-        manager.initialize(poolKey, SQRT_RATIO_1_1);
+        manager.initialize(poolKey, SQRT_RATIO_1_1, "");
 
         // Provide liquidity over different ranges to the pool
         caller.addLiquidity(poolKey, address(this), -60, 60, 10 ether);
@@ -61,7 +61,7 @@ contract DynamicFeeTest is Test, TestPoolManager, Deployers, GasSnapshot {
         // Check the hook fee
         (Pool.Slot0 memory slot0,,,) = manager.pools(poolKey.toId());
         // assertEq(slot0.hookSwapFee, FeeLibrary.DYNAMIC_FEE_FLAG);
-        assertEq(slot0.hookWithdrawFee, 0);
+        assertEq(slot0.hookFees, 0);
 
         assertEq(manager.hookFeesAccrued(address(hook), poolKey.currency0), 0);
         assertEq(manager.hookFeesAccrued(address(hook), poolKey.currency1), 0);

@@ -17,7 +17,7 @@ import {Call, CallType, UniswapV4Router} from "../../src/router/UniswapV4Router.
 library UniswapV4RouterLibrary {
     uint160 internal constant MIN_PRICE_LIMIT = TickMath.MIN_SQRT_RATIO + 1;
     uint160 internal constant MAX_PRICE_LIMIT = TickMath.MAX_SQRT_RATIO - 1;
-    bytes internal constant EMPTY_RESULTS = hex"";
+    bytes internal constant EMPTY_DATA = hex"";
 
     /// @notice Removes the first 4 bytes from bytes data
     /// @dev Array slices only work with calldata, not memory
@@ -47,7 +47,7 @@ library UniswapV4RouterLibrary {
             callType: CallType.Call,
             results: false,
             value: 0,
-            data: abi.encodeWithSelector(manager.modifyPosition.selector, poolKey, modifyPositionParams)
+            data: abi.encodeWithSelector(manager.modifyPosition.selector, poolKey, modifyPositionParams, EMPTY_DATA)
         });
 
         // Transfer token0 to Pool Manager
@@ -57,7 +57,7 @@ library UniswapV4RouterLibrary {
             callType: CallType.Delegate,
             results: true,
             value: 0,
-            data: abi.encodeWithSelector(UniswapV4RouterLibrary.addLiquidityCallback.selector, paramData, EMPTY_RESULTS)
+            data: abi.encodeWithSelector(UniswapV4RouterLibrary.addLiquidityCallback.selector, paramData, EMPTY_DATA)
         });
 
         // Settle token0
@@ -76,7 +76,7 @@ library UniswapV4RouterLibrary {
             callType: CallType.Delegate,
             results: true,
             value: 0,
-            data: abi.encodeWithSelector(UniswapV4RouterLibrary.addLiquidityCallback.selector, paramData, EMPTY_RESULTS)
+            data: abi.encodeWithSelector(UniswapV4RouterLibrary.addLiquidityCallback.selector, paramData, EMPTY_DATA)
         });
 
         // Settle token1
@@ -123,13 +123,13 @@ library UniswapV4RouterLibrary {
             callType: CallType.Call,
             results: false,
             value: 0,
-            data: abi.encodeWithSelector(manager.modifyPosition.selector, poolKey, modifyPositionParams)
+            data: abi.encodeWithSelector(manager.modifyPosition.selector, poolKey, modifyPositionParams, EMPTY_DATA)
         });
 
         // Take toToken using swapCallback
         bytes memory callData = abi.encode(manager, poolKey.currency0, poolKey.currency1, recipient);
         bytes memory callbackData =
-            abi.encodeWithSelector(UniswapV4RouterLibrary.removeLiquidityCallback.selector, callData, EMPTY_RESULTS);
+            abi.encodeWithSelector(UniswapV4RouterLibrary.removeLiquidityCallback.selector, callData, EMPTY_DATA);
         calls[1] = Call({target: callback, callType: CallType.Delegate, results: true, value: 0, data: callbackData});
 
         results = router.process(calls);
@@ -158,9 +158,7 @@ library UniswapV4RouterLibrary {
     ) external returns (bytes[] memory results) {
         Call[] memory calls = new Call[](4);
 
-        // TODO work out why the following not longer works
-        // bool zeroForOne = fromCurrency == poolKey.currency0;
-        bool zeroForOne = Currency.unwrap(fromCurrency) == Currency.unwrap(poolKey.currency0);
+        bool zeroForOne = fromCurrency == poolKey.currency0;
         Currency toCurrency = zeroForOne ? poolKey.currency1 : poolKey.currency0;
 
         // Swap
@@ -174,7 +172,7 @@ library UniswapV4RouterLibrary {
             callType: CallType.Call,
             results: false,
             value: 0,
-            data: abi.encodeWithSelector(manager.swap.selector, poolKey, params)
+            data: abi.encodeWithSelector(manager.swap.selector, poolKey, params, EMPTY_DATA)
         });
 
         // Transfer fromToken to Pool Manager
@@ -198,7 +196,7 @@ library UniswapV4RouterLibrary {
         // Take toToken using swapCallback
         bytes memory callData = abi.encode(manager, toCurrency, recipient, zeroForOne);
         bytes memory callbackData =
-            abi.encodeWithSelector(UniswapV4RouterLibrary.swapCallback.selector, callData, EMPTY_RESULTS);
+            abi.encodeWithSelector(UniswapV4RouterLibrary.swapCallback.selector, callData, EMPTY_DATA);
         calls[3] = Call({target: callback, callType: CallType.Delegate, results: true, value: 0, data: callbackData});
 
         results = router.process(calls);
@@ -227,9 +225,7 @@ library UniswapV4RouterLibrary {
     ) external returns (bytes[] memory results) {
         Call[] memory calls = new Call[](4);
 
-        // TODO work out why the following not longer works
-        // bool zeroForOne = fromCurrency == poolKey.currency0;
-        bool zeroForOne = Currency.unwrap(fromCurrency) == Currency.unwrap(poolKey.currency0);
+        bool zeroForOne = fromCurrency == poolKey.currency0;
         Currency toCurrency = zeroForOne ? poolKey.currency1 : poolKey.currency0;
 
         // Swap
@@ -243,7 +239,7 @@ library UniswapV4RouterLibrary {
             callType: CallType.Call,
             results: false,
             value: 0,
-            data: abi.encodeWithSelector(manager.swap.selector, poolKey, params)
+            data: abi.encodeWithSelector(manager.swap.selector, poolKey, params, EMPTY_DATA)
         });
 
         // Transfer ERC1155 tokens in the Pool Manager from the caller to Pool Manager using transferFromCallerToPoolManager callback
@@ -269,7 +265,7 @@ library UniswapV4RouterLibrary {
         // Transfer toToken using swapManagerTokensCallback
         bytes memory callData = abi.encode(manager, toCurrency, router, recipient, zeroForOne);
         bytes memory callbackData =
-            abi.encodeWithSelector(UniswapV4RouterLibrary.swapManagerTokensCallback.selector, callData, EMPTY_RESULTS);
+            abi.encodeWithSelector(UniswapV4RouterLibrary.swapManagerTokensCallback.selector, callData, EMPTY_DATA);
         calls[3] = Call({target: callback, callType: CallType.Delegate, results: true, value: 0, data: callbackData});
 
         results = router.process(calls);

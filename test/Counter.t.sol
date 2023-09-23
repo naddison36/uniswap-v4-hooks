@@ -41,7 +41,7 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
             60,
             IHooks(hook)
         );
-        manager.initialize(poolKey, SQRT_RATIO_1_1);
+        manager.initialize(poolKey, SQRT_RATIO_1_1, "");
 
         // Provide liquidity over different ranges to the pool
         caller.addLiquidity(poolKey, address(this), -60, 60, 10 ether);
@@ -56,9 +56,8 @@ contract CounterTest is Test, TestPoolManager, Deployers, GasSnapshot {
     function testCounterHookFees() public {
         // Check the hook fee
         (Pool.Slot0 memory slot0,,,) = manager.pools(poolKey.toId());
-        console.log("swap fee %s", slot0.hookSwapFee);
-        assertEq(slot0.hookSwapFee, 0x55);
-        assertEq(slot0.hookWithdrawFee, 0x33);
+        console.log("swap fee %s", slot0.hookFees);
+        assertEq(slot0.hookFees, 0x5533);
 
         assertEq(manager.hookFeesAccrued(address(hook), poolKey.currency0), 0);
         assertEq(manager.hookFeesAccrued(address(hook), poolKey.currency1), 0);

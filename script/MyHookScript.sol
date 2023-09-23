@@ -39,7 +39,7 @@ contract MyHookScript is Script, TestPoolManager {
         // Derive the key for the new pool
         poolKey = PoolKey(Currency.wrap(address(token0)), Currency.wrap(address(token1)), 3000, 60, hook);
         // Create the pool in the Uniswap Pool Manager
-        manager.initialize(poolKey, SQRT_RATIO_1_TO_1);
+        manager.initialize(poolKey, SQRT_RATIO_1_TO_1, "");
 
         // Provide liquidity to the pool
         caller.addLiquidity(poolKey, signerAddr, -60, 60, 10e18);
