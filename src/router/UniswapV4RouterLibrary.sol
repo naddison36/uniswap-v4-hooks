@@ -158,7 +158,9 @@ library UniswapV4RouterLibrary {
     ) external returns (bytes[] memory results) {
         Call[] memory calls = new Call[](4);
 
-        bool zeroForOne = fromCurrency == poolKey.currency0;
+        // TODO work out why the following not longer works
+        // bool zeroForOne = fromCurrency == poolKey.currency0;
+        bool zeroForOne = Currency.unwrap(fromCurrency) == Currency.unwrap(poolKey.currency0);
         Currency toCurrency = zeroForOne ? poolKey.currency1 : poolKey.currency0;
 
         // Swap
@@ -225,7 +227,9 @@ library UniswapV4RouterLibrary {
     ) external returns (bytes[] memory results) {
         Call[] memory calls = new Call[](4);
 
-        bool zeroForOne = fromCurrency == poolKey.currency0;
+        // TODO work out why the following not longer works
+        // bool zeroForOne = fromCurrency == poolKey.currency0;
+        bool zeroForOne = Currency.unwrap(fromCurrency) == Currency.unwrap(poolKey.currency0);
         Currency toCurrency = zeroForOne ? poolKey.currency1 : poolKey.currency0;
 
         // Swap
