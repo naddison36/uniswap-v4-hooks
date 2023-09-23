@@ -115,7 +115,7 @@ library UniswapV4RouterLibrary {
     ) external returns (bytes[] memory results) {
         Call[] memory calls = new Call[](2);
 
-        // Add liquidity to the pool
+        // remove liquidity from the pool
         IPoolManager.ModifyPositionParams memory modifyPositionParams =
             IPoolManager.ModifyPositionParams(tickLower, tickUpper, -1 * liquidityAmount);
         calls[0] = Call({
@@ -126,7 +126,7 @@ library UniswapV4RouterLibrary {
             data: abi.encodeWithSelector(manager.modifyPosition.selector, poolKey, modifyPositionParams, EMPTY_DATA)
         });
 
-        // Take toToken using swapCallback
+        // Take toToken using removeLiquidityCallback
         bytes memory callData = abi.encode(manager, poolKey.currency0, poolKey.currency1, recipient);
         bytes memory callbackData =
             abi.encodeWithSelector(UniswapV4RouterLibrary.removeLiquidityCallback.selector, callData, EMPTY_DATA);
