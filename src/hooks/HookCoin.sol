@@ -77,13 +77,14 @@ contract HookCoin is BaseHook, ERC20, Initializable {
         _mint(_recipient, msg.value);
     }
 
-    function _depositCallback(bytes calldata data) internal {
+    function _depositCallback(bytes calldata data) internal returns (bytes memory result) {
         uint256 amount = abi.decode(data, (uint256));
 
         IPoolManager.ModifyPositionParams memory params =
             IPoolManager.ModifyPositionParams(tickLower, tickUpper, int256(amount));
 
         BalanceDelta delta = poolManager.modifyPosition(poolKey, params, "");
+        result = abi.encode(delta);
 
         // transfer the minted HookCoin tokens to the pool manager
         _transfer(address(this), address(poolManager), uint128(delta.amount0()));
@@ -106,24 +107,25 @@ contract HookCoin is BaseHook, ERC20, Initializable {
 
     function _withdraw(address _owner, address _recipient, uint256 _amount) internal {
         // burn the owner's HookCoin tokens
-        _burn(_owner, msg.value);
+        _burn(_owner, _amount);
 
         // Acquire lock can call the deposit callback
-        poolManager.lock(abi.encodeWithSelector(WITHDRAW_SELECTOR, _recipient, msg.value));
+        poolManager.lock(abi.encodeWithSelector(WITHDRAW_SELECTOR, _recipient, _amount));
 
         // Burn the HookCoin tokens received from the pool
-        _burn(address(this), msg.value);
+        _burn(address(this), _amount);
     }
 
-    function _withdrawCallback(bytes calldata data) internal {
+    function _withdrawCallback(bytes calldata data) internal returns (bytes memory result) {
         (address recipient, uint256 amount) = abi.decode(data, (address, uint256));
 
         IPoolManager.ModifyPositionParams memory params =
             IPoolManager.ModifyPositionParams(tickLower, tickUpper, -1 * int256(amount));
 
-        poolManager.modifyPosition(poolKey, params, "");
+        BalanceDelta delta = poolManager.modifyPosition(poolKey, params, "");
+        result = abi.encode(delta);
 
-        // Tak the HookCoin tokens from the pool manager
+        // Take the HookCoin tokens from the pool manager
         poolManager.take(Currency.wrap(address(this)), address(this), amount);
         // Transfer the ETH to the recipient
         poolManager.take(CurrencyLibrary.NATIVE, recipient, amount);
@@ -133,12 +135,12 @@ contract HookCoin is BaseHook, ERC20, Initializable {
     //                  Pool Manager Callback
     ////////////////////////////////////////////////////////////////
 
-    function lockAcquired(bytes calldata data) external override poolManagerOnly returns (bytes memory) {
+    function lockAcquired(bytes calldata data) external override poolManagerOnly returns (bytes memory result) {
         bytes4 selector = bytes4(data);
         if (selector == DEPOSIT_SELECTOR) {
-            _depositCallback(data);
+            result = _depositCallback(data);
         } else if (selector == WITHDRAW_SELECTOR) {
-            _withdrawCallback(data);
+            result = _withdrawCallback(data);
         } else {
             revert("invalid callback");
         }
@@ -161,8 +163,9 @@ contract HookCoin is BaseHook, ERC20, Initializable {
         });
     }
 
-    function beforeInitialize(address sender, PoolKey calldata key, uint160 sqrtPriceX96, bytes calldata data)
+    function beforeInitialize(address, PoolKey calldata, uint160, bytes calldata)
         external
+        view
         override
         returns (bytes4 selector)
     {

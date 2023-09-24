@@ -40,7 +40,7 @@ contract CounterHook is BaseHook, IHookFeeManager {
 
     /// @notice The interface for setting a fee on swap or fee on withdraw to the hook
     /// @dev This callback is only made if the Fee.HOOK_SWAP_FEE_FLAG or Fee.HOOK_WITHDRAW_FEE_FLAG in set in the pool's key.fee.
-    function getHookFees(PoolKey calldata key) external view returns (uint24 fee) {
+    function getHookFees(PoolKey calldata) external pure returns (uint24 fee) {
         // Swap fee is upper bits.
         // 20% fee as 85 = hex55 which is 5 in both directions. 1/5 = 20%
         // Withdraw fee is lower bits
@@ -52,8 +52,8 @@ contract CounterHook is BaseHook, IHookFeeManager {
 
     function beforeModifyPosition(
         address sender,
-        PoolKey calldata key,
-        IPoolManager.ModifyPositionParams calldata params,
+        PoolKey calldata,
+        IPoolManager.ModifyPositionParams calldata,
         bytes calldata
     ) external override returns (bytes4 selector) {
         beforeModifyCounter++;
@@ -64,9 +64,9 @@ contract CounterHook is BaseHook, IHookFeeManager {
 
     function afterModifyPosition(
         address sender,
-        PoolKey calldata key,
-        IPoolManager.ModifyPositionParams calldata params,
-        BalanceDelta delta,
+        PoolKey calldata,
+        IPoolManager.ModifyPositionParams calldata,
+        BalanceDelta,
         bytes calldata
     ) external override returns (bytes4 selector) {
         afterModifyCounter++;
@@ -75,7 +75,7 @@ contract CounterHook is BaseHook, IHookFeeManager {
         selector = BaseHook.afterModifyPosition.selector;
     }
 
-    function beforeSwap(address sender, PoolKey calldata key, IPoolManager.SwapParams calldata params, bytes calldata)
+    function beforeSwap(address sender, PoolKey calldata, IPoolManager.SwapParams calldata, bytes calldata)
         external
         override
         returns (bytes4 selector)
@@ -89,8 +89,8 @@ contract CounterHook is BaseHook, IHookFeeManager {
     function afterSwap(
         address sender,
         PoolKey calldata key,
-        IPoolManager.SwapParams calldata params,
-        BalanceDelta delta,
+        IPoolManager.SwapParams calldata,
+        BalanceDelta,
         bytes calldata
     ) external override returns (bytes4 selector) {
         afterSwapCounter++;

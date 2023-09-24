@@ -28,7 +28,7 @@ abstract contract BaseFactory {
         return deploy(poolManager, salt);
     }
 
-    function mineSalt(IPoolManager poolManager, uint256 startSalt) public returns (bytes32 salt) {
+    function mineSalt(IPoolManager poolManager, uint256 startSalt) public view returns (bytes32 salt) {
         uint256 endSalt = uint256(startSalt) + 1000;
         unchecked {
             for (uint256 i = startSalt; i < endSalt; ++i) {
