@@ -25,6 +25,7 @@ This project uses [Foundry](https://book.getfoundry.sh) to manage dependencies, 
 git clone git@github.com:naddison36/uniswap-v4-hooks.git
 cd uniswap-v4-hooks
 forge install
+forge update v4-periphery
 ```
 
 ## Unit Testing
