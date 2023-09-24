@@ -32,6 +32,7 @@ contract DynamicFeeHook is BaseHook, IDynamicFeeManager {
     /// @dev note that this pool is only called if the PoolKey fee value is equal to the DYNAMIC_FEE magic value
     function getFee(address sender, PoolKey calldata key, IPoolManager.SwapParams calldata params, bytes calldata data)
         external
+        pure
         returns (uint24 fee)
     {
         // insert hook logic here

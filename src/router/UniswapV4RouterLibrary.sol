@@ -263,7 +263,7 @@ library UniswapV4RouterLibrary {
         });
 
         // Transfer toToken using swapManagerTokensCallback
-        bytes memory callData = abi.encode(manager, toCurrency, router, recipient, zeroForOne);
+        bytes memory callData = abi.encode(manager, toCurrency, recipient, zeroForOne);
         bytes memory callbackData =
             abi.encodeWithSelector(UniswapV4RouterLibrary.swapManagerTokensCallback.selector, callData, EMPTY_DATA);
         calls[3] = Call({target: callback, callType: CallType.Delegate, results: true, value: 0, data: callbackData});
@@ -272,8 +272,8 @@ library UniswapV4RouterLibrary {
     }
 
     function swapManagerTokensCallback(bytes memory callData, bytes memory resultData) external {
-        (IPoolManager poolManager, Currency currency, address router, address recipient, bool zeroForOne) =
-            abi.decode(callData, (IPoolManager, Currency, address, address, bool));
+        (IPoolManager poolManager, Currency currency, address recipient, bool zeroForOne) =
+            abi.decode(callData, (IPoolManager, Currency, address, bool));
 
         bytes[] memory results = abi.decode(resultData, (bytes[]));
         BalanceDelta delta = abi.decode(results[0], (BalanceDelta));
