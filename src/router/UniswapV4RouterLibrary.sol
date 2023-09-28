@@ -91,7 +91,7 @@ library UniswapV4RouterLibrary {
         results = router.process(calls);
     }
 
-    function addLiquidityCallback(bytes memory callData, bytes memory resultData) external {
+    function addLiquidityCallback(bytes calldata callData, bytes calldata resultData) external {
         (IERC20Minimal token, address sender, address recipient, bool zeroToken) =
             abi.decode(callData, (IERC20Minimal, address, address, bool));
 
@@ -135,7 +135,7 @@ library UniswapV4RouterLibrary {
         results = router.process(calls);
     }
 
-    function removeLiquidityCallback(bytes memory callData, bytes memory resultData) external {
+    function removeLiquidityCallback(bytes calldata callData, bytes calldata resultData) external {
         (IPoolManager poolManager, Currency currency0, Currency currency1, address recipient) =
             abi.decode(callData, (IPoolManager, Currency, Currency, address));
 
@@ -202,7 +202,7 @@ library UniswapV4RouterLibrary {
         results = router.process(calls);
     }
 
-    function swapCallback(bytes memory callData, bytes memory resultData) external {
+    function swapCallback(bytes calldata callData, bytes calldata resultData) external {
         (IPoolManager poolManager, Currency currency, address recipient, bool zeroForOne) =
             abi.decode(callData, (IPoolManager, Currency, address, bool));
 
@@ -271,7 +271,7 @@ library UniswapV4RouterLibrary {
         results = router.process(calls);
     }
 
-    function swapManagerTokensCallback(bytes memory callData, bytes memory resultData) external {
+    function swapManagerTokensCallback(bytes calldata callData, bytes calldata resultData) external {
         (IPoolManager poolManager, Currency currency, address recipient, bool zeroForOne) =
             abi.decode(callData, (IPoolManager, Currency, address, bool));
 

@@ -36,7 +36,7 @@ contract UniswapV4Caller {
         results = router.addLiquidity(address(this), manager, poolKey, sender, tickLower, tickUpper, liquidityAmount);
     }
 
-    function addLiquidityCallback(bytes memory callData, bytes memory resultData) external {
+    function addLiquidityCallback(bytes calldata callData, bytes calldata resultData) external {
         UniswapV4RouterLibrary.addLiquidityCallback(callData, resultData);
     }
 
@@ -51,7 +51,7 @@ contract UniswapV4Caller {
             router.removeLiquidity(address(this), manager, poolKey, recipient, tickLower, tickUpper, liquidityAmount);
     }
 
-    function removeLiquidityCallback(bytes memory callData, bytes memory resultData) external {
+    function removeLiquidityCallback(bytes calldata callData, bytes calldata resultData) external {
         UniswapV4RouterLibrary.removeLiquidityCallback(callData, resultData);
     }
 
@@ -62,7 +62,7 @@ contract UniswapV4Caller {
         results = router.swap(address(this), manager, poolKey, swapper, recipient, fromCurrency, swapAmount);
     }
 
-    function swapCallback(bytes memory callData, bytes memory resultData) external {
+    function swapCallback(bytes calldata callData, bytes calldata resultData) external {
         UniswapV4RouterLibrary.swapCallback(callData, resultData);
     }
 
@@ -79,7 +79,7 @@ contract UniswapV4Caller {
         caller = address(1);
     }
 
-    function swapManagerTokensCallback(bytes memory callData, bytes memory resultData) external {
+    function swapManagerTokensCallback(bytes calldata callData, bytes calldata resultData) external {
         UniswapV4RouterLibrary.swapManagerTokensCallback(callData, resultData);
     }
 
